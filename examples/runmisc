@@ -1,0 +1,27 @@
+./exsm -m ../data/$1.mesh << EOF
+2 2 1 1 0 2 10 200 0
+EOF
+./exsm -m ../data/$1.mesh << EOF
+2 2 2 1 0 2 10 200 1
+EOF
+./exsm -m ../data/$1.mesh << EOF
+2 2 3 1 0 2 10 200 1
+EOF
+./exsm -m ../data/$1.mesh << EOF
+2 2 1 2 0 2 10 200 1
+EOF
+./exsm -m ../data/$1.mesh << EOF
+2 2 2 2 0 2 10 200 1
+EOF
+./exsm -m ../data/$1.mesh << EOF
+2 2 3 2 0 2 10 200 1
+EOF
+./exsm -m ../data/$1.mesh << EOF
+2 2 1 7 0 2 10 200 1
+EOF
+./exsm -m ../data/$1.mesh << EOF
+2 2 2 7 0 2 10 200 1
+EOF
+./exsm -m ../data/$1.mesh << EOF
+2 2 3 7 0 2 10 200 1
+EOF

@@ -44,6 +44,10 @@ public:
     virtual ~VectorMeshLaplacianIntegrator() { }
 };
 
+
+
+
+
 // 2. Implement the local stiffness matrix of the mesh Laplacian. This is a
 //    block-diagonal matrix with each block having a unit diagonal and constant
 //    negative off-diagonal entries, such that the row sums are zero.
@@ -81,6 +85,189 @@ void VectorMeshLaplacianIntegrator::AssembleElementMatrix(
         T.ElementNo = Trans.ElementNo;
         vdiff.AssembleElementMatrix(el, T, elmat);
     }
+}
+
+class RelaxedNewtonSolver : public IterativeSolver
+{
+protected:
+    mutable Vector r, c;
+public:
+    RelaxedNewtonSolver() { }
+    
+#ifdef MFEM_USE_MPI
+    RelaxedNewtonSolver(MPI_Comm _comm) : IterativeSolver(_comm) { }
+#endif
+        virtual void SetOperator(const Operator &op);
+    
+        virtual void SetSolver(Solver &solver) { prec = &solver; }
+    
+        virtual void Mult(const Vector &b, Vector &x) const;
+    
+        virtual void Mult2(const Vector &b, Vector &x,
+                      const Mesh &mesh, const IntegrationRule &ir, int *itnums) const;
+    
+    
+};
+
+void RelaxedNewtonSolver::SetOperator(const Operator &op)
+{
+    oper = &op;
+    height = op.Height();
+    width = op.Width();
+    MFEM_ASSERT(height == width, "square Operator is required.");
+    
+    r.SetSize(width);
+    c.SetSize(width);
+}
+
+void RelaxedNewtonSolver::Mult(const Vector &b, Vector &x) const
+{
+    return;
+}
+
+void RelaxedNewtonSolver::Mult2(const Vector &b, Vector &x,
+                                const Mesh &mesh, const IntegrationRule &ir, int *itnums) const
+{
+    MFEM_ASSERT(oper != NULL, "the Operator is not set (use SetOperator).");
+    MFEM_ASSERT(prec != NULL, "the Solver is not set (use SetSolver).");
+    
+    int it;
+    double norm, norm_goal;
+    bool have_b = (b.Size() == Height());
+    
+    if (!iterative_mode)
+    {
+        x = 0.0;
+    }
+    
+    oper->Mult(x, r);
+    if (have_b)
+    {
+        r -= b;
+    }
+    
+    norm = Norm(r);
+    norm_goal = std::max(rel_tol*norm, abs_tol);
+    
+    prec->iterative_mode = false;
+    
+    // x_{i+1} = x_i - [DF(x_i)]^{-1} [F(x_i)-b]
+    for (it = 0; true; it++)
+    {
+        MFEM_ASSERT(IsFinite(norm), "norm = " << norm);
+        if (print_level >= 0)
+            cout << "Newton iteration " << setw(2) << it
+            << " : ||r|| = " << norm << '\n';
+        
+        if (norm <= norm_goal)
+        {
+            converged = 1;
+            break;
+        }
+        
+        
+        if (it >= max_iter)
+        {
+            converged = 0;
+            break;
+        }
+        
+        prec->SetOperator(oper->GetGradient(x));
+        
+        prec->Mult(r, c);  // c = [DF(x_i)]^{-1} [F(x_i)-b]
+        
+        
+        //k10 some changes
+        const int NE = mesh.GetNE();
+        const GridFunction &nodes = *mesh.GetNodes();
+        
+    
+        Array<int> dofs;
+        Vector xsav = x; //create a copy of x
+        Vector csav = c;
+        int tchk = 0;
+        int iters = 0;
+        double alpha = 1.;
+        int jachk = 1;
+        
+        while (tchk !=1 && iters < 20)
+        {
+            iters += 1;
+            cout << "number of iters is " << iters << "\n";
+            jachk = 1;
+            c = csav;
+            x = xsav;
+            add (xsav,-alpha,csav,x);
+            for (int i = 0; i < NE; i++)
+            {
+                const FiniteElement &fe = *nodes.FESpace()->GetFE(i);
+                const int dim = fe.GetDim(), nsp = ir.GetNPoints(),
+                dof = fe.GetDof();
+                
+
+                
+                //cout << dof << " " << dim << " " << nsp << " dof,dim,nsp-k10\n";
+                
+                DenseTensor Jtr(dim, dim, nsp);
+                
+                const GridFunction *nds;
+                nds = &nodes;
+                
+                DenseMatrix dshape(dof, dim), pos(dof, dim);
+                Array<int> xdofs(dof * dim);
+                Vector posV(pos.Data(), dof * dim);
+                
+                //cout << "element number " << i << "\n";
+                
+                nds->FESpace()->GetElementVDofs(i, xdofs);
+                nds->GetSubVector(xdofs, posV);
+                for (int j = 0; j < nsp; j++)
+                {
+                    //cout << "point number " << j << "\n";
+                    fe.CalcDShape(ir.IntPoint(j), dshape);
+                    MultAtB(pos, dshape, Jtr(j));
+                    double det = Jtr(j).Det();
+                    if (det<=0.)
+                    {
+                        jachk *= 0;
+                    }
+                    //cout << i << " " << j << " "<< det << " \n";
+                }
+            }
+            
+            if (jachk==0)
+            {
+                alpha *= 0.5;
+                cout << "some element became inverted..reducing alpha\n";
+            }
+            else
+            {
+                tchk = 1;
+            }
+            
+            
+        }
+        
+        
+        if (jachk==0)
+        {
+            alpha =0;
+        }
+        
+        add (xsav,-alpha,csav,x);
+        
+        //k10
+        oper->Mult(x, r);
+        if (have_b)
+        {
+            r -= b;
+        }
+        norm = Norm(r);
+    }
+    
+    final_iter = it;
+    final_norm = norm;
+    *itnums = final_iter;
 }
 
 
@@ -208,16 +395,10 @@ int main (int argc, char *argv[])
     char vishost[] = "localhost";
     int  visport   = 19916;
     int  ans;
-    vector<double> logvec (10);
+    vector<double> logvec (100);
     
     
     bool dump_iterations = false;
-    
-    if (argc == 1)
-    {
-        cout << "Usage: exsm <mesh_file>" << endl;
-        return 1;
-    }
     
     // 3. Read the mesh from the given mesh file. We can handle triangular,
     //    quadrilateral, tetrahedral or hexahedral elements with the same code.
@@ -244,9 +425,9 @@ int main (int argc, char *argv[])
         return 1;
     }
     args.PrintOptions(cout);
-    
+    cout << mesh_file << " about to read a mesh file\n";
     mesh = new Mesh(mesh_file, 1, 1);
-    
+    cout << "read a mesh file\n";
     
     int dim = mesh->Dimension();
     
@@ -266,6 +447,7 @@ int main (int argc, char *argv[])
         
         logvec[0]=ref_levels;
     }
+        cout << "refinements specified\n";
     
     // 5. Define a finite element space on the mesh. Here we use vector finite
     //    elements which are tensor products of quadratic finite elements. The
@@ -399,14 +581,6 @@ int main (int argc, char *argv[])
     k10*/
     
     int smoother = 1;
-    /* k10commenting this because the smoother is only Hyperelastic in this file
-    cout <<
-    "Select smoother:\n"
-    "1) Hyperelastic model\n"
-    "2) TMOP\n"
-    " --> " << flush;
-    cin >> smoother;
-     */
     
     // 14. Simple mesh smoothing can be performed by relaxing the node coordinate
     //     grid function x with the matrix A and right-hand side b. This process
@@ -493,13 +667,16 @@ int main (int argc, char *argv[])
         logvec[2]=tjtype;
         logvec[3]=modeltype;
         
+        
         tj->SetNodes(*x);
         tj->SetInitialNodes(x0);
         HyperelasticNLFIntegrator *he_nlf_integ;
         he_nlf_integ = new HyperelasticNLFIntegrator(model, tj);
         
         const IntegrationRule *ir =
-        &IntRulesLo.Get(fespace->GetFE(0)->GetGeomType(), 8);
+        &IntRulesLo.Get(fespace->GetFE(0)->GetGeomType(), 8); //k10
+        cout << ir->GetNPoints() << " k10 integration points\n";
+        cout << logvec[1] << " k10integration order\n";
         he_nlf_integ->SetIntegrationRule(*ir);
         
         //c = new ConstantCoefficient(0.5);
@@ -515,11 +692,6 @@ int main (int argc, char *argv[])
         metric.Save(sol_sock2);
         sol_sock2.send();
         sol_sock2 << "keys " << "JREM" << endl;
-        
-        //osockstream sol_sock(visport, vishost);
-        //metric.Save(sol_sock);
-        //sol_sock << "keys M";
-        //sol_sock.send();
         
         
         NonlinearForm a(fespace);
@@ -561,49 +733,6 @@ int main (int argc, char *argv[])
         }
         a.SetEssentialVDofs(ess_vdofs);
         
-        // Check attribute numbers, arc lengths, coordinates.
-        /*
-         GridFunction &X = *x;
-         for (int i = 0; i < mesh->GetNBE(); i++)
-         {
-         x->FESpace()->GetBdrElementVDofs(i, vdofs);
-         int a = mesh->GetBdrElement(i)->GetAttribute();
-         
-         cout << "BE " << i << " with attr " << a << ": " << endl;
-         int nd = vdofs.Size()/2;
-         for (int j = 0; j < nd; j++)
-         {
-         if (a == 8)
-         {
-         cout << "-- Node " << j
-         << ": x = " << X(vdofs[j])
-         << ", y = " << X(vdofs[j+nd])
-         << ", r-0.3 = " << 0.3 - sqrt(X(vdofs[j]) * X(vdofs[j]) +
-         X(vdofs[j+nd]) * X(vdofs[j+nd]))
-         << endl;
-         }
-         }
-         if (a == 8)
-         {
-         const double dx02 = X(vdofs[0]) - X(vdofs[2]);
-         const double dy02 = X(vdofs[0 + nd]) - X(vdofs[2 + nd]);
-         cout << "-- Distance 0 2: "
-         << sqrt( dx02 * dx02 + dy02 * dy02 ) << endl;
-         
-         const double dx12 = X(vdofs[1]) - X(vdofs[2]);
-         const double dy12 = X(vdofs[1 + nd]) - X(vdofs[2 + nd]);
-         cout << "-- Distance 1 2: "
-         << sqrt( dx12 * dx12 + dy12 * dy12 ) << endl;
-         
-         
-         const double dx01 = X(vdofs[0]) - X(vdofs[1]);
-         const double dy01 = X(vdofs[0 + nd]) - X(vdofs[1 + nd]);
-         cout << "-- Distance 0 1: "
-         << sqrt( dx01 * dx01 + dy01 * dy01 ) << endl;
-         }
-         cout << endl;
-         }
-         */
         
         // Fix all boundary nodes.
         //k10partbegin
@@ -669,7 +798,9 @@ int main (int argc, char *argv[])
         logvec[8]=a.GetEnergy(*x);
         
         // note: (*x) are the mesh nodes
-        NewtonSolver *newt= new NewtonSolver;
+        int newtonits = 0;
+        RelaxedNewtonSolver *newt= new RelaxedNewtonSolver;
+        //NewtonSolver *newt= new NewtonSolver;
         newt->SetPreconditioner(*S);
         newt->SetMaxIter(ans);
         newt->SetRelTol(rtol);
@@ -677,14 +808,18 @@ int main (int argc, char *argv[])
         newt->SetPrintLevel(1);
         newt->SetOperator(a);
         Vector b;
-        newt->Mult(b, *x);
+        newt->Mult2(b, *x, *mesh, *ir, &newtonits );
+        //newt->Mult(b, *x);
         
         if (!newt->GetConverged())
             cout << "NewtonIteration : rtol = " << rtol << " not achieved."
             << endl;
-        
-        cout << "Final strain energy   : " << a.GetEnergy(*x) << endl;
         logvec[9]=a.GetEnergy(*x);
+        cout << "Final strain energy   : " << a.GetEnergy(*x) << endl;
+        cout << "Initial strain energy was  : " << logvec[8] << endl;
+        cout << "% change is  : " << (logvec[8]-logvec[9])*100/logvec[8] << endl;
+        logvec[10] = (logvec[8]-logvec[9])*100/logvec[8];
+        logvec[11] = newtonits;
         
         if (tj)
         {
@@ -719,42 +854,14 @@ int main (int argc, char *argv[])
         mesh_ofs.precision(14);
         mesh->Print(mesh_ofs);
     }
-    // save subdivided VTK mesh?
-    /* k10 commenting this stuff for testing
-    if (1)
-    {
-        cout << "Enter VTK mesh subdivision factor or 0 to skip --> " << flush;
-        cin >> ans;
-        if (ans > 0)
-        {
-            ofstream vtk_mesh("smoothed.vtk");
-            vtk_mesh.precision(8);
-            mesh->PrintVTK(vtk_mesh, ans);
-        }
-    }
-     
     
-    
-    // 16. (Optional) Send the relaxed mesh with the vector field representing
-    //     the displacements to the perturbed mesh by socket to a GLVis server.
-    cout << "Visualize the smoothed mesh? [0/1] --> ";
-    cin >> ans;
-    if (ans)
-    {
-        osockstream sol_sock(visport, vishost);
-        sol_sock << "solution\n";
-        mesh->Print(sol_sock);
-        x0.Save(sol_sock);
-        sol_sock.send();
-    }
-    */
     // 17. Free the used memory.
     delete fespace;
     delete fec;
     delete mesh;
 
     // write log to text file-k10
-    /*
+    
     cout << "How do you want to write log to a new file:\n"
     "0) New file\n"
     "1) Append\n" << " --> " << flush;
@@ -771,12 +878,12 @@ int main (int argc, char *argv[])
         outputFile << "\n" << mesh_file << " ";
     }
     
-    for (int i=0;i<10;i++)
+    for (int i=0;i<12;i++)
     {
         outputFile << logvec[i] << " ";
     }
     outputFile.close();
-     */
+    
     // puase 1 second.. this is because X11 can restart if you push stuff too soon
     usleep(1000000);
     //k10 end
