@@ -1,0 +1,3 @@
+./exsm -m ../data/tangsq2.mesh << EOF
+0 1 2 204 0 2 10 40 0
+EOF
