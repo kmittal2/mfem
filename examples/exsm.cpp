@@ -215,7 +215,8 @@ public:
         virtual void Mult(const Vector &b, Vector &x) const;
     
         virtual void Mult2(const Vector &b, Vector &x,
-                      const Mesh &mesh, const IntegrationRule &ir, int *itnums) const;
+                      const Mesh &mesh, const IntegrationRule &ir,
+                           int *itnums, const NonlinearForm &nlf) const;
     
     
 };
@@ -238,7 +239,7 @@ void RelaxedNewtonSolver::Mult(const Vector &b, Vector &x) const
 
 void RelaxedNewtonSolver::Mult2(const Vector &b, Vector &x,
                                 const Mesh &mesh, const IntegrationRule &ir,
-                                int *itnums) const
+                                int *itnums, const NonlinearForm &nlf) const
 {
     MFEM_ASSERT(oper != NULL, "the Operator is not set (use SetOperator).");
     MFEM_ASSERT(prec != NULL, "the Solver is not set (use SetSolver).");
@@ -301,15 +302,24 @@ void RelaxedNewtonSolver::Mult2(const Vector &b, Vector &x,
         int iters = 0;
         double alpha = 1.;
         int jachk = 1;
+        double initenergy = 0.0;
+        double finenergy = 0.0;
+        double nanchk;
+        
+        
+        initenergy =nlf.GetEnergy(x);
         
         while (tchk !=1 && iters < 20)
         {
             iters += 1;
-            cout << "number of iters is " << iters << "\n";
+            //cout << "number of iters is " << iters << "\n";
             jachk = 1;
             c = csav;
             x = xsav;
             add (xsav,-alpha,csav,x);
+            finenergy = nlf.GetEnergy(x);
+            nanchk = isnan(finenergy);
+            
             for (int i = 0; i < NE; i++)
             {
                 const FiniteElement &fe = *nodes.FESpace()->GetFE(i);
@@ -347,10 +357,13 @@ void RelaxedNewtonSolver::Mult2(const Vector &b, Vector &x,
                 }
             }
             
-            if (jachk==0)
+            
+            if (finenergy>initenergy || nanchk!=0 || jachk==0)
+            //if (jachk==0)
             {
+                tchk = 0;
                 alpha *= 0.5;
-                cout << "some element became inverted..reducing alpha\n";
+                //cout << "some element became inverted..reducing alpha\n";
             }
             else
             {
@@ -358,10 +371,13 @@ void RelaxedNewtonSolver::Mult2(const Vector &b, Vector &x,
             }
             
             
+            
         }
         
+        cout << initenergy << " " << finenergy <<  " initial and final value\n";
+        cout << "alpha value is " << alpha << " \n";
         
-        if (jachk==0)
+        if (tchk==0)
         {
             alpha =0;
         }
@@ -512,11 +528,11 @@ void DescentNewtonSolver::Mult2(const Vector &b, Vector &x,
         }
         if (tauval>0)
         {
-            tauval = 1e-2;
+            tauval = 1e-4;
         }
         else
         {
-            tauval -= 0.001;
+            tauval -= 1e-2;
         }
         cout << "the determine tauval is " << tauval << "\n";
         ////
@@ -578,7 +594,7 @@ void DescentNewtonSolver::Mult2(const Vector &b, Vector &x,
             }
             //
             
-            if (finenergy>initenergy || nanchk!=0 || nelinvnew > nelinvorig)
+            if (finenergy>initenergy || nanchk!=0) //|| nelinvnew > nelinvorig)
             {
                 alpha *= 0.1;
             }
@@ -639,7 +655,7 @@ public:
     
 };
 
-//M201 = (I1I2 - 2*I2) / (2I2-2*Beta)
+//M022 = (I1I2 - 2*I2) / (2I2-2*Beta)
 double TMOPHyperelasticModel022::EvalW(const DenseMatrix &Jpt) const
 {
     const double I1 = Dim2Invariant1(Jpt), I2 = Dim2Invariant2(Jpt);
@@ -711,248 +727,7 @@ void TMOPHyperelasticModel022::AssembleH(const DenseMatrix &Jpt,
 }
 
 
-
-// Metric 200
-class TMOPHyperelasticModel200 : public HyperelasticModel
-{
-public:
-    virtual double EvalW(const DenseMatrix &Jpt) const;
-    
-    virtual void EvalP(const DenseMatrix &Jpt, DenseMatrix &P) const;
-    
-    virtual void AssembleH(const DenseMatrix &Jpt, const DenseMatrix &DS,
-                           const double weight, DenseMatrix &A) const;
-};
-
-//M201 = - mu/(I2) and mu = 0 if I2 > 0 i.e. if element is valid
-double TMOPHyperelasticModel200::EvalW(const DenseMatrix &Jpt) const
-{
-    double det = Dim2Invariant2(Jpt);
-    double mu = 1e+20;
-    //cout << det << " k10 det\n";
-    if (det > 0.0) {mu=0.;}
-    //cout << det << " " << mu << " k10det and mu\n";
-    //cout << sumres << " k10 metric value\n";
-    return  0.- mu/(det);
-}
-
-void TMOPHyperelasticModel200::EvalP(const DenseMatrix &Jpt,
-                                     DenseMatrix &P) const
-{
-    double det = Dim2Invariant2(Jpt);
-    double mu = 1e+20;
-    if (det > 0.0) {mu=0.; }
-    
-    Dim2Invariant2_dM(Jpt, P); //DI2/DM
-    P *= mu/(det*det);       //(mu/det^2)*DI2/DM
-    
-}
-
-void TMOPHyperelasticModel200::AssembleH(const DenseMatrix &Jpt,
-                                         const DenseMatrix &DS,
-                                         const double weight,
-                                         DenseMatrix &A) const
-{
-    const int dof = DS.Height(), dim = DS.Width();
-    const double I1 = Dim2Invariant1(Jpt), I2 = Dim2Invariant2(Jpt);
-    DenseMatrix dI1_dM(dim), dI1_dMdM(dim), dI2_dM(dim), dI2_dMdM(dim);
-    Dim2Invariant1_dM(Jpt, dI1_dM);
-    Dim2Invariant2_dM(Jpt, dI2_dM);
-    double mu = 1e+20;
-    if (I2 > 0.0) {mu=0.; }
-    
-    for (int r = 0; r < dim; r++)
-        for (int c = 0; c < dim; c++)
-        {
-            Dim2Invariant1_dMdM(Jpt, r, c, dI1_dMdM);
-            Dim2Invariant2_dMdM(Jpt, r, c, dI2_dMdM);
-            // Compute each entry of d(Grc)_dJ.
-            for (int rr = 0; rr < dim; rr++)
-            {
-                for (int cc = 0; cc < dim; cc++)
-                {
-                    const double entry_rr_cc = // This stuff from 001
-                    -2*(mu/(I2*I2*I2))*dI2_dM(rr,cc)*dI2_dM(r,c) + //-2*(mu/I3^3)*(DI2/DM)*(DI2/DM)
-                    (mu/(I2*I2))*dI2_dMdM(rr,cc); // + (mu/I2^2)*D2I2/DM^2
-                    
-                    for (int i = 0; i < dof; i++)
-                        for (int j = 0; j < dof; j++)
-                        {
-                            A(i+r*dof, j+rr*dof) +=
-                            weight * DS(i, c) * DS(j, cc) * entry_rr_cc;
-                        }
-                }
-            }
-        }
-}
-
-
-
-//Metric 201
-class TMOPHyperelasticModel201 : public HyperelasticModel
-{
-public:
-    virtual double EvalW(const DenseMatrix &Jpt) const;
-    
-    virtual void EvalP(const DenseMatrix &Jpt, DenseMatrix &P) const;
-    
-    virtual void AssembleH(const DenseMatrix &Jpt, const DenseMatrix &DS,
-                           const double weight, DenseMatrix &A) const;
-};
-
-//M201 = I1*I2 - mu/(I2) and mu = 0 if I2 > 0 i.e. if element is valid
-double TMOPHyperelasticModel201::EvalW(const DenseMatrix &Jpt) const
-{
-    double det = Dim2Invariant2(Jpt);
-    double mu = 1e+20;
-    //cout << det << " k10 det\n";
-    if (det > 0.0) {mu=0.;}
-    //cout << det << " " << mu << " k10det and mu\n";
-    double sumres = Dim2Invariant1(Jpt) * Dim2Invariant2(Jpt) - mu/(det);
-    //cout << sumres << " k10 metric value\n";
-    return Dim2Invariant1(Jpt) * Dim2Invariant2(Jpt) - mu/(det);
-}
-
-void TMOPHyperelasticModel201::EvalP(const DenseMatrix &Jpt,
-                                     DenseMatrix &P) const
-{
-    double det = Dim2Invariant2(Jpt);
-    double mu = 1e+20;
-    if (det > 0.0) {mu=0.; }
-    
-    Dim2Invariant1_dM(Jpt, P); //DI1/DM
-    P *= Dim2Invariant2(Jpt);  // I2*DI1/DM
-    
-    DenseMatrix PP(P.Size());
-    Dim2Invariant2_dM(Jpt, PP); //DI2/DM
-    PP *= Dim2Invariant1(Jpt);  //I1*DI2/DM
-    
-    DenseMatrix PPP(P.Size());
-    Dim2Invariant2_dM(Jpt, PPP); //DI2/DM
-    PPP *= mu/(det*det);         //(mu/det^2)*DI2/DM
-    
-    P += PP;
-    P += PPP;
-}
-
-void TMOPHyperelasticModel201::AssembleH(const DenseMatrix &Jpt,
-                                         const DenseMatrix &DS,
-                                         const double weight,
-                                         DenseMatrix &A) const
-{
-    const int dof = DS.Height(), dim = DS.Width();
-    const double I1 = Dim2Invariant1(Jpt), I2 = Dim2Invariant2(Jpt);
-    DenseMatrix dI1_dM(dim), dI1_dMdM(dim), dI2_dM(dim), dI2_dMdM(dim);
-    Dim2Invariant1_dM(Jpt, dI1_dM);
-    Dim2Invariant2_dM(Jpt, dI2_dM);
-    double mu = 1e+20;
-    if (I2 > 0.0) {mu=0.; }
-    
-    for (int r = 0; r < dim; r++)
-        for (int c = 0; c < dim; c++)
-        {
-            Dim2Invariant1_dMdM(Jpt, r, c, dI1_dMdM);
-            Dim2Invariant2_dMdM(Jpt, r, c, dI2_dMdM);
-            // Compute each entry of d(Grc)_dJ.
-            for (int rr = 0; rr < dim; rr++)
-            {
-                for (int cc = 0; cc < dim; cc++)
-                {
-                    const double entry_rr_cc =
-                    dI1_dMdM(rr,cc) * I2 +
-                    dI1_dM(r, c)    * dI2_dM(rr,cc) +
-                    dI2_dMdM(rr,cc) * I1 +
-                    dI2_dM(r, c)    * dI1_dM(rr,cc) - // This stuff from 001
-                    2*(mu/(I2*I2*I2))*dI2_dM(rr,cc)*dI2_dM(r,c) + //-2*(mu/I3^3)*(DI2/DM)*(DI2/DM)
-                    (mu/(I2*I2))*dI2_dMdM(rr,cc); // + (mu/I2^2)*D2I2/DM^2
-                    
-                    for (int i = 0; i < dof; i++)
-                        for (int j = 0; j < dof; j++)
-                        {
-                            A(i+r*dof, j+rr*dof) +=
-                            weight * DS(i, c) * DS(j, cc) * entry_rr_cc;
-                        }
-                }
-            }
-        }
-}
-
-// Metric 204
-class TMOPHyperelasticModel204 : public HyperelasticModel
-{
-public:
-    virtual double EvalW(const DenseMatrix &Jpt) const;
-    
-    virtual void EvalP(const DenseMatrix &Jpt, DenseMatrix &P) const;
-    
-    virtual void AssembleH(const DenseMatrix &Jpt, const DenseMatrix &DS,
-                           const double weight, DenseMatrix &A) const;
-};
-
-//M204 = -I2 + sqrt(I2^2+beta) and beta = 0.0001
-double TMOPHyperelasticModel204::EvalW(const DenseMatrix &Jpt) const
-{
-    double det = Dim2Invariant2(Jpt);
-    double beta = 1e-4;
-    //cout << det << " " << -det + sqrt(det*det + beta) << " k10 det\n";
-    //cout << -det  << " k10 det\n";
-    return  -det + sqrt(det*det + beta);
-}
-
-void TMOPHyperelasticModel204::EvalP(const DenseMatrix &Jpt,
-                                     DenseMatrix &P) const
-{
-    double det = Dim2Invariant2(Jpt);
-    double beta = 1e-4;
-    double alpha = det/sqrt(det*det+beta);
-
-    Dim2Invariant2_dM(Jpt, P);     //DI2/DM
-    P *= (alpha-1.0);                //(alpha)*DI2/DM
-    //cout << det << " "<< alpha << " " << det*det+beta <<  " k10alpha\n";
-}
-
-void TMOPHyperelasticModel204::AssembleH(const DenseMatrix &Jpt,
-                                         const DenseMatrix &DS,
-                                         const double weight,
-                                         DenseMatrix &A) const
-{
-    const int dof = DS.Height(), dim = DS.Width();
-    const double I2 = Dim2Invariant2(Jpt);
-    DenseMatrix dI2_dM(dim), dI2_dMdM(dim);
-    Dim2Invariant2_dM(Jpt, dI2_dM);
-    double det = I2;
-    double beta = 1e-4;
-    double alpha = det/sqrt(det*det+beta);
-    double alpha2 = pow(det*det+beta,1.5);
-    
-    for (int r = 0; r < dim; r++)
-        for (int c = 0; c < dim; c++)
-        {
-            Dim2Invariant2_dMdM(Jpt, r, c, dI2_dMdM);
-            // Compute each entry of d(Grc)_dJ.
-            for (int rr = 0; rr < dim; rr++)
-            {
-                for (int cc = 0; cc < dim; cc++)
-                {
-                    const double entry_rr_cc =
-                    -dI2_dMdM(rr,cc) + alpha*dI2_dMdM(rr,cc) +
-                    dI2_dM(rr,cc)*dI2_dM(r,c)*1/(sqrt(det*det+beta))+
-                    (I2*dI2_dM(r,c))*(-I2/alpha2)*dI2_dM(rr,cc);
-                    
-                    
-                    
-                    for (int i = 0; i < dof; i++)
-                        for (int j = 0; j < dof; j++)
-                        {
-                            A(i+r*dof, j+rr*dof) +=
-                            weight * DS(i, c) * DS(j, cc) * entry_rr_cc;
-                        }
-                }
-            }
-        }
-}
-
-// Metric 211 (I2-1)^2 - (I2 + sqrt(I2^2 + beta))
+// Metric 211 (I2-1)^2 + (-I2 + sqrt(I2^2 + beta))
 class TMOPHyperelasticModel211 : public HyperelasticModel
 {
 public:
@@ -964,7 +739,7 @@ public:
                            const double weight, DenseMatrix &A) const;
 };
 
-//Metric 211 (I2-1)^2 - (I2 + sqrt(I2^2 + beta))
+//Metric 211 (I2-1)^2 + (-I2 + sqrt(I2^2 + beta))
 double TMOPHyperelasticModel211::EvalW(const DenseMatrix &Jpt) const
 {
     double det = Dim2Invariant2(Jpt);
@@ -1171,13 +946,13 @@ int main (int argc, char *argv[])
     //     The latter is based on the DofToVDof() method which maps the scalar to
     //     the vector degrees of freedom in fespace.
     GridFunction rdm(fespace);
-    double jitter = 0.; // perturbation scaling factor
+    double jitter = 0.0; // perturbation scaling factor
     /* k10commenting this for input
     cout << "Enter jitter --> " << flush;
     cin >> jitter;
     */
     rdm.Randomize();
-    rdm -= 0.5; // shift to random values in [-0.5,0.5]
+    rdm -= 0.2; // shift to random values in [-0.5,0.5]
     rdm *= jitter;
     {
         // scale the random values to be of order of the local mesh size
@@ -1237,7 +1012,7 @@ int main (int argc, char *argv[])
     GridFunction x0(fespace);
     x0 = *x;
     
-    L2_FECollection mfec(3, mesh->Dimension(), BasisType::GaussLobatto); //this for vis
+    L2_FECollection mfec(mesh_poly_deg, mesh->Dimension(), BasisType::GaussLobatto); //this for vis
     FiniteElementSpace mfes(mesh, &mfec, 1);
     GridFunction metric(&mfes);
     
@@ -1290,12 +1065,6 @@ int main (int argc, char *argv[])
         << "     shape+size.\n"
         << "22  : |T|^2 - 2*tau / (2*tau - 2*tau_0)\n"
         << "     untangling.\n"
-        << "200  : - mu/tau\n"
-        << "     untangling.\n"
-        << "201  : |T|^2 - mu/tau\n"
-        << "     shape + untangling.\n"
-        << "204  : -tau + sqrt(tau^2+beta)\n"
-        << "      untangling.\n"
         << "211  : (tau-1)^2 - tau + sqrt(tau^2+beta)\n"
         << "      untangling.\n"
         " --> " << flush;
@@ -1305,35 +1074,27 @@ int main (int argc, char *argv[])
         if (modeltype == 1)
         {
             model = new TMOPHyperelasticModel001;
+            cout << " you chose metric 1 \n";
         }
         else if (modeltype == 2)
         {
             model = new TMOPHyperelasticModel002;
+            cout << " you chose metric 2 \n";
         }
         else if (modeltype == 7)
         {
             model = new TMOPHyperelasticModel007;
+            cout << " you chose metric 7 \n";
         }
         else if (modeltype == 22)
         {
             model = new TMOPHyperelasticModel022(tauval);
-            cout << " you chose 22 metric \n";
-        }
-        else if (modeltype == 200)
-        {
-            model = new TMOPHyperelasticModel201;
-        }
-        else if (modeltype == 201)
-        {
-            model = new TMOPHyperelasticModel201;
-        }
-        else if (modeltype == 204)
-        {
-            model = new TMOPHyperelasticModel204;
+            cout << " you chose metric 22\n";
         }
         else if (modeltype == 211)
         {
             model = new TMOPHyperelasticModel211;
+            cout << " you chose metric 211 \n";
         }
         else
         {
@@ -1351,9 +1112,17 @@ int main (int argc, char *argv[])
         HyperelasticNLFIntegrator *he_nlf_integ;
         he_nlf_integ = new HyperelasticNLFIntegrator(model, tj);
         
+        ///*
         const IntegrationRule *ir =
-        &IntRulesLo.Get(fespace->GetFE(0)->GetGeomType(), 8); //this for metric
+        &IntRulesLo.Get(fespace->GetFE(0)->GetGeomType(),5); //this for metric
         he_nlf_integ->SetIntegrationRule(*ir);
+        */
+        
+        /*
+        const IntegrationRule *ir =
+        &IntRulesCU.Get(fespace->GetFE(0)->GetGeomType(),5); //this for metric
+        he_nlf_integ->SetIntegrationRule(*ir);
+        */
         
         //c = new ConstantCoefficient(0.5);
         //he_nlf_integ->SetCoefficient(*c);
@@ -1411,7 +1180,6 @@ int main (int argc, char *argv[])
         
         
         // Fix all boundary nodes.
-        //k10partbegin
         int bndrflag;
         cout <<
         "Allow boundary node movement:\n"
@@ -1475,10 +1243,11 @@ int main (int argc, char *argv[])
         
         // save original
         Vector xsav = *x;
-        //set value of tau_0 for metric 22
+        //set value of tau_0 for metric 22 and get min jacobian for mesh statistic
         //
         Array<int> dofs;
         tauval = 1e+6;
+        double minjaco;
         const int NE = mesh->GetNE();
         const GridFunction &nodes = *mesh->GetNodes();
         for (int i = 0; i < NE; i++)
@@ -1504,6 +1273,7 @@ int main (int argc, char *argv[])
                 tauval = min(tauval,det);
             }
         }
+        minjaco = tauval;
         
         int newtonits = 0;
         if (tauval>0)
@@ -1517,14 +1287,17 @@ int main (int argc, char *argv[])
             newt->SetPrintLevel(1);
             newt->SetOperator(a);
             Vector b;
-            newt->Mult2(b, *x, *mesh, *ir, &newtonits );
+            cout << " Relaxed newton solver will be user \n";
+            newt->Mult2(b, *x, *mesh, *ir, &newtonits, a );
             if (!newt->GetConverged())
                 cout << "NewtonIteration : rtol = " << rtol << " not achieved."
                 << endl;
         }
         else
         {
-            tauval -= 0.015;
+            model = new TMOPHyperelasticModel022(tauval);
+            cout << "model 22 will be used since mesh has negative jacobians\n";
+            tauval -= 100;
             DescentNewtonSolver *newt= new DescentNewtonSolver;
             newt->SetPreconditioner(*S);
             newt->SetMaxIter(ans);
@@ -1533,6 +1306,8 @@ int main (int argc, char *argv[])
             newt->SetPrintLevel(1);
             newt->SetOperator(a);
             Vector b;
+            cout << " There are inverted elements in the mesh \n";
+            cout << " Descent newton solver will be user \n";
             newt->Mult2(b, *x, *mesh, *ir, &newtonits, a, tauval );
             if (!newt->GetConverged())
                 cout << "NewtonIteration : rtol = " << rtol << " not achieved."
@@ -1557,6 +1332,35 @@ int main (int argc, char *argv[])
             sol_sock << "keys " << "JREM" << endl;
         }
         
+        // 17. Get some mesh statistics
+        double minjacs = 1.e+100;
+        for (int i = 0; i < NE; i++)
+        {
+            const FiniteElement &fe = *nodes.FESpace()->GetFE(i);
+            const int dim = fe.GetDim();
+            int nsp = ir->GetNPoints();
+            int dof = fe.GetDof();
+            DenseTensor Jtr(dim, dim, nsp);
+            const GridFunction *nds;
+            nds = &nodes;
+            DenseMatrix dshape(dof, dim), pos(dof, dim);
+            Array<int> xdofs(dof * dim);
+            Vector posV(pos.Data(), dof * dim);
+            nds->FESpace()->GetElementVDofs(i, xdofs);
+            nds->GetSubVector(xdofs, posV);
+            for (int j = 0; j < nsp; j++)
+            {
+                //cout << "point number " << j << "\n";
+                fe.CalcDShape(ir->IntPoint(j), dshape);
+                MultAtB(pos, dshape, Jtr(j));
+                double det = Jtr(j).Det();
+                minjacs = min(minjacs,det);
+            }
+        }
+        
+        cout << "mesh smoothing done " << minjaco << " " << minjacs << " \n";
+        
+        
         delete S;
         delete model;
         delete c;
@@ -1578,11 +1382,13 @@ int main (int argc, char *argv[])
         mesh->Print(mesh_ofs);
     }
     
+    
+    
     // 17. Free the used memory.
     delete fespace;
     delete fec;
     delete mesh;
-
+    
     // write log to text file-k10
     
     cout << "How do you want to write log to a new file:\n"
