@@ -319,7 +319,6 @@ void RelaxedNewtonSolver::Mult2(const Vector &b, Vector &x,
             add (xsav,-alpha,csav,x);
             finenergy = nlf.GetEnergy(x);
             nanchk = isnan(finenergy);
-            
             for (int i = 0; i < NE; i++)
             {
                 const FiniteElement &fe = *nodes.FESpace()->GetFE(i);
@@ -357,9 +356,8 @@ void RelaxedNewtonSolver::Mult2(const Vector &b, Vector &x,
                 }
             }
             
-            
-            if (finenergy>initenergy || nanchk!=0 || jachk==0)
-            //if (jachk==0)
+            //finenergy = initenergy - 1; //WARNING: THIS IS JUST FOR TIPTONUNI.MESH
+            if (finenergy>1.*initenergy || nanchk!=0 || jachk==0)
             {
                 tchk = 0;
                 alpha *= 0.5;
@@ -800,6 +798,136 @@ void TMOPHyperelasticModel211::AssembleH(const DenseMatrix &Jpt,
         }
 }
 
+// Metric 56
+class TMOPHyperelasticModel056 : public HyperelasticModel
+{
+public:
+    virtual double EvalW(const DenseMatrix &Jpt) const;
+    
+    virtual void EvalP(const DenseMatrix &Jpt, DenseMatrix &P) const;
+    
+    virtual void AssembleH(const DenseMatrix &Jpt, const DenseMatrix &DS,
+                           const double weight, DenseMatrix &A) const;
+    
+};
+
+//M056 = 1/2 ( sqrt(tau) - 1/sqrt(tau))^2  = 1/2 (I2 + 1/I2) - 1
+double TMOPHyperelasticModel056::EvalW(const DenseMatrix &Jpt) const
+{
+    const double I2 = Dim2Invariant2(Jpt);
+    return  0.5*(I2 + (1/I2)) - 1;
+}
+
+void TMOPHyperelasticModel056::EvalP(const DenseMatrix &Jpt,
+                                     DenseMatrix &P) const
+{
+    const double I2 = Dim2Invariant2(Jpt);
+    double alpha = 1/(I2*I2);
+    
+    Dim2Invariant2_dM(Jpt, P);
+    P *= (0.5 - 0.5*alpha);
+}
+
+void TMOPHyperelasticModel056::AssembleH(const DenseMatrix &Jpt,
+                                         const DenseMatrix &DS,
+                                         const double weight,
+                                         DenseMatrix &A) const
+{
+    const int dof = DS.Height(), dim = DS.Width();
+    const double I2 = Dim2Invariant2(Jpt);
+    DenseMatrix dI2_dM(dim), dI2_dMdM(dim);
+    Dim2Invariant2_dM(Jpt, dI2_dM);
+    double alpha = 1/(I2*I2*I2);
+    
+    for (int r = 0; r < dim; r++)
+        for (int c = 0; c < dim; c++)
+        {
+            Dim2Invariant2_dMdM(Jpt, r, c, dI2_dMdM);
+            // Compute each entry of d(Grc)_dJ.
+            for (int rr = 0; rr < dim; rr++)
+            {
+                for (int cc = 0; cc < dim; cc++)
+                {
+                    const double entry_rr_cc =
+                    alpha*dI2_dM(rr,cc)*dI2_dM(r,c) + dI2_dMdM(rr,cc)*(0.5 - 0.5/(I2*I2));
+                    
+                    for (int i = 0; i < dof; i++)
+                        for (int j = 0; j < dof; j++)
+                        {
+                            A(i+r*dof, j+rr*dof) +=
+                            weight * DS(i, c) * DS(j, cc) * entry_rr_cc;
+                        }
+                }
+            }
+        }
+}
+
+// Metric 77
+class TMOPHyperelasticModel077 : public HyperelasticModel
+{
+public:
+    virtual double EvalW(const DenseMatrix &Jpt) const;
+    
+    virtual void EvalP(const DenseMatrix &Jpt, DenseMatrix &P) const;
+    
+    virtual void AssembleH(const DenseMatrix &Jpt, const DenseMatrix &DS,
+                           const double weight, DenseMatrix &A) const;
+    
+};
+
+//M077 = 1/2 ( (tau) - 1/(tau))^2
+double TMOPHyperelasticModel077::EvalW(const DenseMatrix &Jpt) const
+{
+    const double I2 = Dim2Invariant2(Jpt);
+    return  0.5*(I2*I2 + 1/(I2*I2) - 2);
+}
+
+void TMOPHyperelasticModel077::EvalP(const DenseMatrix &Jpt,
+                                     DenseMatrix &P) const
+{
+    const double I2 = Dim2Invariant2(Jpt);
+    double alpha = 1/(I2*I2*I2);
+    
+    Dim2Invariant2_dM(Jpt, P);
+    P *= (I2 - alpha);
+}
+
+void TMOPHyperelasticModel077::AssembleH(const DenseMatrix &Jpt,
+                                         const DenseMatrix &DS,
+                                         const double weight,
+                                         DenseMatrix &A) const
+{
+    const int dof = DS.Height(), dim = DS.Width();
+    const double I2 = Dim2Invariant2(Jpt);
+    DenseMatrix dI2_dM(dim), dI2_dMdM(dim);
+    Dim2Invariant2_dM(Jpt, dI2_dM);
+    double alpha = 1/(I2*I2*I2);
+    double alpha2 = 1/(I2*I2*I2*I2);
+    
+    for (int r = 0; r < dim; r++)
+        for (int c = 0; c < dim; c++)
+        {
+            Dim2Invariant2_dMdM(Jpt, r, c, dI2_dMdM);
+            // Compute each entry of d(Grc)_dJ.
+            for (int rr = 0; rr < dim; rr++)
+            {
+                for (int cc = 0; cc < dim; cc++)
+                {
+                    const double entry_rr_cc =
+                    dI2_dMdM(rr,cc)*(I2 - alpha) + dI2_dM(rr,cc)*dI2_dM(r,c) +
+                    3*alpha2*dI2_dM(rr,cc)*dI2_dM(r,c);
+                    
+                    for (int i = 0; i < dof; i++)
+                        for (int j = 0; j < dof; j++)
+                        {
+                            A(i+r*dof, j+rr*dof) +=
+                            weight * DS(i, c) * DS(j, cc) * entry_rr_cc;
+                        }
+                }
+            }
+        }
+}
+
 
 
 #define BIG_NUMBER 1e+100 // Used when a matrix is outside the metric domain.
@@ -815,6 +943,8 @@ int main (int argc, char *argv[])
     int  visport   = 19916;
     int  ans;
     vector<double> logvec (100);
+    double weight_fun(const Vector &x);
+    
     
     
     bool dump_iterations = false;
@@ -1024,6 +1154,10 @@ int main (int argc, char *argv[])
         Coefficient *c = NULL;
         TargetJacobian *tj = NULL;
         
+        HyperelasticModel *model2; //this is for combo
+        Coefficient *c2 = NULL;     //this is for combo
+        TargetJacobian *tj2 = NULL; //this is for combo
+        
         //{IDEAL, IDEAL_EQ_SIZE, IDEAL_INIT_SIZE,
         // IDEAL_CUSTOM_SIZE, TARGET_MESH, ALIGNED}
         int tjtype;
@@ -1040,14 +1174,17 @@ int main (int argc, char *argv[])
         if (tjtype == 1)
         {
             tj    = new TargetJacobian(TargetJacobian::IDEAL);
+            cout << " you chose Target Jacobian - Ideal \n";
         }
         else if (tjtype == 2)
         {
             tj    = new TargetJacobian(TargetJacobian::IDEAL_EQ_SIZE);
+            cout << " you chose Target Jacobian - Ideal_eq_size \n";
         }
         else if (tjtype == 3)
         {
             tj    = new TargetJacobian(TargetJacobian::IDEAL_INIT_SIZE);
+            cout << " you chose Target Jacobian - Ideal_init_size \n";
         }
         else
         {
@@ -1065,6 +1202,10 @@ int main (int argc, char *argv[])
         << "     shape+size.\n"
         << "22  : |T|^2 - 2*tau / (2*tau - 2*tau_0)\n"
         << "     untangling.\n"
+        << "56  : 0.5*(sqrt(tau) - 1/sqrt(tau))^2\n"
+        << "     size metric\n"
+        << "77  : 0.5*(tau - 1/tau)^2\n"
+        << "     size metric\n"
         << "211  : (tau-1)^2 - tau + sqrt(tau^2+beta)\n"
         << "      untangling.\n"
         " --> " << flush;
@@ -1091,6 +1232,16 @@ int main (int argc, char *argv[])
             model = new TMOPHyperelasticModel022(tauval);
             cout << " you chose metric 22\n";
         }
+        else if (modeltype == 56)
+        {
+            model = new TMOPHyperelasticModel056;
+            cout << " you chose metric 56\n";
+        }
+        else if (modeltype == 77)
+        {
+            model = new TMOPHyperelasticModel077;
+            cout << " you chose metric 77\n";
+        }
         else if (modeltype == 211)
         {
             model = new TMOPHyperelasticModel211;
@@ -1106,29 +1257,70 @@ int main (int argc, char *argv[])
         logvec[2]=tjtype;
         logvec[3]=modeltype;
         
-        
         tj->SetNodes(*x);
         tj->SetInitialNodes(x0);
         HyperelasticNLFIntegrator *he_nlf_integ;
         he_nlf_integ = new HyperelasticNLFIntegrator(model, tj);
         
-        ///*
+        int ptflag = 1; //if 1 - GLL, else uniform
+        int nptdir = 8; //number of sample points in each direction
         const IntegrationRule *ir =
-        &IntRulesLo.Get(fespace->GetFE(0)->GetGeomType(),5); //this for metric
+        &IntRulesLo.Get(fespace->GetFE(0)->GetGeomType(),nptdir); //this for GLL points "LO"
         he_nlf_integ->SetIntegrationRule(*ir);
-        */
-        
-        /*
-        const IntegrationRule *ir =
-        &IntRulesCU.Get(fespace->GetFE(0)->GetGeomType(),5); //this for metric
-        he_nlf_integ->SetIntegrationRule(*ir);
-        */
+        if (ptflag==1) {
+            cout << "Sample point distribution is GLL based\n";
+        }
+        else {
+            const IntegrationRule *ir =
+            &IntRulesCU.Get(fespace->GetFE(0)->GetGeomType(),nptdir); //this for uniform points "CU"
+            he_nlf_integ->SetIntegrationRule(*ir);
+            cout << "Sample point distribution is uniformly spaced\n";
+        }
         
         //c = new ConstantCoefficient(0.5);
         //he_nlf_integ->SetCoefficient(*c);
         //he_nlf_integ->SetLimited(1e-4, x0);
         
+        //
         nf_integ = he_nlf_integ;
+        NonlinearForm a(fespace);
+        
+        
+        // This is for trying a combo of two integrators
+        const int combomet = 0;
+        if (combomet==1) {
+            c = new ConstantCoefficient(0.5);  //weight of original metric
+            he_nlf_integ->SetCoefficient(*c);
+            nf_integ = he_nlf_integ;
+            a.AddDomainIntegrator(nf_integ);
+            
+            
+            tj2    = new TargetJacobian(TargetJacobian::IDEAL_EQ_SIZE);
+            model2 = new TMOPHyperelasticModel077;
+            tj2->SetNodes(*x);
+            tj2->SetInitialNodes(x0);
+            HyperelasticNLFIntegrator *he_nlf_integ2;
+            he_nlf_integ2 = new HyperelasticNLFIntegrator(model2, tj2);
+            const IntegrationRule *ir =
+            &IntRulesLo.Get(fespace->GetFE(0)->GetGeomType(),nptdir); //this for metric
+            he_nlf_integ2->SetIntegrationRule(*ir);
+            
+            
+            c2 = new ConstantCoefficient(2.5);
+            he_nlf_integ2->SetCoefficient(*c2);     //weight of new metric
+            
+            //FunctionCoefficient rhs_coef (weight_fun);
+            //he_nlf_integ2->SetCoefficient(rhs_coef);     //weight of new metric as function
+            //he_nlf_integ2->SetLimited(1e-4, x0);
+            cout << "You have added a combo metric \n";
+            a.AddDomainIntegrator(he_nlf_integ2);
+        }
+        else{
+            a.AddDomainIntegrator(nf_integ);
+        }
+        //
+        
+        
         
         InterpolateHyperElasticModel(*model, *tj, *mesh, metric);
         osockstream sol_sock2(visport, vishost);
@@ -1139,8 +1331,8 @@ int main (int argc, char *argv[])
         sol_sock2 << "keys " << "JREM" << endl;
         
         
-        NonlinearForm a(fespace);
-        a.AddDomainIntegrator(nf_integ);
+        
+        
         
         // Set essential vdofs by hand for x = 0 and y = 0 (2D). These are
         // attributes 1 and 2.
@@ -1274,7 +1466,7 @@ int main (int argc, char *argv[])
             }
         }
         minjaco = tauval;
-        
+        cout << "minimum jacobian in the original mesh is " << minjaco << " \n";
         int newtonits = 0;
         if (tauval>0)
         {
@@ -1358,7 +1550,7 @@ int main (int argc, char *argv[])
             }
         }
         
-        cout << "mesh smoothing done " << minjaco << " " << minjacs << " \n";
+        cout << "minimum jacobian before and after " << minjaco << " " << minjacs << " \n";
         
         
         delete S;
@@ -1418,3 +1610,44 @@ int main (int argc, char *argv[])
     //k10 end
     
 }
+double weight_fun(const Vector &x)
+{
+    double r2 = x(0)*x(0) + x(1)*x(1);
+    double l2;
+    if (r2>0)
+    {
+        r2 = sqrt(r2);
+    }
+    l2 = 0;
+    //This is for tipton
+    /*
+    if (r2 >= 0.11 && r2 <= 0.12 )
+    {
+        l2 = 1;
+    }
+    */
+    //This is for blade
+    int l4 = 0, l3 = 0;
+    double xmin, xmax, ymin, ymax,dx ,dy;
+    xmin = 0.9; xmax = 1.;
+    ymin = -0.2; ymax = 0.;
+    dx = (xmax-xmin)/2;dy = (ymax-ymin)/2;
+    
+    if (abs(x(0)-xmin)<dx && abs(x(0)-xmax)<dx) {
+        l4 = 1;
+    }
+    if (abs(x(1)-ymin)<dy && abs(x(1)-ymax)<dy) {
+        l3 = 1;
+    }
+    l2 = l4*l3;
+    
+    // This is for square perturbed
+    /*
+     if (r2 < 0.5) {
+        l2 = 1;
+    }
+     */
+    
+    return l2;
+}
+

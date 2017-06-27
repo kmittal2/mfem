@@ -458,7 +458,7 @@ void TMOPHyperelasticModel002::AssembleH(const DenseMatrix &Jpt,
 double TMOPHyperelasticModel007::EvalW(const DenseMatrix &Jpt) const
 {
    const double I2 = Dim2Invariant2(Jpt);
-   if (I2 <= 0.0) { return 1e+100; }
+//   if (I2 <= 0.0) { return 1e+100; }
 
    return Dim2Invariant1(Jpt) * (I2 + 1.0 / I2) - 4.0;
 }
@@ -594,6 +594,7 @@ void TargetJacobian::ComputeElementTargets(int e_id, const FiniteElement &fe,
 #else
          double avg_area = lf.Sum() / nodes->FESpace()->GetNE();
 #endif
+         avg_area *= 1;
 
          DenseMatrix Wideal(fe.GetDim());
          ConstructIdealJ(fe.GetGeomType(), Wideal);
