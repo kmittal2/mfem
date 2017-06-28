@@ -357,7 +357,7 @@ void RelaxedNewtonSolver::Mult2(const Vector &b, Vector &x,
             }
             
             //finenergy = initenergy - 1; //WARNING: THIS IS JUST FOR TIPTONUNI.MESH
-            if (finenergy>1.*initenergy || nanchk!=0 || jachk==0)
+            if (finenergy>1.0*initenergy || nanchk!=0 || jachk==0)
             {
                 tchk = 0;
                 alpha *= 0.5;
@@ -742,7 +742,7 @@ double TMOPHyperelasticModel211::EvalW(const DenseMatrix &Jpt) const
 {
     double det = Dim2Invariant2(Jpt);
     double beta = 1e-4;
-    return  (det*det) -3*det + sqrt(det*det + beta) + 1;
+    return  (det*det) -3.*det + sqrt(det*det + beta) + 1.;
 }
 
 void TMOPHyperelasticModel211::EvalP(const DenseMatrix &Jpt,
@@ -753,7 +753,7 @@ void TMOPHyperelasticModel211::EvalP(const DenseMatrix &Jpt,
     double alpha = det/sqrt(det*det+beta);
     
     Dim2Invariant2_dM(Jpt, P);     //DI2/DM
-    P *= (2*det - 3 + alpha);
+    P *= (2.*det - 3. + alpha);
 }
 
 void TMOPHyperelasticModel211::AssembleH(const DenseMatrix &Jpt,
@@ -815,14 +815,14 @@ public:
 double TMOPHyperelasticModel056::EvalW(const DenseMatrix &Jpt) const
 {
     const double I2 = Dim2Invariant2(Jpt);
-    return  0.5*(I2 + (1/I2)) - 1;
+    return  0.5*(I2 + (1/I2)) - 1.;
 }
 
 void TMOPHyperelasticModel056::EvalP(const DenseMatrix &Jpt,
                                      DenseMatrix &P) const
 {
     const double I2 = Dim2Invariant2(Jpt);
-    double alpha = 1/(I2*I2);
+    double alpha = 1./(I2*I2);
     
     Dim2Invariant2_dM(Jpt, P);
     P *= (0.5 - 0.5*alpha);
@@ -879,14 +879,14 @@ public:
 double TMOPHyperelasticModel077::EvalW(const DenseMatrix &Jpt) const
 {
     const double I2 = Dim2Invariant2(Jpt);
-    return  0.5*(I2*I2 + 1/(I2*I2) - 2);
+    return  0.5*(I2*I2 + 1./(I2*I2) - 2.);
 }
 
 void TMOPHyperelasticModel077::EvalP(const DenseMatrix &Jpt,
                                      DenseMatrix &P) const
 {
     const double I2 = Dim2Invariant2(Jpt);
-    double alpha = 1/(I2*I2*I2);
+    double alpha = 1./(I2*I2*I2);
     
     Dim2Invariant2_dM(Jpt, P);
     P *= (I2 - alpha);
@@ -928,6 +928,77 @@ void TMOPHyperelasticModel077::AssembleH(const DenseMatrix &Jpt,
         }
 }
 
+//3D METRICS
+// Metric 2 - (I1I2)/9 - 1
+class TMOPHyperelasticModel302 : public HyperelasticModel
+{
+public:
+    virtual double EvalW(const DenseMatrix &Jpt) const;
+    
+    virtual void EvalP(const DenseMatrix &Jpt, DenseMatrix &P) const;
+    
+    virtual void AssembleH(const DenseMatrix &Jpt, const DenseMatrix &DS,
+                           const double weight, DenseMatrix &A) const;
+};
+
+//M022 = (I1I2) / 9 - 1
+double TMOPHyperelasticModel302::EvalW(const DenseMatrix &Jpt) const
+{
+    const double I1 = Dim3Invariant1(Jpt), I2 = Dim3Invariant2(Jpt);
+    return  I1*I2/9 - 1;
+    
+}
+
+void TMOPHyperelasticModel302::EvalP(const DenseMatrix &Jpt,
+                                     DenseMatrix &P) const
+{
+    const double I1 = Dim3Invariant1(Jpt), I2 = Dim3Invariant2(Jpt);
+    Dim3Invariant1_dM(Jpt, P);
+    P *= I2; //I2*DI1/DM
+    //cout << I1 << " " << I2 << " " << " k10\n";
+    DenseMatrix PP(P.Size());
+    Dim3Invariant2_dM(Jpt, PP); //DI2/DM
+    PP *= (I1);
+    P += PP;
+    
+    P *= 1./(9.);
+}
+
+void TMOPHyperelasticModel302::AssembleH(const DenseMatrix &Jpt,
+                                         const DenseMatrix &DS,
+                                         const double weight,
+                                         DenseMatrix &A) const
+{
+    const int dof = DS.Height(), dim = DS.Width();
+    const double I1 = Dim3Invariant1(Jpt), I2 = Dim3Invariant2(Jpt);
+    DenseMatrix dI1_dM(dim), dI1_dMdM(dim), dI2_dM(dim), dI2_dMdM(dim);
+    Dim3Invariant1_dM(Jpt, dI1_dM);
+    Dim3Invariant2_dM(Jpt, dI2_dM);
+    
+    for (int r = 0; r < dim; r++)
+        for (int c = 0; c < dim; c++)
+        {
+            Dim3Invariant1_dMdM(Jpt, r, c, dI1_dMdM);
+            Dim3Invariant2_dMdM(Jpt, r, c, dI2_dMdM);
+            // Compute each entry of d(Grc)_dJ.
+            for (int rr = 0; rr < dim; rr++)
+            {
+                for (int cc = 0; cc < dim; cc++)
+                {
+                    const double entry_rr_cc =
+                    (1./9.)*(dI1_dMdM(rr,cc)*I2 +dI1_dM(r,c)*dI2_dM(rr,cc) + dI1_dM(rr,cc)*dI2_dM(r,c)
+                           +dI2_dMdM(rr,cc)*I1);
+                    
+                    for (int i = 0; i < dof; i++)
+                        for (int j = 0; j < dof; j++)
+                        {
+                            A(i+r*dof, j+rr*dof) +=
+                            weight * DS(i, c) * DS(j, cc) * entry_rr_cc;
+                        }
+                }
+            }
+        }
+}
 
 
 #define BIG_NUMBER 1e+100 // Used when a matrix is outside the metric domain.
@@ -1167,6 +1238,7 @@ int main (int argc, char *argv[])
         "1) IDEAL\n"
         "2) IDEAL_EQ_SIZE\n"
         "3) IDEAL_INIT_SIZE\n"
+        "4) IDEAL_EQ_SCALE_SIZE\n"
         " --> " << flush;
         cin >> tjtype;
         
@@ -1186,6 +1258,11 @@ int main (int argc, char *argv[])
             tj    = new TargetJacobian(TargetJacobian::IDEAL_INIT_SIZE);
             cout << " you chose Target Jacobian - Ideal_init_size \n";
         }
+        else if (tjtype == 4)
+        {
+            tj    = new TargetJacobian(TargetJacobian::IDEAL_EQ_SCALE_SIZE);
+            cout << " you chose Target Jacobian - Ideal_eq_scale_size \n";
+        }
         else
         {
             cout << tjtype;
@@ -1193,67 +1270,90 @@ int main (int argc, char *argv[])
             cout << "Target Jacobian will default to IDEAL\n";
         }
         
-        cout << "Choose optimization metric:\n"
-        << "1  : |T|^2 \n"
-        << "     shape.\n"
-        << "2  : 0.5 |T|^2 / tau  - 1 \n"
-        << "     shape, condition number metric.\n"
-        << "7  : |T - T^-t|^2 \n"
-        << "     shape+size.\n"
-        << "22  : |T|^2 - 2*tau / (2*tau - 2*tau_0)\n"
-        << "     untangling.\n"
-        << "56  : 0.5*(sqrt(tau) - 1/sqrt(tau))^2\n"
-        << "     size metric\n"
-        << "77  : 0.5*(tau - 1/tau)^2\n"
-        << "     size metric\n"
-        << "211  : (tau-1)^2 - tau + sqrt(tau^2+beta)\n"
-        << "      untangling.\n"
-        " --> " << flush;
+        //Metrics for 2D
         double tauval = -0.1;
-        cin >> modeltype;
-        model    = new TMOPHyperelasticModel001;
-        if (modeltype == 1)
-        {
-            model = new TMOPHyperelasticModel001;
-            cout << " you chose metric 1 \n";
+        if (dim==2) {
+            cout << "Choose optimization metric:\n"
+            << "1  : |T|^2 \n"
+            << "     shape.\n"
+            << "2  : 0.5 |T|^2 / tau  - 1 \n"
+            << "     shape, condition number metric.\n"
+            << "7  : |T - T^-t|^2 \n"
+            << "     shape+size.\n"
+            << "22  : |T|^2 - 2*tau / (2*tau - 2*tau_0)\n"
+            << "     untangling.\n"
+            << "56  : 0.5*(sqrt(tau) - 1/sqrt(tau))^2\n"
+            << "     size metric\n"
+            << "77  : 0.5*(tau - 1/tau)^2\n"
+            << "     size metric\n"
+            << "211  : (tau-1)^2 - tau + sqrt(tau^2+beta)\n"
+            << "      untangling.\n"
+            " --> " << flush;
+            double tauval = -0.1;
+            cin >> modeltype;
+            model    = new TMOPHyperelasticModel001;
+            if (modeltype == 1)
+            {
+                model = new TMOPHyperelasticModel001;
+                cout << " you chose metric 1 \n";
+            }
+            else if (modeltype == 2)
+            {
+                model = new TMOPHyperelasticModel002;
+                cout << " you chose metric 2 \n";
+            }
+            else if (modeltype == 7)
+            {
+                model = new TMOPHyperelasticModel007;
+                cout << " you chose metric 7 \n";
+            }
+            else if (modeltype == 22)
+            {
+                model = new TMOPHyperelasticModel022(tauval);
+                cout << " you chose metric 22\n";
+            }
+            else if (modeltype == 56)
+            {
+                model = new TMOPHyperelasticModel056;
+                cout << " you chose metric 56\n";
+            }
+            else if (modeltype == 77)
+            {
+                model = new TMOPHyperelasticModel077;
+                cout << " you chose metric 77\n";
+            }
+            else if (modeltype == 211)
+            {
+                model = new TMOPHyperelasticModel211;
+                cout << " you chose metric 211 \n";
+            }
+            else
+            {
+                cout << "You did not choose a valid option\n";
+                cout << "Model type will default to 1\n";
+                cout << modeltype;
+            }
         }
-        else if (modeltype == 2)
-        {
-            model = new TMOPHyperelasticModel002;
-            cout << " you chose metric 2 \n";
+        else {  //Metrics for 3D
+            cout << "Choose optimization metric:\n"
+            << "2  : (|T|^2|T^-1|^2)/9 - 1 \n"
+            << "     shape.\n"
+            " --> " << flush;
+            double tauval = -0.1;
+            cin >> modeltype;
+            model    = new TMOPHyperelasticModel302;
+            if (modeltype == 2)
+            {
+                model = new TMOPHyperelasticModel302;
+                cout << " you chose metric 2 \n";
+            }
+            else
+            {
+                cout << "You did not choose a valid option\n";
+                cout << "Model type will default to 2\n";
+                cout << modeltype;
+            }
         }
-        else if (modeltype == 7)
-        {
-            model = new TMOPHyperelasticModel007;
-            cout << " you chose metric 7 \n";
-        }
-        else if (modeltype == 22)
-        {
-            model = new TMOPHyperelasticModel022(tauval);
-            cout << " you chose metric 22\n";
-        }
-        else if (modeltype == 56)
-        {
-            model = new TMOPHyperelasticModel056;
-            cout << " you chose metric 56\n";
-        }
-        else if (modeltype == 77)
-        {
-            model = new TMOPHyperelasticModel077;
-            cout << " you chose metric 77\n";
-        }
-        else if (modeltype == 211)
-        {
-            model = new TMOPHyperelasticModel211;
-            cout << " you chose metric 211 \n";
-        }
-        else
-        {
-            cout << "You did not choose a valid option\n";
-            cout << "Model type will default to 1\n";
-            cout << modeltype;
-        }
-        
         logvec[2]=tjtype;
         logvec[3]=modeltype;
         
@@ -1295,7 +1395,7 @@ int main (int argc, char *argv[])
             a.AddDomainIntegrator(nf_integ);
             
             
-            tj2    = new TargetJacobian(TargetJacobian::IDEAL_EQ_SIZE);
+            tj2    = new TargetJacobian(TargetJacobian::IDEAL_EQ_SCALE_SIZE);
             model2 = new TMOPHyperelasticModel077;
             tj2->SetNodes(*x);
             tj2->SetInitialNodes(x0);
@@ -1306,11 +1406,11 @@ int main (int argc, char *argv[])
             he_nlf_integ2->SetIntegrationRule(*ir);
             
             
-            c2 = new ConstantCoefficient(2.5);
-            he_nlf_integ2->SetCoefficient(*c2);     //weight of new metric
+            //c2 = new ConstantCoefficient(2.5);
+            //he_nlf_integ2->SetCoefficient(*c2);     //weight of new metric
             
-            //FunctionCoefficient rhs_coef (weight_fun);
-            //he_nlf_integ2->SetCoefficient(rhs_coef);     //weight of new metric as function
+            FunctionCoefficient rhs_coef (weight_fun);
+            he_nlf_integ2->SetCoefficient(rhs_coef);     //weight of new metric as function
             //he_nlf_integ2->SetLimited(1e-4, x0);
             cout << "You have added a combo metric \n";
             a.AddDomainIntegrator(he_nlf_integ2);
@@ -1328,7 +1428,7 @@ int main (int argc, char *argv[])
         mesh->Print(sol_sock2);
         metric.Save(sol_sock2);
         sol_sock2.send();
-        sol_sock2 << "keys " << "JREM" << endl;
+        sol_sock2 << "keys " << "JRem" << endl;
         
         
         
@@ -1479,7 +1579,7 @@ int main (int argc, char *argv[])
             newt->SetPrintLevel(1);
             newt->SetOperator(a);
             Vector b;
-            cout << " Relaxed newton solver will be user \n";
+            cout << " Relaxed newton solver will be used \n";
             newt->Mult2(b, *x, *mesh, *ir, &newtonits, a );
             if (!newt->GetConverged())
                 cout << "NewtonIteration : rtol = " << rtol << " not achieved."
@@ -1499,7 +1599,7 @@ int main (int argc, char *argv[])
             newt->SetOperator(a);
             Vector b;
             cout << " There are inverted elements in the mesh \n";
-            cout << " Descent newton solver will be user \n";
+            cout << " Descent newton solver will be used \n";
             newt->Mult2(b, *x, *mesh, *ir, &newtonits, a, tauval );
             if (!newt->GetConverged())
                 cout << "NewtonIteration : rtol = " << rtol << " not achieved."
@@ -1521,7 +1621,7 @@ int main (int argc, char *argv[])
             mesh->Print(sol_sock);
             metric.Save(sol_sock);
             sol_sock.send();
-            sol_sock << "keys " << "JREM" << endl;
+            sol_sock << "keys " << "JRem" << endl;
         }
         
         // 17. Get some mesh statistics
@@ -1620,12 +1720,16 @@ double weight_fun(const Vector &x)
     }
     l2 = 0;
     //This is for tipton
-    /*
-    if (r2 >= 0.11 && r2 <= 0.12 )
+    if (r2 >= 0.10 && r2 <= 0.15 )
     {
         l2 = 1;
     }
-    */
+    l2 = 0.01+0.5*std::tanh((r2-0.13)/0.01)-(0.5*std::tanh((r2-0.14)/0.01))
+            +0.5*std::tanh((r2-0.21)/0.01)-(0.5*std::tanh((r2-0.22)/0.01));
+    l2 = 0.1+0.5*std::tanh((r2-0.12)/0.005)-(0.5*std::tanh((r2-0.13)/0.005))
+    +0.5*std::tanh((r2-0.18)/0.005)-(0.5*std::tanh((r2-0.19)/0.005));
+    //l2 = 10*r2;
+    /*
     //This is for blade
     int l4 = 0, l3 = 0;
     double xmin, xmax, ymin, ymax,dx ,dy;
@@ -1640,6 +1744,7 @@ double weight_fun(const Vector &x)
         l3 = 1;
     }
     l2 = l4*l3;
+     */
     
     // This is for square perturbed
     /*
