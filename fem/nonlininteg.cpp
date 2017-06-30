@@ -199,9 +199,8 @@ void HyperelasticModel::Dim3Invariant1_dMdM(const DenseMatrix &M, int i, int j,
    {
       for (int c = 0; c < 3; c++)
       {
-         dMdM(r,c) =
-             ((2.0 * det*det*dM(r,c) + (4./3.)*det* M(r,c) *dI(i,j) - (4./3.)*det*M(i,j)*dI(r,c) + (2./9.)*fnorm*fnorm*dI(i,j)*dI(r,c))
-        - dI(i,j)*((8./3.)*M(r,c)*det-(8./9.)*fnorm*fnorm*dI(r,c)))/(pow(det,8./3.));
+         dMdM(r,c) = (2.0 * det*det*dM(r,c)+ dI(i,j)*(10./9.)*fnorm*fnorm*dI(r,c)
+                        - (4./3.)*dI(i,j)*det*M(r,c)-(4./3.)*det*M(i,j)*dI(r,c))/(pow(det,8./3.));
       }
    }
 }
