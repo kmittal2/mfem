@@ -1,0 +1,3 @@
+mpirun -np 4 exsmp -m ../data/psph2.mesh << EOF
+0 4 1 3 0 2 400 30 1
+EOF

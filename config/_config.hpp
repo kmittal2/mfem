@@ -29,7 +29,7 @@
 
 // Build the parallel MFEM library.
 // Requires an MPI compiler, and the libraries HYPRE and METIS.
-// #define MFEM_USE_MPI
+#define MFEM_USE_MPI
 
 // Enable debug checks in MFEM.
 // #define MFEM_DEBUG
@@ -102,6 +102,6 @@
 #endif
 
 // Version of HYPRE used for building MFEM.
-// #define MFEM_HYPRE_VERSION @MFEM_HYPRE_VERSION@
+#define MFEM_HYPRE_VERSION 21000
 
 #endif // MFEM_CONFIG_HEADER

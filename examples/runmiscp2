@@ -1,0 +1,3 @@
+mpirun -np 4 exsmp -m ../data/hexpert4x4.mesh << EOF
+1 1 1 3 0 2 400 100 1
+EOF

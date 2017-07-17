@@ -42,9 +42,26 @@ using namespace std;
 void transformation(const Vector &p, Vector &v)
 {
    // simple shear transformation
-   double s = 0.1;
-   v(0) = p(0) + s*p(1) + s*p(2);
-   v(1) = p(1) + s*p(2) + s*p(0);
+   double pi = 3.14159265;
+   double theta = atan2(p(1),p(0));
+   double xv, dx,xm, yv,xf;
+   double xlim = 0.2;
+   double fac = 0.5;
+   dx = 0.;
+   xv = p(0);
+   yv = p(1);
+   xm = 1. - (1.-xlim)*(1.-xlim)/(1.-xlim-fac*xlim);
+   
+   
+   if (xv > xm && yv < sin(pi/4.) && yv > -sin(pi/4.))
+    {
+     xf = (xv-1.)*(1.-xlim-fac*xlim)/(1.-xlim) + (1.-xlim);
+     dx = xf*exp(-yv*yv/0.05);
+    }
+   v(0) = p(0) - dx;
+//   v(0) =  p(0) + s*p(1) + s*p(2);
+//   v(1) = p(1) + s*p(2) + s*p(0);
+   v(1) = p(1);
    v(2) = p(2);
 }
 
