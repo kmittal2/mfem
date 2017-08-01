@@ -1,0 +1,17 @@
+{
+  "dsets": {
+    "main": {
+      "cycle": 1,
+      "domains": 4,
+      "mesh": {
+        "path": "tiptonorig.mesh",
+        "tags": {
+          "max_lods": "32",
+          "spatial_dim": "3",
+          "topo_dim": "3"
+        }
+      },
+      "time": 1.0000000000000007
+    }
+  }
+}

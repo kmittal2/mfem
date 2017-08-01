@@ -717,6 +717,8 @@ int main (int argc, char *argv[])
             << "     shape, condition number.\n"
             << "7  : |T - T^-t|^2 \n"
             << "     shape+size.\n"
+            << "9  : tau*|T - T^-t|^2 \n"
+            << "     shape+size.\n"
             << "22  : |T|^2 - 2*tau / (2*tau - 2*tau_0)\n"
             << "     untangling.\n"
             << "50  : |T^tT|^2/(2tau^2) - 1\n"
@@ -749,6 +751,10 @@ int main (int argc, char *argv[])
        else if (modeltype == 7)
        {
           model = new TMOPHyperelasticModel007;
+       }
+       else if (modeltype == 9)
+       {
+           model = new TMOPHyperelasticModel009;
        }
        else if (modeltype == 22)
        {
@@ -864,7 +870,8 @@ int main (int argc, char *argv[])
     tj->SetInitialNodes(x0);
     HyperelasticNLFIntegrator *he_nlf_integ;
     he_nlf_integ = new HyperelasticNLFIntegrator(model, tj);
-        
+    //he_nlf_integ->SetLimited(0.00001,x0);
+    
     int ptflag = 1; //if 1 - GLL, else uniform
     int nptdir = 8; //number of sample points in each direction
     const IntegrationRule *ir =
