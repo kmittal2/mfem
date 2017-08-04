@@ -62,6 +62,7 @@ double NonlinearForm::GetEnergy(const Vector &x) const
          x.GetSubVector(vdofs, el_x);
          for (int k = 0; k < dfi.Size(); k++)
          {
+            
             energy += dfi[k]->GetElementEnergy(*fe, *T, el_x);
          }
       }

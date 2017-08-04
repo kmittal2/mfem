@@ -1,0 +1,159 @@
+Options used:
+   --mesh ../data/blade.mesh
+   --order 1
+   --no-static-condensation
+   --visualization
+../data/blade.mesh about to read a mesh file
+read a mesh file
+enter refinement levels [1] --> refinements specified
+Mesh curvature: L2_T4_2D_P4
+Enter polynomial degree of mesh finite element space:
+0) QuadraticPos (quads only)
+p) Degree p >= 1
+ --> Specify Target Jacobian type:
+1) IDEAL
+2) IDEAL_EQ_SIZE
+3) IDEAL_INIT_SIZE
+4) IDEAL_EQ_SCALE_SIZE
+ -->  you chose Target Jacobian - Ideal 
+Choose optimization metric:
+1  : |T|^2 
+     shape.
+2  : 0.5 |T|^2 / tau  - 1 
+     shape, condition number.
+7  : |T - T^-t|^2 
+     shape+size.
+9  : tau*|T - T^-t|^2 
+     shape+size.
+22  : |T|^2 - 2*tau / (2*tau - 2*tau_0)
+     untangling.
+50  : |T^tT|^2/(2tau^2) - 1
+     shape.
+52  : (tau-1)^2/ (2*tau - 2*tau_0)
+     untangling.
+55  : (tau-1)^2
+     size.
+56  : 0.5*(sqrt(tau) - 1/sqrt(tau))^2
+     size.
+58  : (|T^tT|^2/(tau^2) - 2*|T|^2/tau + 2)
+     shape.
+77  : 0.5*(tau - 1/tau)^2
+     size metric
+211  : (tau-1)^2 - tau + sqrt(tau^2+beta)
+      untangling.
+ -->  you chose metric 2 
+Sample point distribution is GLL based
+Allow boundary node movement:
+1 - yes
+2 - no
+ --> Choose linear smoother:
+0) l1-Jacobi
+1) CG
+2) MINRES
+ --> 
+Enter number of MINRES smoothing iterations -->
+ Enter number of Newton iterations -->
+ Initial strain energy : 170.9
+minimum jacobian in the original mesh is 6.564e-05 
+ Relaxed newton solver will be used 
+Newton iteration  0 : ||r|| = 1720
+MINRES: iteration   0: ||r||_B = 1720 ...
+MINRES: iteration 400: ||r||_B = 6.799
+MINRES: No convergence!
+170.9 150 energy value before and after newton iteration
+alpha value is 0.25 
+Newton iteration  1 : ||r|| = 1356
+MINRES: iteration   0: ||r||_B = 1356 ...
+MINRES: iteration 400: ||r||_B = 5.13
+MINRES: No convergence!
+150 119.9 energy value before and after newton iteration
+alpha value is 0.5 
+Newton iteration  2 : ||r|| = 865.5
+MINRES: iteration   0: ||r||_B = 865.5 ...
+MINRES: iteration 400: ||r||_B = 2.555
+MINRES: No convergence!
+119.9 99.73 energy value before and after newton iteration
+alpha value is 0.5 
+Newton iteration  3 : ||r|| = 552.9
+MINRES: iteration   0: ||r||_B = 552.9 ...
+MINRES: iteration 400: ||r||_B = 1.146
+MINRES: No convergence!
+99.73 78.97 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration  4 : ||r|| = 239.4
+MINRES: iteration   0: ||r||_B = 239.4 ...
+MINRES: iteration 400: ||r||_B = 0.3891
+MINRES: No convergence!
+78.97 70.65 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration  5 : ||r|| = 101.6
+MINRES: iteration   0: ||r||_B = 101.6 ...
+MINRES: iteration 400: ||r||_B = 0.1876
+MINRES: No convergence!
+70.65 67.59 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration  6 : ||r|| = 43.06
+MINRES: iteration   0: ||r||_B = 43.06 ...
+MINRES: iteration 400: ||r||_B = 0.09006
+MINRES: No convergence!
+67.59 66.66 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration  7 : ||r|| = 17.51
+MINRES: iteration   0: ||r||_B = 17.51 ...
+MINRES: iteration 400: ||r||_B = 0.04734
+MINRES: No convergence!
+66.66 66.5 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration  8 : ||r|| = 7.581
+MINRES: iteration   0: ||r||_B = 7.581 ...
+MINRES: iteration 400: ||r||_B = 0.01992
+MINRES: No convergence!
+66.5 66.48 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration  9 : ||r|| = 4.162
+MINRES: iteration   0: ||r||_B = 4.162 ...
+MINRES: iteration 400: ||r||_B = 0.0116
+MINRES: No convergence!
+66.48 66.47 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 10 : ||r|| = 2.817
+MINRES: iteration   0: ||r||_B = 2.817 ...
+MINRES: iteration 400: ||r||_B = 0.006834
+MINRES: No convergence!
+66.47 66.47 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 11 : ||r|| = 1.81
+MINRES: iteration   0: ||r||_B = 1.81 ...
+MINRES: iteration 400: ||r||_B = 0.004708
+MINRES: No convergence!
+66.47 66.47 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 12 : ||r|| = 1.228
+MINRES: iteration   0: ||r||_B = 1.228 ...
+MINRES: iteration 400: ||r||_B = 0.00302
+MINRES: No convergence!
+66.47 66.47 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 13 : ||r|| = 0.7853
+MINRES: iteration   0: ||r||_B = 0.7853 ...
+MINRES: iteration 400: ||r||_B = 0.001998
+MINRES: No convergence!
+66.47 66.47 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 14 : ||r|| = 0.5345
+MINRES: iteration   0: ||r||_B = 0.5345 ...
+MINRES: iteration 400: ||r||_B = 0.001292
+MINRES: No convergence!
+66.47 66.47 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 15 : ||r|| = 0.3395
+NewtonIteration : rtol = 1e-12 not achieved.
+Final strain energy   : 66.47
+Initial strain energy was  : 170.9
+% change is  : 61.11
+minimum jacobian before and after smoothing 6.564e-05 3.885e-05 
+The total time it took for this example's execution is: 2.942 seconds
+How do you want to write log to a new file:
+0) New file
+1) Append
+ --> 

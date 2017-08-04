@@ -1,0 +1,287 @@
+Options used:
+   --mesh ../data/tipton.mesh
+   --order 1
+   --no-static-condensation
+   --visualization
+enter refinement levels [1] --> Mesh curvature: Quadratic
+Enter polynomial degree of mesh finite element space:
+0) QuadraticPos (quads only)
+p) Degree p >= 1
+ --> Specify Target Jacobian type:
+1) IDEAL
+2) IDEAL_EQ_SIZE
+3) IDEAL_INIT_SIZE
+4) IDEAL_EQ_SCALE_SIZE
+ --> Choose optimization metric:
+1  : |T|^2 
+     shape.
+2  : 0.5 |T|^2 / tau  - 1 
+     shape, condition number.
+7  : |T - T^-t|^2 
+     shape+size.
+9  : tau*|T - T^-t|^2 
+     shape+size.
+22  : |T|^2 - 2*tau / (2*tau - 2*tau_0)
+     untangling.
+50  : |T^tT|^2/(2tau^2) - 1
+     shape.
+52  : (tau-1)^2/ (2*tau - 2*tau_0)
+     untangling.
+55  : (tau-1)^2
+     size.
+56  : 0.5*(sqrt(tau) - 1/sqrt(tau))^2
+     size.
+58  : (|T^tT|^2/(tau^2) - 2*|T|^2/tau + 2)
+     shape.
+77  : 0.5*(tau - 1/tau)^2
+     size metric
+211  : (tau-1)^2 - tau + sqrt(tau^2+beta)
+      untangling.
+ --> Sample point distribution is GLL based
+Allow boundary node movement:
+1 - yes
+2 - no
+ --> Choose linear smoother:
+0) l1-Jacobi
+1) CG
+2) MINRES
+ --> 
+Enter number of linear smoothing iterations -->
+ Enter number of Newton iterations -->
+ 0 0.205619 energyforel
+1 0.218926 energyforel
+0 1.62178 energyforel
+0 3.13778 energyforel
+2 0.218926 energyforel
+3 0.205619 energyforel
+1 1.67178 energyforel
+2 3.2464 energyforel
+0 0.0430328 energyforel
+1 0.0386138 energyforel
+2 0.0390959 energyforel
+1 5.91652 energyforel
+2 8.92347 energyforel
+3 7.33842 energyforel
+4 0.205619 energyforel
+5 0.218926 energyforel
+6 0.218926 energyforel
+3 3.32753 energyforel
+4 3.32753 energyforel
+3 0.0503788 energyforel
+4 8.47531 energyforel
+4 2.8672 energyforel
+5 0.395334 energyforel
+7 0.205619 energyforel
+8 6.93889e-18 energyforel
+9 -1.38778e-17 energyforel
+5 3.2464 energyforel
+6 3.34251 energyforel
+5 8.60563 energyforel
+6 8.53538 energyforel
+6 3.21471 energyforel
+10 2.54426e-17 energyforel
+11 -7.17019e-17 energyforel
+12 1.1719e-16 energyforel
+7 3.42559 energyforel
+8 3.42559 energyforel
+7 8.18663 energyforel
+8 3.47043 energyforel
+7 6.02649 energyforel
+8 9.07442 energyforel
+9 7.49334 energyforel
+13 5.39692e-18 energyforel
+14 1.00228e-16 energyforel
+15 1.35694e-16 energyforel
+9 3.34251 energyforel
+10 3.43859 energyforel
+9 3.54114 energyforel
+10 3.52194 energyforel
+11 3.52362 energyforel
+12 3.52362 energyforel
+10 2.95669 energyforel
+11 0.403609 energyforel
+16 -1.15648e-17 energyforel
+17 1.54198e-17 energyforel
+11 3.41871 energyforel
+12 1.23288 energyforel
+13 3.43859 energyforel
+14 3.56312 energyforel
+13 1.27217 energyforel
+12 1.67197 energyforel
+13 3.21514 energyforel
+18 8.32667e-17 energyforel
+19 1.38778e-17 energyforel
+14 1.27186 energyforel
+15 1.23568 energyforel
+20 6.09081e-17 energyforel
+21 3.85494e-18 energyforel
+15 3.24639 energyforel
+16 3.34251 energyforel
+14 6.02754 energyforel
+15 9.07776 energyforel
+16 7.49196 energyforel
+17 3.43858 energyforel
+18 3.56308 energyforel
+16 0.0973255 energyforel
+17 0.105964 energyforel
+22 -4.93432e-17 energyforel
+23 9.48316e-17 energyforel
+24 0.00589859 energyforel
+17 2.96163 energyforel
+18 0.384413 energyforel
+19 3.32753 energyforel
+20 3.42559 energyforel
+18 0.106677 energyforel
+19 0.0997457 energyforel
+25 0.0283438 energyforel
+26 0.0962522 energyforel
+19 1.62215 energyforel
+20 3.13903 energyforel
+27 0.287568 energyforel
+28 0.0205937 energyforel
+21 3.52362 energyforel
+22 3.65051 energyforel
+20 0.00937902 energyforel
+21 0.00705458 energyforel
+21 5.91889 energyforel
+22 8.9328 energyforel
+29 0.0380646 energyforel
+30 0.0869576 energyforel
+23 3.32753 energyforel
+24 3.42559 energyforel
+22 0.00703899 energyforel
+23 0.00932041 energyforel
+23 7.36228 energyforel
+24 2.9095 energyforel
+31 0.217246 energyforel
+32 0.046185 energyforel
+25 3.52362 energyforel
+26 3.65052 energyforel
+33 0.0658901 energyforel
+34 0.115378 energyforel
+24 0.0468021 energyforel
+25 0.0411149 energyforel
+25 0.349796 energyforel
+26 3.65055 energyforel
+27 3.2464 energyforel
+28 3.34251 energyforel
+35 0.235754 energyforel
+36 0.0787739 energyforel
+26 0.0411134 energyforel
+27 0.0467964 energyforel
+27 3.65055 energyforel
+28 3.56312 energyforel
+37 0.105366 energyforel
+38 0.17007 energyforel
+39 0.313 energyforel
+29 3.43858 energyforel
+30 3.56311 energyforel
+31 0.277806 energyforel
+28 7.58476 energyforel
+29 3.15756 energyforel
+29 1.6224 energyforel
+30 1.67227 energyforel
+40 0.00589859 energyforel
+41 0.0205937 energyforel
+32 0.293508 energyforel
+33 0.293508 energyforel
+30 1.26103 energyforel
+31 0.121163 energyforel
+31 1.6723 energyforel
+32 1.62235 energyforel
+42 0.046185 energyforel
+43 0.0787739 energyforel
+33 3.13996 energyforel
+34 3.21652 energyforel
+34 0.277806 energyforel
+35 0.354298 energyforel
+36 0.372312 energyforel
+32 0.00884025 energyforel
+33 0.0467486 energyforel
+44 0.0283438 energyforel
+45 0.0380646 energyforel
+46 0.0658901 energyforel
+34 7.62668 energyforel
+35 3.21674 energyforel
+36 3.1399 energyforel
+37 0.372312 energyforel
+38 0.354298 energyforel
+35 3.22764 energyforel
+36 1.32556 energyforel
+47 0.105366 energyforel
+48 0.0962522 energyforel
+49 0.0869576 energyforel
+37 5.91998 energyforel
+38 6.03135 energyforel
+39 0.43409 energyforel
+40 0.454352 energyforel
+37 0.133146 energyforel
+38 0.00655657 energyforel
+39 6.03235 energyforel
+40 5.92078 energyforel
+50 0.115378 energyforel
+51 0.17007 energyforel
+52 0.287568 energyforel
+41 0.454352 energyforel
+42 0.43409 energyforel
+39 0.041063 energyforel
+40 7.68963 energyforel
+41 8.92432 energyforel
+42 9.08217 energyforel
+53 0.217246 energyforel
+54 0.235754 energyforel
+55 0.313 energyforel
+43 0.277806 energyforel
+44 0.354298 energyforel
+41 3.2888 energyforel
+42 1.31175 energyforel
+43 9.0876 energyforel
+44 8.93295 energyforel
+45 0.43409 energyforel
+45 7.33986 energyforel
+46 0.293508 energyforel
+43 0.124717 energyforel
+44 0.00671937 energyforel
+46 7.50424 energyforel
+47 7.51587 energyforel
+47 0.372312 energyforel
+48 0.454352 energyforel
+45 0.04108 energyforel
+46 7.5676 energyforel
+48 7.35884 energyforel
+49 2.92091 energyforel
+49 0.293508 energyforel
+50 0.372312 energyforel
+47 3.31164 energyforel
+50 2.99977 energyforel
+51 2.99245 energyforel
+48 1.23185 energyforel
+51 0.454352 energyforel
+52 0.277806 energyforel
+49 0.103594 energyforel
+50 0.00923324 energyforel
+52 2.90933 energyforel
+53 0.34175 energyforel
+53 0.354298 energyforel
+51 0.0467877 energyforel
+52 0.0622712 energyforel
+54 0.360942 energyforel
+54 0.43409 energyforel
+55 0.364895 energyforel
+53 0.0596379 energyforel
+54 0.0591827 energyforel
+56 0.349952 energyforel
+55 0.0591103 energyforel
+103.072 471.708 k10energy
+5.52086 471.708 k10energy
+Initial strain energy : 471.708
+111.246 471.708 k10energy
+251.87 471.708 k10energy
+--------------------------------------------------------------------------
+MPI_ABORT was invoked on rank 1 in communicator MPI_COMM_WORLD
+with errorcode 1.
+
+NOTE: invoking MPI_ABORT causes Open MPI to kill all MPI processes.
+You may or may not see output from other processes, depending on
+exactly when Open MPI kills them.
+--------------------------------------------------------------------------

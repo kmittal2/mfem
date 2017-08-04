@@ -870,7 +870,7 @@ int main (int argc, char *argv[])
     tj->SetInitialNodes(x0);
     HyperelasticNLFIntegrator *he_nlf_integ;
     he_nlf_integ = new HyperelasticNLFIntegrator(model, tj);
-    //he_nlf_integ->SetLimited(0.00001,x0);
+    //he_nlf_integ->SetLimited(0.05,x0);
     
     int ptflag = 1; //if 1 - GLL, else uniform
     int nptdir = 8; //number of sample points in each direction
@@ -1044,11 +1044,13 @@ int main (int argc, char *argv[])
     MPI_Bcast(&newits, 1, MPI_INT, 0, MPI_COMM_WORLD);
     logvec[7]=newits;
     logvec[8]=a.GetEnergy(x);
+    cout.precision(17);
     if (myid==0)
     {
         cout << "Initial strain energy : " << logvec[8] << endl;
     }
     
+    // MFEM_ABORT("Initial energy done ");
     // save original
     Vector xsav = x;
     //set value of tau_0 for metric 22 and get min jacobian for mesh statistic

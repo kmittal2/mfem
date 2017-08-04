@@ -1,0 +1,278 @@
+Options used:
+   --mesh ../data/tipton.mesh
+   --order 1
+   --no-static-condensation
+   --visualization
+../data/tipton.mesh about to read a mesh file
+read a mesh file
+enter refinement levels [1] --> refinements specified
+Mesh curvature: Quadratic
+Enter polynomial degree of mesh finite element space:
+0) QuadraticPos (quads only)
+p) Degree p >= 1
+ --> Specify Target Jacobian type:
+1) IDEAL
+2) IDEAL_EQ_SIZE
+3) IDEAL_INIT_SIZE
+4) IDEAL_EQ_SCALE_SIZE
+ -->  you chose Target Jacobian - Ideal 
+Choose optimization metric:
+1  : |T|^2 
+     shape.
+2  : 0.5 |T|^2 / tau  - 1 
+     shape, condition number.
+7  : |T - T^-t|^2 
+     shape+size.
+22  : |T|^2 - 2*tau / (2*tau - 2*tau_0)
+     untangling.
+50  : |T^tT|^2/(2tau^2) - 1
+     shape.
+52  : (tau-1)^2/ (2*tau - 2*tau_0)
+     untangling.
+55  : (tau-1)^2
+     size.
+56  : 0.5*(sqrt(tau) - 1/sqrt(tau))^2
+     size.
+58  : (|T^tT|^2/(tau^2) - 2*|T|^2/tau + 2)
+     shape.
+77  : 0.5*(tau - 1/tau)^2
+     size metric
+211  : (tau-1)^2 - tau + sqrt(tau^2+beta)
+      untangling.
+ -->  you chose metric 2 
+Sample point distribution is GLL based
+Allow boundary node movement:
+1 - yes
+2 - no
+ --> Choose linear smoother:
+0) l1-Jacobi
+1) CG
+2) MINRES
+ --> 
+Enter number of MINRES smoothing iterations -->
+ Enter number of Newton iterations -->
+ 0 1.62178 energyforel
+1 3.13778 energyforel
+2 5.91652 energyforel
+3 8.92347 energyforel
+4 7.3387 energyforel
+5 2.87052 energyforel
+6 0.39603 energyforel
+7 0.0430512 energyforel
+8 1.67178 energyforel
+9 3.21471 energyforel
+10 6.02649 energyforel
+11 9.07442 energyforel
+12 7.49361 energyforel
+13 2.9601 energyforel
+14 0.404086 energyforel
+15 0.0386288 energyforel
+16 1.67197 energyforel
+17 3.21514 energyforel
+18 6.02754 energyforel
+19 9.07776 energyforel
+20 7.49224 energyforel
+21 2.96465 energyforel
+22 0.38482 energyforel
+23 0.0391185 energyforel
+24 1.62215 energyforel
+25 3.13903 energyforel
+26 5.91889 energyforel
+27 8.9328 energyforel
+28 7.36255 energyforel
+29 2.91262 energyforel
+30 0.350227 energyforel
+31 0.0503769 energyforel
+32 3.2464 energyforel
+33 3.32753 energyforel
+34 3.32753 energyforel
+35 3.2464 energyforel
+36 3.34251 energyforel
+37 3.42559 energyforel
+38 3.42559 energyforel
+39 3.34251 energyforel
+40 3.43859 energyforel
+41 3.52362 energyforel
+42 3.52362 energyforel
+43 3.43859 energyforel
+44 3.56312 energyforel
+45 3.65055 energyforel
+46 3.65055 energyforel
+47 3.56312 energyforel
+48 3.24639 energyforel
+49 3.34251 energyforel
+50 3.43858 energyforel
+51 3.56308 energyforel
+52 3.32753 energyforel
+53 3.42559 energyforel
+54 3.52362 energyforel
+55 3.65051 energyforel
+56 3.32753 energyforel
+57 3.42559 energyforel
+58 3.52362 energyforel
+59 3.65052 energyforel
+60 3.2464 energyforel
+61 3.34251 energyforel
+62 3.43858 energyforel
+63 3.56311 energyforel
+64 0.205619 energyforel
+65 0.218926 energyforel
+66 0.218926 energyforel
+67 0.205619 energyforel
+68 0.277806 energyforel
+69 0.293508 energyforel
+70 0.293508 energyforel
+71 0.277806 energyforel
+72 0.354298 energyforel
+73 0.372312 energyforel
+74 0.372312 energyforel
+75 0.354298 energyforel
+76 0.43409 energyforel
+77 0.454352 energyforel
+78 0.454352 energyforel
+79 0.43409 energyforel
+80 0.205619 energyforel
+81 0.277806 energyforel
+82 0.354298 energyforel
+83 0.43409 energyforel
+84 0.218926 energyforel
+85 0.293508 energyforel
+86 0.372312 energyforel
+87 0.454352 energyforel
+88 0.218926 energyforel
+89 0.293508 energyforel
+90 0.372312 energyforel
+91 0.454352 energyforel
+92 0.205619 energyforel
+93 0.277806 energyforel
+94 0.354298 energyforel
+95 0.43409 energyforel
+96 6.93889e-18 energyforel
+97 -1.38778e-17 energyforel
+98 2.54426e-17 energyforel
+99 -7.17019e-17 energyforel
+100 1.1719e-16 energyforel
+101 5.39692e-18 energyforel
+102 1.00228e-16 energyforel
+103 1.35694e-16 energyforel
+104 -1.15648e-17 energyforel
+105 1.54198e-17 energyforel
+106 8.32667e-17 energyforel
+107 1.38778e-17 energyforel
+108 6.09081e-17 energyforel
+109 3.85494e-18 energyforel
+110 -4.93432e-17 energyforel
+111 9.48316e-17 energyforel
+112 0.00589859 energyforel
+113 0.0283438 energyforel
+114 0.0962522 energyforel
+115 0.287568 energyforel
+116 0.0205937 energyforel
+117 0.0380646 energyforel
+118 0.0869576 energyforel
+119 0.217246 energyforel
+120 0.046185 energyforel
+121 0.0658901 energyforel
+122 0.115378 energyforel
+123 0.235754 energyforel
+124 0.0787739 energyforel
+125 0.105366 energyforel
+126 0.17007 energyforel
+127 0.313 energyforel
+128 0.00589859 energyforel
+129 0.0205937 energyforel
+130 0.046185 energyforel
+131 0.0787739 energyforel
+132 0.0283438 energyforel
+133 0.0380646 energyforel
+134 0.0658901 energyforel
+135 0.105366 energyforel
+136 0.0962522 energyforel
+137 0.0869576 energyforel
+138 0.115378 energyforel
+139 0.17007 energyforel
+140 0.287568 energyforel
+141 0.217246 energyforel
+142 0.235754 energyforel
+143 0.313 energyforel
+144 8.47437 energyforel
+145 8.60468 energyforel
+146 8.53457 energyforel
+147 8.18618 energyforel
+148 3.46995 energyforel
+149 3.54063 energyforel
+150 3.52144 energyforel
+151 3.41821 energyforel
+152 1.23276 energyforel
+153 1.27206 energyforel
+154 1.27174 energyforel
+155 1.23556 energyforel
+156 0.0973328 energyforel
+157 0.105972 energyforel
+158 0.106685 energyforel
+159 0.0997534 energyforel
+160 0.00937902 energyforel
+161 0.00705458 energyforel
+162 0.007039 energyforel
+163 0.00932041 energyforel
+164 0.0468021 energyforel
+165 0.041115 energyforel
+166 0.0411134 energyforel
+167 0.0467964 energyforel
+168 7.5848 energyforel
+169 3.15751 energyforel
+170 1.26096 energyforel
+171 0.121175 energyforel
+172 0.00884026 energyforel
+173 0.0467486 energyforel
+174 7.62659 energyforel
+175 3.2276 energyforel
+176 1.32552 energyforel
+177 0.13316 energyforel
+178 0.00655657 energyforel
+179 0.0410631 energyforel
+180 7.68995 energyforel
+181 3.2887 energyforel
+182 1.31169 energyforel
+183 0.124729 energyforel
+184 0.00671937 energyforel
+185 0.04108 energyforel
+186 7.56762 energyforel
+187 3.31128 energyforel
+188 1.23175 energyforel
+189 0.103602 energyforel
+190 0.00923325 energyforel
+191 0.0467877 energyforel
+192 1.6224 energyforel
+193 1.67227 energyforel
+194 1.6723 energyforel
+195 1.62235 energyforel
+196 3.13996 energyforel
+197 3.21652 energyforel
+198 3.21674 energyforel
+199 3.1399 energyforel
+200 5.91998 energyforel
+201 6.03135 energyforel
+202 6.03235 energyforel
+203 5.92078 energyforel
+204 8.92432 energyforel
+205 9.08217 energyforel
+206 9.0876 energyforel
+207 8.93295 energyforel
+208 7.34013 energyforel
+209 7.5045 energyforel
+210 7.51614 energyforel
+211 7.35911 energyforel
+212 2.9238 energyforel
+213 3.00287 energyforel
+214 2.99571 energyforel
+215 2.91247 energyforel
+216 0.342226 energyforel
+217 0.361452 energyforel
+218 0.365435 energyforel
+219 0.350477 energyforel
+220 0.0621354 energyforel
+221 0.0594885 energyforel
+222 0.0590468 energyforel
+223 0.0590283 energyforel
+Initial strain energy : 471.733

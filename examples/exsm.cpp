@@ -666,6 +666,8 @@ int main (int argc, char *argv[])
         << "     shape, condition number.\n"
         << "7  : |T - T^-t|^2 \n"
         << "     shape+size.\n"
+        << "9  : tau*|T - T^-t|^2 \n"
+        << "     shape+size.\n"
         << "22  : |T|^2 - 2*tau / (2*tau - 2*tau_0)\n"
         << "     untangling.\n"
         << "50  : |T^tT|^2/(2tau^2) - 1\n"
@@ -700,6 +702,10 @@ int main (int argc, char *argv[])
         {
             model = new TMOPHyperelasticModel007;
             cout << " you chose metric 7 \n";
+        }
+        else if (modeltype == 9)
+        {
+            model = new TMOPHyperelasticModel009;
         }
         else if (modeltype == 22)
         {
@@ -820,7 +826,7 @@ int main (int argc, char *argv[])
     he_nlf_integ = new HyperelasticNLFIntegrator(model, tj);
     
     int ptflag = 1; //if 1 - GLL, else uniform
-    int nptdir = 9; //number of sample points in each direction
+    int nptdir = 6; //number of sample points in each direction
     const IntegrationRule *ir =
     &IntRulesLo.Get(fespace->GetFE(0)->GetGeomType(),nptdir); //this for GLL points "LO"
     he_nlf_integ->SetIntegrationRule(*ir);
@@ -975,8 +981,11 @@ int main (int argc, char *argv[])
     cout << "Enter number of Newton iterations -->\n " << flush;
     cin >> ans;
     logvec[7]=ans;
-    cout << "Initial strain energy : " << a.GetEnergy(*x) << endl;
+    
     logvec[8]=a.GetEnergy(*x);
+    cout.precision(4);
+    cout << "Initial strain energy : " << logvec[8] << endl;
+    //MFEM_ABORT("Initial energy done ");
     
     // save original
     Vector xsav = *x;
@@ -1073,7 +1082,7 @@ int main (int argc, char *argv[])
         mesh->Print(sol_sock);
         metric.Save(sol_sock);
         sol_sock.send();
-        sol_sock << "keys " << "JRem" << endl;
+        sol_sock << "keys " << "JRmm" << endl;
     }
     
     // 17. Get some mesh statistics
@@ -1168,12 +1177,15 @@ double weight_fun(const Vector &x)
     }
     //l2 = 0.01+0.5*std::tanh((r2-0.13)/0.01)-(0.5*std::tanh((r2-0.14)/0.01))
     //        +0.5*std::tanh((r2-0.21)/0.01)-(0.5*std::tanh((r2-0.22)/0.01));
-    double den = 0.005;
+    double den = 0.002;
     //l2 = 0.05+0.5*std::tanh((r2-0.12)/den)-(0.5*std::tanh((r2-0.13)/den))
     //+0.5*std::tanh((r2-0.18)/den)-(0.5*std::tanh((r2-0.19)/den));
-    l2 = 0.2 +     +0.5*std::tanh((r2-0.14)/den)-(0.5*std::tanh((r2-0.15)/den))
-    +0.5*std::tanh((r2-0.19)/den)-(0.5*std::tanh((r2-0.20)/den))
-    +0.5*std::tanh((r2-0.23)/den)-(0.5*std::tanh((r2-0.24)/den));
+    //l2 = 0.2 +     +0.5*std::tanh((r2-0.14)/den)-(0.5*std::tanh((r2-0.15)/den))
+    //+0.5*std::tanh((r2-0.19)/den)-(0.5*std::tanh((r2-0.20)/den))
+    //+0.5*std::tanh((r2-0.23)/den)-(0.5*std::tanh((r2-0.24)/den));
+    l2 = 0.2 +     0.5*std::tanh((r2-0.16)/den)-(0.5*std::tanh((r2-0.17)/den))
+    +0.5*std::tanh((r2-0.23)/den)-(0.5*std::tanh((r2-0.24)/den)); //used for paper with den=0.002
+    
     //l2 = 10*r2;
     /*
     //This is for blade
