@@ -826,19 +826,22 @@ int main (int argc, char *argv[])
     he_nlf_integ = new HyperelasticNLFIntegrator(model, tj);
     
     int ptflag = 1; //if 1 - GLL, else uniform
-    int nptdir = 6; //number of sample points in each direction
-    const IntegrationRule *ir =
-    &IntRulesLo.Get(fespace->GetFE(0)->GetGeomType(),nptdir); //this for GLL points "LO"
-    he_nlf_integ->SetIntegrationRule(*ir);
-    if (ptflag==1) {
+    int nptdir = 8; //number of sample points in each direction
+    const IntegrationRule *ir = NULL;
+    if (ptflag == 1)
+    {
+        // Gauss-Lobatto points.
+        ir = &IntRulesLo.Get(fespace->GetFE(0)->GetGeomType(),nptdir);
         cout << "Sample point distribution is GLL based\n";
     }
-    else {
-        const IntegrationRule *ir =
-        &IntRulesCU.Get(fespace->GetFE(0)->GetGeomType(),nptdir); //this for uniform points "CU"
-        he_nlf_integ->SetIntegrationRule(*ir);
+    else
+    {
+        // Closed uniform points.
+        ir = &IntRulesCU.Get(fespace->GetFE(0)->GetGeomType(),nptdir);
         cout << "Sample point distribution is uniformly spaced\n";
     }
+    he_nlf_integ->SetIntegrationRule(*ir);
+    //he_nlf_integ->SetLimited(0.05, x0);
     
     //
     nf_integ = he_nlf_integ;
@@ -984,7 +987,9 @@ int main (int argc, char *argv[])
     
     logvec[8]=a.GetEnergy(*x);
     cout.precision(4);
-    cout << "Initial strain energy : " << logvec[8] << endl;
+    cout << "Initial strain energy : " << setprecision(16)
+    << logvec[8] << endl;
+    //cout << "Initial strain energy : " << logvec[8] << endl;
     //MFEM_ABORT("Initial energy done ");
     
     // save original
@@ -1032,7 +1037,7 @@ int main (int argc, char *argv[])
         newt->SetAbsTol(0.0);
         newt->SetPrintLevel(1);
         newt->SetOperator(a);
-        Vector b;
+        Vector b(0);
         cout << " Relaxed newton solver will be used \n";
         newt->Mult2(b, *x, *mesh, *ir, &newtonits, a );
         if (!newt->GetConverged())
@@ -1058,7 +1063,7 @@ int main (int argc, char *argv[])
         newt->SetAbsTol(0.0);
         newt->SetPrintLevel(1);
         newt->SetOperator(a);
-        Vector b;
+        Vector b(0);
         cout << " There are inverted elements in the mesh \n";
         cout << " Descent newton solver will be used \n";
         newt->Mult2(b, *x, *mesh, *ir, &newtonits, a, tauval );

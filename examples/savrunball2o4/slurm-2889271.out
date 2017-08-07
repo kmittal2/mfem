@@ -1,0 +1,483 @@
+Options used:
+   --mesh ../data/pinchsph.mesh
+   --order 1
+   --no-static-condensation
+   --visualization
+enter refinement levels [0] --> Mesh curvature: H1_3D_P4
+Enter polynomial degree of mesh finite element space:
+0) QuadraticPos (quads only)
+p) Degree p >= 1
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+ --> 448 total_element_count
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Mesh::GeneratePartitioning returned 1 empty parts!
+Specify Target Jacobian type:
+1) IDEAL
+2) IDEAL_EQ_SIZE
+3) IDEAL_INIT_SIZE
+4) IDEAL_EQ_SCALE_SIZE
+ --> Choose optimization metric:
+1  : (|T||T^-1|)/3 - 1 
+     shape.
+2  : (|T|^2|T^-1|^2)/9 - 1 
+     shape.
+3  : (|T|^2)/3*tau^(2/3) - 1 
+     shape.
+15  : (tau-1)^2
+     size.
+16  : 1/2 ( sqrt(tau) - 1/sqrt(tau))^2
+     size.
+21  : (|T-T^-t|^2)
+     shape+size.
+52  : (tau-1)^2/ (2*tau - 2*tau_0)
+     untangling.
+ --> Sample point distribution is GLL based
+4 0 8 deg,rp,nptdir
+Allow boundary node movement:
+1 - yes
+2 - no
+ --> the number of procs is 64 
+Choose linear smoother:
+0) l1-Jacobi
+1) CG
+2) MINRES
+ --> 
+Enter number of MINRES smoothing iterations -->
+ Enter number of Newton iterations -->
+ Initial strain energy : 169.605
+minimum jacobian in the original mesh is 2.30882e-05 
+ Relaxed newton solver will be used 
+Newton iteration  0 : ||r|| = 620.186
+MINRES: iteration   0: ||r||_B = 620.186 ...
+MINRES: iteration 5000: ||r||_B = 2.37426e-06
+MINRES: No convergence!
+169.605 122.397 energy value before and after newton iteration
+alpha value is 0.25 
+Newton iteration  1 : ||r|| = 319.049
+MINRES: iteration   0: ||r||_B = 319.049 ...
+MINRES: iteration 5000: ||r||_B = 2.65445e-09
+MINRES: No convergence!
+122.397 72.7061 energy value before and after newton iteration
+alpha value is 0.5 
+Newton iteration  2 : ||r|| = 108.854
+MINRES: iteration   0: ||r||_B = 108.854 ...
+MINRES: iteration 3238: ||r||_B = 1.07977e-10
+72.7061 41.8604 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration  3 : ||r|| = 54.0929
+MINRES: iteration   0: ||r||_B = 54.0929 ...
+MINRES: iteration 2771: ||r||_B = 5.35085e-11
+41.8604 33.3585 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration  4 : ||r|| = 25.8286
+MINRES: iteration   0: ||r||_B = 25.8286 ...
+MINRES: iteration 1954: ||r||_B = 2.55133e-11
+33.3585 30.876 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration  5 : ||r|| = 14.7771
+MINRES: iteration   0: ||r||_B = 14.7771 ...
+MINRES: iteration 1660: ||r||_B = 1.46095e-11
+30.876 30.0297 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration  6 : ||r|| = 10.1196
+MINRES: iteration   0: ||r||_B = 10.1196 ...
+MINRES: iteration 1581: ||r||_B = 9.92527e-12
+30.0297 29.6665 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration  7 : ||r|| = 7.0239
+MINRES: iteration   0: ||r||_B = 7.0239 ...
+MINRES: iteration 1524: ||r||_B = 6.88582e-12
+29.6665 29.4872 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration  8 : ||r|| = 4.17487
+MINRES: iteration   0: ||r||_B = 4.17487 ...
+MINRES: iteration 1453: ||r||_B = 4.13778e-12
+29.4872 29.3892 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration  9 : ||r|| = 2.22713
+MINRES: iteration   0: ||r||_B = 2.22713 ...
+MINRES: iteration 1457: ||r||_B = 2.21833e-12
+29.3892 29.3326 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 10 : ||r|| = 0.893883
+MINRES: iteration   0: ||r||_B = 0.893883 ...
+MINRES: iteration 1473: ||r||_B = 8.81265e-13
+29.3326 29.303 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 11 : ||r|| = 0.310577
+MINRES: iteration   0: ||r||_B = 0.310577 ...
+MINRES: iteration 1524: ||r||_B = 3.09187e-13
+29.303 29.2869 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 12 : ||r|| = 0.210661
+MINRES: iteration   0: ||r||_B = 0.210661 ...
+MINRES: iteration 1516: ||r||_B = 2.09801e-13
+29.2869 29.2775 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 13 : ||r|| = 0.165517
+MINRES: iteration   0: ||r||_B = 0.165517 ...
+MINRES: iteration 1516: ||r||_B = 1.65055e-13
+29.2775 29.2719 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 14 : ||r|| = 0.125824
+MINRES: iteration   0: ||r||_B = 0.125824 ...
+MINRES: iteration 1497: ||r||_B = 1.25306e-13
+29.2719 29.2686 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 15 : ||r|| = 0.0984406
+MINRES: iteration   0: ||r||_B = 0.0984406 ...
+MINRES: iteration 1505: ||r||_B = 9.82814e-14
+29.2686 29.2666 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 16 : ||r|| = 0.0756172
+MINRES: iteration   0: ||r||_B = 0.0756172 ...
+MINRES: iteration 1506: ||r||_B = 7.5426e-14
+29.2666 29.2654 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 17 : ||r|| = 0.0590432
+MINRES: iteration   0: ||r||_B = 0.0590432 ...
+MINRES: iteration 1504: ||r||_B = 5.8925e-14
+29.2654 29.2647 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 18 : ||r|| = 0.0455688
+MINRES: iteration   0: ||r||_B = 0.0455688 ...
+MINRES: iteration 1508: ||r||_B = 4.50409e-14
+29.2647 29.2642 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 19 : ||r|| = 0.03555
+MINRES: iteration   0: ||r||_B = 0.03555 ...
+MINRES: iteration 1501: ||r||_B = 3.48461e-14
+29.2642 29.264 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 20 : ||r|| = 0.0275035
+MINRES: iteration   0: ||r||_B = 0.0275035 ...
+MINRES: iteration 1502: ||r||_B = 2.71414e-14
+29.264 29.2638 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 21 : ||r|| = 0.0214459
+MINRES: iteration   0: ||r||_B = 0.0214459 ...
+MINRES: iteration 1498: ||r||_B = 2.13638e-14
+29.2638 29.2637 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 22 : ||r|| = 0.0166148
+MINRES: iteration   0: ||r||_B = 0.0166148 ...
+MINRES: iteration 1501: ||r||_B = 1.63018e-14
+29.2637 29.2637 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 23 : ||r|| = 0.0129506
+MINRES: iteration   0: ||r||_B = 0.0129506 ...
+MINRES: iteration 1509: ||r||_B = 1.2798e-14
+29.2637 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 24 : ||r|| = 0.0100421
+MINRES: iteration   0: ||r||_B = 0.0100421 ...
+MINRES: iteration 1500: ||r||_B = 9.94266e-15
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 25 : ||r|| = 0.00782486
+MINRES: iteration   0: ||r||_B = 0.00782486 ...
+MINRES: iteration 1500: ||r||_B = 7.76147e-15
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 26 : ||r|| = 0.00607125
+MINRES: iteration   0: ||r||_B = 0.00607125 ...
+MINRES: iteration 1509: ||r||_B = 6.05561e-15
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 27 : ||r|| = 0.00472934
+MINRES: iteration   0: ||r||_B = 0.00472934 ...
+MINRES: iteration 1502: ||r||_B = 4.6665e-15
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 28 : ||r|| = 0.0036711
+MINRES: iteration   0: ||r||_B = 0.0036711 ...
+MINRES: iteration 1505: ||r||_B = 3.59938e-15
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 29 : ||r|| = 0.00285891
+MINRES: iteration   0: ||r||_B = 0.00285891 ...
+MINRES: iteration 1506: ||r||_B = 2.81735e-15
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 30 : ||r|| = 0.00221996
+MINRES: iteration   0: ||r||_B = 0.00221996 ...
+MINRES: iteration 1500: ||r||_B = 2.20842e-15
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 31 : ||r|| = 0.00172841
+MINRES: iteration   0: ||r||_B = 0.00172841 ...
+MINRES: iteration 1498: ||r||_B = 1.68084e-15
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 32 : ||r|| = 0.00134247
+MINRES: iteration   0: ||r||_B = 0.00134247 ...
+MINRES: iteration 1504: ||r||_B = 1.33327e-15
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 33 : ||r|| = 0.001045
+MINRES: iteration   0: ||r||_B = 0.001045 ...
+MINRES: iteration 1502: ||r||_B = 1.00931e-15
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 34 : ||r|| = 0.000811837
+MINRES: iteration   0: ||r||_B = 0.000811837 ...
+MINRES: iteration 1507: ||r||_B = 7.89918e-16
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 35 : ||r|| = 0.000631832
+MINRES: iteration   0: ||r||_B = 0.000631832 ...
+MINRES: iteration 1498: ||r||_B = 6.30303e-16
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 36 : ||r|| = 0.000490939
+MINRES: iteration   0: ||r||_B = 0.000490939 ...
+MINRES: iteration 1508: ||r||_B = 4.77035e-16
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 37 : ||r|| = 0.000382027
+MINRES: iteration   0: ||r||_B = 0.000382027 ...
+MINRES: iteration 1519: ||r||_B = 3.79105e-16
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 38 : ||r|| = 0.00029688
+MINRES: iteration   0: ||r||_B = 0.00029688 ...
+MINRES: iteration 1506: ||r||_B = 2.89335e-16
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 39 : ||r|| = 0.000230989
+MINRES: iteration   0: ||r||_B = 0.000230989 ...
+MINRES: iteration 1500: ||r||_B = 2.29929e-16
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 40 : ||r|| = 0.000179525
+MINRES: iteration   0: ||r||_B = 0.000179525 ...
+MINRES: iteration 1505: ||r||_B = 1.78497e-16
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 41 : ||r|| = 0.000139666
+MINRES: iteration   0: ||r||_B = 0.000139666 ...
+MINRES: iteration 1510: ||r||_B = 1.36117e-16
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 42 : ||r|| = 0.000108559
+MINRES: iteration   0: ||r||_B = 0.000108559 ...
+MINRES: iteration 1506: ||r||_B = 1.05429e-16
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 43 : ||r|| = 8.44478e-05
+MINRES: iteration   0: ||r||_B = 8.44478e-05 ...
+MINRES: iteration 1497: ||r||_B = 8.36952e-17
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 44 : ||r|| = 6.56441e-05
+MINRES: iteration   0: ||r||_B = 6.56441e-05 ...
+MINRES: iteration 1500: ||r||_B = 6.48479e-17
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 45 : ||r|| = 5.10608e-05
+MINRES: iteration   0: ||r||_B = 5.10608e-05 ...
+MINRES: iteration 1504: ||r||_B = 5.0571e-17
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 46 : ||r|| = 3.96937e-05
+MINRES: iteration   0: ||r||_B = 3.96937e-05 ...
+MINRES: iteration 1501: ||r||_B = 3.92728e-17
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 47 : ||r|| = 3.08736e-05
+MINRES: iteration   0: ||r||_B = 3.08736e-05 ...
+MINRES: iteration 1509: ||r||_B = 3.05729e-17
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 48 : ||r|| = 2.40017e-05
+MINRES: iteration   0: ||r||_B = 2.40017e-05 ...
+MINRES: iteration 1501: ||r||_B = 2.39707e-17
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 49 : ||r|| = 1.86675e-05
+MINRES: iteration   0: ||r||_B = 1.86675e-05 ...
+MINRES: iteration 1516: ||r||_B = 1.86475e-17
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 50 : ||r|| = 1.45131e-05
+MINRES: iteration   0: ||r||_B = 1.45131e-05 ...
+MINRES: iteration 1519: ||r||_B = 1.43268e-17
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 51 : ||r|| = 1.12872e-05
+MINRES: iteration   0: ||r||_B = 1.12872e-05 ...
+MINRES: iteration 1509: ||r||_B = 1.11259e-17
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 52 : ||r|| = 8.7755e-06
+MINRES: iteration   0: ||r||_B = 8.7755e-06 ...
+MINRES: iteration 1508: ||r||_B = 8.72618e-18
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 53 : ||r|| = 6.82469e-06
+MINRES: iteration   0: ||r||_B = 6.82469e-06 ...
+MINRES: iteration 1517: ||r||_B = 6.73774e-18
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 54 : ||r|| = 5.30617e-06
+MINRES: iteration   0: ||r||_B = 5.30617e-06 ...
+MINRES: iteration 1666: ||r||_B = 5.3051e-18
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 55 : ||r|| = 4.12649e-06
+MINRES: iteration   0: ||r||_B = 4.12649e-06 ...
+MINRES: iteration 1654: ||r||_B = 4.12439e-18
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 56 : ||r|| = 3.2084e-06
+MINRES: iteration   0: ||r||_B = 3.2084e-06 ...
+MINRES: iteration 1674: ||r||_B = 3.18987e-18
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 57 : ||r|| = 2.49505e-06
+MINRES: iteration   0: ||r||_B = 2.49505e-06 ...
+MINRES: iteration 1683: ||r||_B = 2.47661e-18
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 58 : ||r|| = 1.93997e-06
+MINRES: iteration   0: ||r||_B = 1.93997e-06 ...
+MINRES: iteration 1685: ||r||_B = 1.92157e-18
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 59 : ||r|| = 1.50861e-06
+MINRES: iteration   0: ||r||_B = 1.50861e-06 ...
+MINRES: iteration 1692: ||r||_B = 1.48979e-18
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 60 : ||r|| = 1.173e-06
+MINRES: iteration   0: ||r||_B = 1.173e-06 ...
+MINRES: iteration 1669: ||r||_B = 1.14552e-18
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 61 : ||r|| = 9.12166e-07
+MINRES: iteration   0: ||r||_B = 9.12166e-07 ...
+MINRES: iteration 1690: ||r||_B = 9.01049e-19
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 62 : ||r|| = 7.09252e-07
+MINRES: iteration   0: ||r||_B = 7.09252e-07 ...
+MINRES: iteration 1680: ||r||_B = 7.04893e-19
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 63 : ||r|| = 5.51532e-07
+MINRES: iteration   0: ||r||_B = 5.51532e-07 ...
+MINRES: iteration 1834: ||r||_B = 5.47348e-19
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 64 : ||r|| = 4.28847e-07
+MINRES: iteration   0: ||r||_B = 4.28847e-07 ...
+MINRES: iteration 1842: ||r||_B = 4.23921e-19
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 65 : ||r|| = 3.33479e-07
+MINRES: iteration   0: ||r||_B = 3.33479e-07 ...
+MINRES: iteration 1702: ||r||_B = 3.313e-19
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 66 : ||r|| = 2.593e-07
+MINRES: iteration   0: ||r||_B = 2.593e-07 ...
+MINRES: iteration 1834: ||r||_B = 2.58703e-19
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 67 : ||r|| = 2.01635e-07
+MINRES: iteration   0: ||r||_B = 2.01635e-07 ...
+MINRES: iteration 1850: ||r||_B = 2.01384e-19
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 68 : ||r|| = 1.56784e-07
+MINRES: iteration   0: ||r||_B = 1.56784e-07 ...
+MINRES: iteration 1841: ||r||_B = 1.56019e-19
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 69 : ||r|| = 1.21916e-07
+MINRES: iteration   0: ||r||_B = 1.21916e-07 ...
+MINRES: iteration 1848: ||r||_B = 1.20636e-19
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 70 : ||r|| = 9.47984e-08
+MINRES: iteration   0: ||r||_B = 9.47984e-08 ...
+MINRES: iteration 1844: ||r||_B = 9.38211e-20
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 0.000244141 
+Newton iteration 71 : ||r|| = 9.47933e-08
+MINRES: iteration   0: ||r||_B = 9.47933e-08 ...
+MINRES: iteration 1848: ||r||_B = 9.2977e-20
+29.2636 29.2636 energy value before and after newton iteration
+alpha value is 9.53674e-07 
+Line search was not successfull.. stopping Newton
+Newton: rtol = 1e-12 not achieved.
+Final strain energy   : 29.2636
+Initial strain energy was  : 169.605
+% change is  : 82.746
+minimum jacobian before and after smoothing 2.30882e-05 4.1269e-06 
+The total time ist took for this example's execution is: 657.97 seconds
+How do you want to write log to a new file:
+0) New file
+1) Append
+ --> 

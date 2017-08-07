@@ -1,0 +1,525 @@
+Options used:
+   --mesh ../data/ball6to1.mesh
+   --order 1
+   --no-static-condensation
+   --visualization
+enter refinement levels [0] --> Mesh curvature: H1_3D_P1
+Enter polynomial degree of mesh finite element space:
+0) QuadraticPos (quads only)
+p) Degree p >= 1
+ --> 1835008 total_element_count
+Specify Target Jacobian type:
+1) IDEAL
+2) IDEAL_EQ_SIZE
+3) IDEAL_INIT_SIZE
+4) IDEAL_EQ_SCALE_SIZE
+ --> Choose optimization metric:
+1  : (|T||T^-1|)/3 - 1 
+     shape.
+2  : (|T|^2|T^-1|^2)/9 - 1 
+     shape.
+3  : (|T|^2)/3*tau^(2/3) - 1 
+     shape.
+15  : (tau-1)^2
+     size.
+16  : 1/2 ( sqrt(tau) - 1/sqrt(tau))^2
+     size.
+21  : (|T-T^-t|^2)
+     shape+size.
+52  : (tau-1)^2/ (2*tau - 2*tau_0)
+     untangling.
+ --> Sample point distribution is GLL based
+2 0 4 deg,rp,nptdir
+Allow boundary node movement:
+1 - yes
+2 - no
+ --> the number of procs is 512 
+Choose linear smoother:
+0) l1-Jacobi
+1) CG
+2) MINRES
+ --> 
+Enter number of MINRES smoothing iterations -->
+ Enter number of Newton iterations -->
+ Initial strain energy : 691028
+minimum jacobian in the original mesh is 5.94762e-08 
+ Relaxed newton solver will be used 
+Newton iteration  0 : ||r|| = 38155.6
+MINRES: iteration   0: ||r||_B = 38155.6 ...
+MINRES: iteration 5000: ||r||_B = 273.339
+MINRES: No convergence!
+691028 597346 energy value before and after newton iteration
+alpha value is 0.125 
+Newton iteration  1 : ||r|| = 31701.8
+MINRES: iteration   0: ||r||_B = 31701.8 ...
+MINRES: iteration 5000: ||r||_B = 190.355
+MINRES: No convergence!
+597346 452743 energy value before and after newton iteration
+alpha value is 0.25 
+Newton iteration  2 : ||r|| = 22356.3
+MINRES: iteration   0: ||r||_B = 22356.3 ...
+MINRES: iteration 5000: ||r||_B = 176.308
+MINRES: No convergence!
+452743 291607 energy value before and after newton iteration
+alpha value is 0.5 
+Newton iteration  3 : ||r|| = 12158.6
+MINRES: iteration   0: ||r||_B = 12158.6 ...
+MINRES: iteration 5000: ||r||_B = 166.672
+MINRES: No convergence!
+291607 174211 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration  4 : ||r|| = 5523.93
+MINRES: iteration   0: ||r||_B = 5523.93 ...
+MINRES: iteration 5000: ||r||_B = 161.944
+MINRES: No convergence!
+174211 150280 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration  5 : ||r|| = 1896.33
+MINRES: iteration   0: ||r||_B = 1896.33 ...
+MINRES: iteration 5000: ||r||_B = 109.312
+MINRES: No convergence!
+150280 134260 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration  6 : ||r|| = 781.958
+MINRES: iteration   0: ||r||_B = 781.958 ...
+MINRES: iteration 5000: ||r||_B = 76.7378
+MINRES: No convergence!
+134260 127179 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration  7 : ||r|| = 482.729
+MINRES: iteration   0: ||r||_B = 482.729 ...
+MINRES: iteration 5000: ||r||_B = 53.4091
+MINRES: No convergence!
+127179 123069 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration  8 : ||r|| = 381.946
+MINRES: iteration   0: ||r||_B = 381.946 ...
+MINRES: iteration 5000: ||r||_B = 36.2476
+MINRES: No convergence!
+123069 121113 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration  9 : ||r|| = 270.725
+MINRES: iteration   0: ||r||_B = 270.725 ...
+MINRES: iteration 5000: ||r||_B = 24.9305
+MINRES: No convergence!
+121113 120057 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 10 : ||r|| = 218.642
+MINRES: iteration   0: ||r||_B = 218.642 ...
+MINRES: iteration 5000: ||r||_B = 16.451
+MINRES: No convergence!
+120057 119563 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 11 : ||r|| = 151.45
+MINRES: iteration   0: ||r||_B = 151.45 ...
+MINRES: iteration 5000: ||r||_B = 11.0742
+MINRES: No convergence!
+119563 119317 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 12 : ||r|| = 124.404
+MINRES: iteration   0: ||r||_B = 124.404 ...
+MINRES: iteration 5000: ||r||_B = 7.23958
+MINRES: No convergence!
+119317 119203 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 13 : ||r|| = 83.14
+MINRES: iteration   0: ||r||_B = 83.14 ...
+MINRES: iteration 5000: ||r||_B = 4.85586
+MINRES: No convergence!
+119203 119148 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 14 : ||r|| = 68.4891
+MINRES: iteration   0: ||r||_B = 68.4891 ...
+MINRES: iteration 5000: ||r||_B = 3.2233
+MINRES: No convergence!
+119148 119122 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 15 : ||r|| = 44.972
+MINRES: iteration   0: ||r||_B = 44.972 ...
+MINRES: iteration 5000: ||r||_B = 2.18773
+MINRES: No convergence!
+119122 119109 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 16 : ||r|| = 36.5006
+MINRES: iteration   0: ||r||_B = 36.5006 ...
+MINRES: iteration 5000: ||r||_B = 1.47799
+MINRES: No convergence!
+119109 119102 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 17 : ||r|| = 24.0278
+MINRES: iteration   0: ||r||_B = 24.0278 ...
+MINRES: iteration 5000: ||r||_B = 1.01782
+MINRES: No convergence!
+119102 119099 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 18 : ||r|| = 19.1807
+MINRES: iteration   0: ||r||_B = 19.1807 ...
+MINRES: iteration 5000: ||r||_B = 0.69858
+MINRES: No convergence!
+119099 119097 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 19 : ||r|| = 12.7843
+MINRES: iteration   0: ||r||_B = 12.7843 ...
+MINRES: iteration 5000: ||r||_B = 0.485894
+MINRES: No convergence!
+119097 119096 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 20 : ||r|| = 10.0572
+MINRES: iteration   0: ||r||_B = 10.0572 ...
+MINRES: iteration 5000: ||r||_B = 0.336246
+MINRES: No convergence!
+119096 119096 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 21 : ||r|| = 6.84403
+MINRES: iteration   0: ||r||_B = 6.84403 ...
+MINRES: iteration 5000: ||r||_B = 0.235228
+MINRES: No convergence!
+119096 119096 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 22 : ||r|| = 5.32813
+MINRES: iteration   0: ||r||_B = 5.32813 ...
+MINRES: iteration 5000: ||r||_B = 0.163614
+MINRES: No convergence!
+119096 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 23 : ||r|| = 3.71639
+MINRES: iteration   0: ||r||_B = 3.71639 ...
+MINRES: iteration 5000: ||r||_B = 0.114621
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 24 : ||r|| = 2.87213
+MINRES: iteration   0: ||r||_B = 2.87213 ...
+MINRES: iteration 5000: ||r||_B = 0.0797697
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 25 : ||r|| = 2.05385
+MINRES: iteration   0: ||r||_B = 2.05385 ...
+MINRES: iteration 5000: ||r||_B = 0.0557742
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 26 : ||r|| = 1.58107
+MINRES: iteration   0: ||r||_B = 1.58107 ...
+MINRES: iteration 5000: ||r||_B = 0.0386646
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 27 : ||r|| = 1.15556
+MINRES: iteration   0: ||r||_B = 1.15556 ...
+MINRES: iteration 5000: ||r||_B = 0.0269117
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 28 : ||r|| = 0.888308
+MINRES: iteration   0: ||r||_B = 0.888308 ...
+MINRES: iteration 5000: ||r||_B = 0.0185101
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 29 : ||r|| = 0.660831
+MINRES: iteration   0: ||r||_B = 0.660831 ...
+MINRES: iteration 5000: ||r||_B = 0.0127857
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 30 : ||r|| = 0.508121
+MINRES: iteration   0: ||r||_B = 0.508121 ...
+MINRES: iteration 5000: ||r||_B = 0.00872301
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 31 : ||r|| = 0.383153
+MINRES: iteration   0: ||r||_B = 0.383153 ...
+MINRES: iteration 5000: ||r||_B = 0.00599039
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 32 : ||r|| = 0.295026
+MINRES: iteration   0: ||r||_B = 0.295026 ...
+MINRES: iteration 5000: ||r||_B = 0.00408316
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 33 : ||r|| = 0.224682
+MINRES: iteration   0: ||r||_B = 0.224682 ...
+MINRES: iteration 5000: ||r||_B = 0.00284955
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 34 : ||r|| = 0.173356
+MINRES: iteration   0: ||r||_B = 0.173356 ...
+MINRES: iteration 5000: ||r||_B = 0.00202939
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 35 : ||r|| = 0.132973
+MINRES: iteration   0: ||r||_B = 0.132973 ...
+MINRES: iteration 5000: ||r||_B = 0.00151105
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 36 : ||r|| = 0.102829
+MINRES: iteration   0: ||r||_B = 0.102829 ...
+MINRES: iteration 5000: ||r||_B = 0.00118096
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 37 : ||r|| = 0.07929
+MINRES: iteration   0: ||r||_B = 0.07929 ...
+MINRES: iteration 5000: ||r||_B = 0.00095844
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 38 : ||r|| = 0.0614547
+MINRES: iteration   0: ||r||_B = 0.0614547 ...
+MINRES: iteration 5000: ||r||_B = 0.000801511
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 39 : ||r|| = 0.0475758
+MINRES: iteration   0: ||r||_B = 0.0475758 ...
+MINRES: iteration 5000: ||r||_B = 0.000685802
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 40 : ||r|| = 0.036951
+MINRES: iteration   0: ||r||_B = 0.036951 ...
+MINRES: iteration 5000: ||r||_B = 0.000587606
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 41 : ||r|| = 0.0286931
+MINRES: iteration   0: ||r||_B = 0.0286931 ...
+MINRES: iteration 5000: ||r||_B = 0.000500547
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 42 : ||r|| = 0.0223272
+MINRES: iteration   0: ||r||_B = 0.0223272 ...
+MINRES: iteration 5000: ||r||_B = 0.000425968
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 43 : ||r|| = 0.0173787
+MINRES: iteration   0: ||r||_B = 0.0173787 ...
+MINRES: iteration 5000: ||r||_B = 0.000360029
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 44 : ||r|| = 0.0135449
+MINRES: iteration   0: ||r||_B = 0.0135449 ...
+MINRES: iteration 5000: ||r||_B = 0.000302331
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 45 : ||r|| = 0.0105621
+MINRES: iteration   0: ||r||_B = 0.0105621 ...
+MINRES: iteration 5000: ||r||_B = 0.000252208
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 46 : ||r|| = 0.00824317
+MINRES: iteration   0: ||r||_B = 0.00824317 ...
+MINRES: iteration 5000: ||r||_B = 0.000208895
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 47 : ||r|| = 0.00643688
+MINRES: iteration   0: ||r||_B = 0.00643688 ...
+MINRES: iteration 5000: ||r||_B = 0.000172158
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 48 : ||r|| = 0.00502928
+MINRES: iteration   0: ||r||_B = 0.00502928 ...
+MINRES: iteration 5000: ||r||_B = 0.000141291
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 49 : ||r|| = 0.00393142
+MINRES: iteration   0: ||r||_B = 0.00393142 ...
+MINRES: iteration 5000: ||r||_B = 0.000115355
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 50 : ||r|| = 0.00307426
+MINRES: iteration   0: ||r||_B = 0.00307426 ...
+MINRES: iteration 5000: ||r||_B = 9.35517e-05
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 51 : ||r|| = 0.00240497
+MINRES: iteration   0: ||r||_B = 0.00240497 ...
+MINRES: iteration 5000: ||r||_B = 7.57331e-05
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 52 : ||r|| = 0.00188203
+MINRES: iteration   0: ||r||_B = 0.00188203 ...
+MINRES: iteration 5000: ||r||_B = 6.10207e-05
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 53 : ||r|| = 0.00147309
+MINRES: iteration   0: ||r||_B = 0.00147309 ...
+MINRES: iteration 5000: ||r||_B = 4.89786e-05
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 54 : ||r|| = 0.00115328
+MINRES: iteration   0: ||r||_B = 0.00115328 ...
+MINRES: iteration 5000: ||r||_B = 3.92738e-05
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 55 : ||r|| = 0.000903125
+MINRES: iteration   0: ||r||_B = 0.000903125 ...
+MINRES: iteration 5000: ||r||_B = 3.14287e-05
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 56 : ||r|| = 0.000707219
+MINRES: iteration   0: ||r||_B = 0.000707219 ...
+MINRES: iteration 5000: ||r||_B = 2.50552e-05
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 57 : ||r|| = 0.000553862
+MINRES: iteration   0: ||r||_B = 0.000553862 ...
+MINRES: iteration 5000: ||r||_B = 1.99499e-05
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 58 : ||r|| = 0.000433826
+MINRES: iteration   0: ||r||_B = 0.000433826 ...
+MINRES: iteration 5000: ||r||_B = 1.58348e-05
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 59 : ||r|| = 0.000339793
+MINRES: iteration   0: ||r||_B = 0.000339793 ...
+MINRES: iteration 5000: ||r||_B = 1.25703e-05
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 60 : ||r|| = 0.000266196
+MINRES: iteration   0: ||r||_B = 0.000266196 ...
+MINRES: iteration 5000: ||r||_B = 9.9537e-06
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 61 : ||r|| = 0.000208494
+MINRES: iteration   0: ||r||_B = 0.000208494 ...
+MINRES: iteration 5000: ||r||_B = 7.8636e-06
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 62 : ||r|| = 0.000163324
+MINRES: iteration   0: ||r||_B = 0.000163324 ...
+MINRES: iteration 5000: ||r||_B = 6.20795e-06
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 63 : ||r|| = 0.000127944
+MINRES: iteration   0: ||r||_B = 0.000127944 ...
+MINRES: iteration 5000: ||r||_B = 4.8952e-06
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 64 : ||r|| = 0.000100221
+MINRES: iteration   0: ||r||_B = 0.000100221 ...
+MINRES: iteration 5000: ||r||_B = 3.85881e-06
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 65 : ||r|| = 7.85071e-05
+MINRES: iteration   0: ||r||_B = 7.85071e-05 ...
+MINRES: iteration 5000: ||r||_B = 3.04229e-06
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 66 : ||r|| = 6.14915e-05
+MINRES: iteration   0: ||r||_B = 6.14915e-05 ...
+MINRES: iteration 5000: ||r||_B = 2.39571e-06
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 67 : ||r|| = 4.81589e-05
+MINRES: iteration   0: ||r||_B = 4.81589e-05 ...
+MINRES: iteration 5000: ||r||_B = 1.88421e-06
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 68 : ||r|| = 3.77174e-05
+MINRES: iteration   0: ||r||_B = 3.77174e-05 ...
+MINRES: iteration 5000: ||r||_B = 1.48375e-06
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 0.5 
+Newton iteration 69 : ||r|| = 3.36301e-05
+MINRES: iteration   0: ||r||_B = 3.36301e-05 ...
+MINRES: iteration 5000: ||r||_B = 1.32412e-06
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 70 : ||r|| = 2.63369e-05
+MINRES: iteration   0: ||r||_B = 2.63369e-05 ...
+MINRES: iteration 5000: ||r||_B = 1.03995e-06
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 71 : ||r|| = 2.06257e-05
+MINRES: iteration   0: ||r||_B = 2.06257e-05 ...
+MINRES: iteration 5000: ||r||_B = 8.17002e-07
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 72 : ||r|| = 1.61539e-05
+MINRES: iteration   0: ||r||_B = 1.61539e-05 ...
+MINRES: iteration 5000: ||r||_B = 6.40769e-07
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 73 : ||r|| = 1.26492e-05
+MINRES: iteration   0: ||r||_B = 1.26492e-05 ...
+MINRES: iteration 5000: ||r||_B = 5.02991e-07
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 74 : ||r|| = 9.90727e-06
+MINRES: iteration   0: ||r||_B = 9.90727e-06 ...
+MINRES: iteration 5000: ||r||_B = 3.94544e-07
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1 
+Newton iteration 75 : ||r|| = 7.7573e-06
+MINRES: iteration   0: ||r||_B = 7.7573e-06 ...
+MINRES: iteration 5000: ||r||_B = 3.09697e-07
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 0.25 
+Newton iteration 76 : ||r|| = 7.33672e-06
+MINRES: iteration   0: ||r||_B = 7.33672e-06 ...
+MINRES: iteration 5000: ||r||_B = 2.92807e-07
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 1.52588e-05 
+Newton iteration 77 : ||r|| = 7.3367e-06
+MINRES: iteration   0: ||r||_B = 7.3367e-06 ...
+MINRES: iteration 5000: ||r||_B = 2.93119e-07
+MINRES: No convergence!
+119095 119095 energy value before and after newton iteration
+alpha value is 9.53674e-07 
+Line search was not successfull.. stopping Newton
+Newton: rtol = 1e-12 not achieved.
+Final strain energy   : 119095
+Initial strain energy was  : 691028
+% change is  : 82.7655
+minimum jacobian before and after smoothing 5.94762e-08 1.67573e-10 
+The total time ist took for this example's execution is: 13718.1 seconds
+How do you want to write log to a new file:
+0) New file
+1) Append
+ --> 
