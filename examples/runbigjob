@@ -1,0 +1,6 @@
+#!/bin/csh
+#SBATCH -N 32
+#SBATCH -t 1:30:00
+#SBATCH -p pbatch
+
+srun -N32 --ntasks-per-node=8 ./bigrun 
