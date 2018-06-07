@@ -183,6 +183,7 @@ else
    MFEM_CXX ?= $(MPICXX)
    INCFLAGS += $(HYPRE_OPT)
    ALL_LIBS += $(HYPRE_LIB)
+   ALL_LIBS += $(FPT_LIB)
 endif
 
 DEP_CXX ?= $(MFEM_CXX)
