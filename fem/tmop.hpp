@@ -520,6 +520,11 @@ public:
                                          const FiniteElement &fe,
                                          const IntegrationRule &ir,
                                          DenseTensor &Jtr_dx) const;
+
+   virtual void ComputeTargetDerivativesb(int e_id, int ip_id,
+                                         const FiniteElement &fe,
+                                         const IntegrationRule &ir,
+                                         DenseTensor &Jtr_dx) const;
 };
 
 
@@ -544,7 +549,7 @@ protected:
    Coefficient *coeff0; // not owned, if NULL -> coeff0 is 0, i.e. no limiting
 
    //   Jrt: the inverse of the ref->target Jacobian, Jrt = Jtr^{-1}.
-   //   Jpr: the ref->physical transformation Jacobian, Jpr = PMatI^t DS.
+   //   Jpr: the ref->physical transformation Jacobian, Jpr = PMatI^t DSh.
    //   Jpt: the target->physical transformation Jacobian, Jpt = Jpr Jrt.
    //     P: represents dW_d(Jtp) (dim x dim).
    //   DSh: gradients of reference shape functions (dof x dim).

@@ -1,0 +1,29 @@
+Options used:
+   --mesh blade.mesh
+   --order 4
+   --refine-serial 0
+   --refine-parallel 0
+   --jitter 0
+   --metric-id 2
+   --target-id 1
+   --limit-const 0
+   --quad-type 1
+   --quad_order 8
+   --solver_type 0
+   --newton-iters 200
+   --newton-rel-tolerance 1e-12
+   --lin-solver 2
+   --lin-iter 100
+   --move-boundary
+   --no-combo-met
+   --visualization
+   --verbosity-level 2
+Mesh curvature: L2_T4_2D_P4
+Quadrature points per cell: 36
+Initial strain energy: 170.792
+Minimum det(J) of the original mesh is 6.52325e-05
+RelaxedNewtonSolver is used (as all det(J) > 0).
+-------------------------------------------------------
+Primary job  terminated normally, but 1 process returned
+a non-zero exit code. Per user-direction, the job has been aborted.
+-------------------------------------------------------

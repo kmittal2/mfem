@@ -1,0 +1,1 @@
+grep "Energy decrease" $1.out | awk '{print $7}' > $2.out

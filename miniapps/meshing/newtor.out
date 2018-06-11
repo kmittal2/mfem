@@ -1,0 +1,1288 @@
+Options used:
+   --mesh square.mesh
+   --order 3
+   --refine-serial 3
+   --refine-parallel 0
+   --jitter 0
+   --metric-id 7
+   --target-id 5
+   --limit-const 0
+   --quad-type 2
+   --quad_order 4
+   --solver_type 0
+   --newton-iters 200
+   --newton-rel-tolerance 1e-12
+   --lin-solver 2
+   --lin-iter 100
+   --move-boundary
+   --no-combo-met
+   --visualization
+   --verbosity-level 2
+Mesh curvature: H1_2D_P1
+Quadrature points per cell: 9
+Initial strain energy: 3.11638
+Minimum det(J) of the original mesh is 0.000976562
+RelaxedNewtonSolver is used (as all det(J) > 0).
+Newton iteration  0 : ||r|| = 0.594635
+MINRES: iteration   0: ||r||_B = 0.0431595 ...
+MINRES: iteration 100: ||r||_B = 0.0012942
+MINRES: No convergence!
+Scale = 1 Increasing energy.
+Scale = 0.5 Norm increased.
+Energy decrease: 12.0192% with 0.25 scaling. 2.74181
+Remap with dt = 0.834908 took 2 steps.
+Newton iteration  1 : ||r|| = 0.471742, ||r||/||r_0|| = 0.793331
+MINRES: iteration   0: ||r||_B = 0.0339027 ...
+MINRES: iteration 100: ||r||_B = 0.000850638
+MINRES: No convergence!
+Scale = 1 Norm increased.
+Energy decrease: 13.7516% with 0.5 scaling. 2.25347
+Remap with dt = 0.323767 took 4 steps.
+Newton iteration  2 : ||r|| = 0.385087, ||r||/||r_0|| = 0.647603
+MINRES: iteration   0: ||r||_B = 0.0291879 ...
+MINRES: iteration 100: ||r||_B = 0.000466823
+MINRES: No convergence!
+Scale = 1 Norm increased.
+Energy decrease: 6.52179% with 0.5 scaling. 1.9254
+Remap with dt = 0.245235 took 5 steps.
+Newton iteration  3 : ||r|| = 0.246022, ||r||/||r_0|| = 0.413736
+MINRES: iteration   0: ||r||_B = 0.0178882 ...
+MINRES: iteration 100: ||r||_B = 0.000266517
+MINRES: No convergence!
+Energy decrease: 3.23836% with 1 scaling. 1.75696
+Remap with dt = 0.192901 took 6 steps.
+Newton iteration  4 : ||r|| = 0.14127, ||r||/||r_0|| = 0.237574
+MINRES: iteration   0: ||r||_B = 0.0104419 ...
+MINRES: iteration 100: ||r||_B = 0.000122228
+MINRES: No convergence!
+Energy decrease: 0.446073% with 1 scaling. 1.61737
+Remap with dt = 0.188785 took 6 steps.
+Newton iteration  5 : ||r|| = 0.0401312, ||r||/||r_0|| = 0.0674888
+MINRES: iteration   0: ||r||_B = 0.00294327 ...
+MINRES: iteration 100: ||r||_B = 3.97294e-05
+MINRES: No convergence!
+Energy decrease: 0.0204878% with 1 scaling. 1.59707
+Remap with dt = 0.189831 took 6 steps.
+Newton iteration  6 : ||r|| = 0.0493178, ||r||/||r_0|| = 0.0829379
+MINRES: iteration   0: ||r||_B = 0.00373698 ...
+MINRES: iteration 100: ||r||_B = 1.44064e-05
+MINRES: No convergence!
+Energy decrease: 0.0019222% with 1 scaling. 1.59914
+Remap with dt = 0.189827 took 6 steps.
+Newton iteration  7 : ||r|| = 0.232084, ||r||/||r_0|| = 0.390297
+MINRES: iteration   0: ||r||_B = 0.0168875 ...
+MINRES: iteration 100: ||r||_B = 8.61714e-06
+MINRES: No convergence!
+Energy decrease: 0.0192773% with 1 scaling. 1.60032
+Remap with dt = 0.189689 took 6 steps.
+Newton iteration  8 : ||r|| = 0.759228, ||r||/||r_0|| = 1.2768
+MINRES: iteration   0: ||r||_B = 0.0458609 ...
+MINRES: iteration 100: ||r||_B = 2.44994e-05
+MINRES: No convergence!
+Energy decrease: 0.222009% with 1 scaling. 1.60538
+Remap with dt = 0.190082 took 6 steps.
+Newton iteration  9 : ||r|| = 0.637549, ||r||/||r_0|| = 1.07217
+MINRES: iteration   0: ||r||_B = 0.0415627 ...
+MINRES: iteration 100: ||r||_B = 1.53654e-05
+MINRES: No convergence!
+Energy decrease: 0.141573% with 1 scaling. 1.60855
+Remap with dt = 0.190165 took 6 steps.
+Newton iteration 10 : ||r|| = 0.588958, ||r||/||r_0|| = 0.990453
+MINRES: iteration   0: ||r||_B = 0.0365395 ...
+MINRES: iteration 100: ||r||_B = 1.12083e-05
+MINRES: No convergence!
+Energy decrease: 0.120784% with 1 scaling. 1.61148
+Remap with dt = 0.190278 took 6 steps.
+Newton iteration 11 : ||r|| = 0.416091, ||r||/||r_0|| = 0.699742
+MINRES: iteration   0: ||r||_B = 0.026626 ...
+MINRES: iteration 100: ||r||_B = 7.58237e-06
+MINRES: No convergence!
+Energy decrease: 0.0686921% with 1 scaling. 1.61113
+Remap with dt = 0.190052 took 6 steps.
+Newton iteration 12 : ||r|| = 0.444622, ||r||/||r_0|| = 0.747722
+MINRES: iteration   0: ||r||_B = 0.0273527 ...
+MINRES: iteration 100: ||r||_B = 6.38129e-06
+MINRES: No convergence!
+Energy decrease: 0.0613697% with 1 scaling. 1.61081
+Remap with dt = 0.190077 took 6 steps.
+Newton iteration 13 : ||r|| = 0.356935, ||r||/||r_0|| = 0.600259
+MINRES: iteration   0: ||r||_B = 0.023567 ...
+MINRES: iteration 100: ||r||_B = 4.27657e-06
+MINRES: No convergence!
+Energy decrease: 0.0403541% with 1 scaling. 1.61022
+Remap with dt = 0.190038 took 6 steps.
+Newton iteration 14 : ||r|| = 0.366298, ||r||/||r_0|| = 0.616004
+MINRES: iteration   0: ||r||_B = 0.0242844 ...
+MINRES: iteration 100: ||r||_B = 3.05875e-06
+MINRES: No convergence!
+Energy decrease: 0.0443615% with 1 scaling. 1.61047
+Remap with dt = 0.190099 took 6 steps.
+Newton iteration 15 : ||r|| = 0.410631, ||r||/||r_0|| = 0.690559
+MINRES: iteration   0: ||r||_B = 0.0267905 ...
+MINRES: iteration 100: ||r||_B = 3.93804e-06
+MINRES: No convergence!
+Energy decrease: 0.0551152% with 1 scaling. 1.61139
+Remap with dt = 0.190124 took 6 steps.
+Newton iteration 16 : ||r|| = 0.541273, ||r||/||r_0|| = 0.910261
+MINRES: iteration   0: ||r||_B = 0.0326576 ...
+MINRES: iteration 100: ||r||_B = 7.4903e-06
+MINRES: No convergence!
+Energy decrease: 0.0834318% with 1 scaling. 1.61312
+Remap with dt = 0.190243 took 6 steps.
+Newton iteration 17 : ||r|| = 0.309413, ||r||/||r_0|| = 0.520341
+MINRES: iteration   0: ||r||_B = 0.0204215 ...
+MINRES: iteration 100: ||r||_B = 4.76587e-06
+MINRES: No convergence!
+Energy decrease: 0.0354958% with 1 scaling. 1.61309
+Remap with dt = 0.190092 took 6 steps.
+Newton iteration 18 : ||r|| = 0.232239, ||r||/||r_0|| = 0.390557
+MINRES: iteration   0: ||r||_B = 0.0146687 ...
+MINRES: iteration 100: ||r||_B = 4.50766e-06
+MINRES: No convergence!
+Energy decrease: 0.0187791% with 1 scaling. 1.61248
+Remap with dt = 0.189997 took 6 steps.
+Newton iteration 19 : ||r|| = 0.24477, ||r||/||r_0|| = 0.41163
+MINRES: iteration   0: ||r||_B = 0.0156519 ...
+MINRES: iteration 100: ||r||_B = 2.54816e-06
+MINRES: No convergence!
+Energy decrease: 0.019087% with 1 scaling. 1.61194
+Remap with dt = 0.189942 took 6 steps.
+Newton iteration 20 : ||r|| = 0.224673, ||r||/||r_0|| = 0.377833
+MINRES: iteration   0: ||r||_B = 0.0150535 ...
+MINRES: iteration 100: ||r||_B = 5.08763e-06
+MINRES: No convergence!
+Energy decrease: 0.0180666% with 1 scaling. 1.61099
+Remap with dt = 0.189857 took 6 steps.
+Newton iteration 21 : ||r|| = 0.286056, ||r||/||r_0|| = 0.481061
+MINRES: iteration   0: ||r||_B = 0.0194196 ...
+MINRES: iteration 100: ||r||_B = 3.11157e-06
+MINRES: No convergence!
+Energy decrease: 0.0301683% with 1 scaling. 1.61055
+Remap with dt = 0.189855 took 6 steps.
+Newton iteration 22 : ||r|| = 0.417895, ||r||/||r_0|| = 0.702776
+MINRES: iteration   0: ||r||_B = 0.0268186 ...
+MINRES: iteration 100: ||r||_B = 4.80353e-06
+MINRES: No convergence!
+Energy decrease: 0.0565852% with 1 scaling. 1.61038
+Remap with dt = 0.189853 took 6 steps.
+Newton iteration 23 : ||r|| = 0.543798, ||r||/||r_0|| = 0.914506
+MINRES: iteration   0: ||r||_B = 0.0338522 ...
+MINRES: iteration 100: ||r||_B = 7.86112e-06
+MINRES: No convergence!
+Energy decrease: 0.0936782% with 1 scaling. 1.61141
+Remap with dt = 0.19002 took 6 steps.
+Newton iteration 24 : ||r|| = 0.353837, ||r||/||r_0|| = 0.595048
+MINRES: iteration   0: ||r||_B = 0.023634 ...
+MINRES: iteration 100: ||r||_B = 3.92964e-06
+MINRES: No convergence!
+Energy decrease: 0.0425088% with 1 scaling. 1.6106
+Remap with dt = 0.189977 took 6 steps.
+Newton iteration 25 : ||r|| = 0.377173, ||r||/||r_0|| = 0.634293
+MINRES: iteration   0: ||r||_B = 0.0241376 ...
+MINRES: iteration 100: ||r||_B = 7.48897e-06
+MINRES: No convergence!
+Energy decrease: 0.0462319% with 1 scaling. 1.61154
+Remap with dt = 0.190149 took 6 steps.
+Newton iteration 26 : ||r|| = 0.325054, ||r||/||r_0|| = 0.546645
+MINRES: iteration   0: ||r||_B = 0.0210939 ...
+MINRES: iteration 100: ||r||_B = 4.22967e-06
+MINRES: No convergence!
+Energy decrease: 0.0349929% with 1 scaling. 1.61127
+Remap with dt = 0.190083 took 6 steps.
+Newton iteration 27 : ||r|| = 0.503636, ||r||/||r_0|| = 0.846967
+MINRES: iteration   0: ||r||_B = 0.0318343 ...
+MINRES: iteration 100: ||r||_B = 5.68982e-06
+MINRES: No convergence!
+Energy decrease: 0.0809681% with 1 scaling. 1.61212
+Remap with dt = 0.190096 took 6 steps.
+Newton iteration 28 : ||r|| = 0.641907, ||r||/||r_0|| = 1.0795
+MINRES: iteration   0: ||r||_B = 0.0396842 ...
+MINRES: iteration 100: ||r||_B = 8.41638e-06
+MINRES: No convergence!
+Energy decrease: 0.119561% with 1 scaling. 1.61336
+Remap with dt = 0.190169 took 6 steps.
+Newton iteration 29 : ||r|| = 0.386356, ||r||/||r_0|| = 0.649736
+MINRES: iteration   0: ||r||_B = 0.0253864 ...
+MINRES: iteration 100: ||r||_B = 8.08963e-06
+MINRES: No convergence!
+Energy decrease: 0.0547222% with 1 scaling. 1.6133
+Remap with dt = 0.19019 took 6 steps.
+Newton iteration 30 : ||r|| = 0.263551, ||r||/||r_0|| = 0.443215
+MINRES: iteration   0: ||r||_B = 0.0183094 ...
+MINRES: iteration 100: ||r||_B = 1.40055e-05
+MINRES: No convergence!
+Energy decrease: 0.0382444% with 1 scaling. 1.61149
+Remap with dt = 0.189965 took 6 steps.
+Newton iteration 31 : ||r|| = 0.409304, ||r||/||r_0|| = 0.688328
+MINRES: iteration   0: ||r||_B = 0.025459 ...
+MINRES: iteration 100: ||r||_B = 1.4181e-05
+MINRES: No convergence!
+Energy decrease: 0.071445% with 1 scaling. 1.61262
+Remap with dt = 0.190197 took 6 steps.
+Newton iteration 32 : ||r|| = 0.266002, ||r||/||r_0|| = 0.447336
+MINRES: iteration   0: ||r||_B = 0.0190973 ...
+MINRES: iteration 100: ||r||_B = 2.30795e-05
+MINRES: No convergence!
+Energy decrease: 0.0582236% with 1 scaling. 1.61015
+Remap with dt = 0.18981 took 6 steps.
+Newton iteration 33 : ||r|| = 0.651698, ||r||/||r_0|| = 1.09596
+MINRES: iteration   0: ||r||_B = 0.0394885 ...
+MINRES: iteration 100: ||r||_B = 1.92748e-05
+MINRES: No convergence!
+Energy decrease: 0.171593% with 1 scaling. 1.61253
+Remap with dt = 0.190156 took 6 steps.
+Newton iteration 34 : ||r|| = 0.336892, ||r||/||r_0|| = 0.566553
+MINRES: iteration   0: ||r||_B = 0.0243095 ...
+MINRES: iteration 100: ||r||_B = 1.86058e-05
+MINRES: No convergence!
+Energy decrease: 0.0660381% with 1 scaling. 1.60997
+Remap with dt = 0.189832 took 6 steps.
+Newton iteration 35 : ||r|| = 0.572782, ||r||/||r_0|| = 0.963249
+MINRES: iteration   0: ||r||_B = 0.0355736 ...
+MINRES: iteration 100: ||r||_B = 2.06837e-05
+MINRES: No convergence!
+Energy decrease: 0.149472% with 1 scaling. 1.61265
+Remap with dt = 0.190061 took 6 steps.
+Newton iteration 36 : ||r|| = 0.52756, ||r||/||r_0|| = 0.8872
+MINRES: iteration   0: ||r||_B = 0.0335897 ...
+MINRES: iteration 100: ||r||_B = 1.66993e-05
+MINRES: No convergence!
+Energy decrease: 0.102477% with 1 scaling. 1.6113
+Remap with dt = 0.189889 took 6 steps.
+Newton iteration 37 : ||r|| = 0.82226, ||r||/||r_0|| = 1.3828
+MINRES: iteration   0: ||r||_B = 0.0452489 ...
+MINRES: iteration 100: ||r||_B = 1.12478e-05
+MINRES: No convergence!
+Energy decrease: 0.176025% with 1 scaling. 1.61227
+Remap with dt = 0.190048 took 6 steps.
+Newton iteration 38 : ||r|| = 0.545046, ||r||/||r_0|| = 0.916605
+MINRES: iteration   0: ||r||_B = 0.0350103 ...
+MINRES: iteration 100: ||r||_B = 1.42896e-05
+MINRES: No convergence!
+Energy decrease: 0.106733% with 1 scaling. 1.61031
+Remap with dt = 0.189809 took 6 steps.
+Newton iteration 39 : ||r|| = 0.692562, ||r||/||r_0|| = 1.16468
+MINRES: iteration   0: ||r||_B = 0.039997 ...
+MINRES: iteration 100: ||r||_B = 1.45469e-05
+MINRES: No convergence!
+Energy decrease: 0.13939% with 1 scaling. 1.61164
+Remap with dt = 0.190134 took 6 steps.
+Newton iteration 40 : ||r|| = 0.543664, ||r||/||r_0|| = 0.914283
+MINRES: iteration   0: ||r||_B = 0.0327756 ...
+MINRES: iteration 100: ||r||_B = 1.34769e-05
+MINRES: No convergence!
+Energy decrease: 0.0996864% with 1 scaling. 1.60969
+Remap with dt = 0.189831 took 6 steps.
+Newton iteration 41 : ||r|| = 0.464537, ||r||/||r_0|| = 0.781213
+MINRES: iteration   0: ||r||_B = 0.0294269 ...
+MINRES: iteration 100: ||r||_B = 1.3063e-05
+MINRES: No convergence!
+Energy decrease: 0.0771839% with 1 scaling. 1.61018
+Remap with dt = 0.190034 took 6 steps.
+Newton iteration 42 : ||r|| = 0.365287, ||r||/||r_0|| = 0.614305
+MINRES: iteration   0: ||r||_B = 0.0246803 ...
+MINRES: iteration 100: ||r||_B = 1.16372e-05
+MINRES: No convergence!
+Energy decrease: 0.0594634% with 1 scaling. 1.60922
+Remap with dt = 0.189898 took 6 steps.
+Newton iteration 43 : ||r|| = 0.648058, ||r||/||r_0|| = 1.08984
+MINRES: iteration   0: ||r||_B = 0.0385718 ...
+MINRES: iteration 100: ||r||_B = 2.19975e-05
+MINRES: No convergence!
+Energy decrease: 0.160785% with 1 scaling. 1.61342
+Remap with dt = 0.190325 took 6 steps.
+Newton iteration 44 : ||r|| = 0.502078, ||r||/||r_0|| = 0.844346
+MINRES: iteration   0: ||r||_B = 0.0311934 ...
+MINRES: iteration 100: ||r||_B = 1.30547e-05
+MINRES: No convergence!
+Energy decrease: 0.0884257% with 1 scaling. 1.61213
+Remap with dt = 0.190013 took 6 steps.
+Newton iteration 45 : ||r|| = 0.553129, ||r||/||r_0|| = 0.930199
+MINRES: iteration   0: ||r||_B = 0.0316888 ...
+MINRES: iteration 100: ||r||_B = 2.5563e-05
+MINRES: No convergence!
+Energy decrease: 0.129557% with 1 scaling. 1.61561
+Remap with dt = 0.190313 took 6 steps.
+Newton iteration 46 : ||r|| = 0.301825, ||r||/||r_0|| = 0.507579
+MINRES: iteration   0: ||r||_B = 0.0213673 ...
+MINRES: iteration 100: ||r||_B = 3.63032e-05
+MINRES: No convergence!
+Energy decrease: 0.100623% with 1 scaling. 1.61127
+Remap with dt = 0.189608 took 6 steps.
+Newton iteration 47 : ||r|| = 0.841355, ||r||/||r_0|| = 1.41491
+MINRES: iteration   0: ||r||_B = 0.044975 ...
+MINRES: iteration 100: ||r||_B = 3.33072e-05
+MINRES: No convergence!
+Energy decrease: 0.295277% with 1 scaling. 1.61586
+Remap with dt = 0.190181 took 6 steps.
+Newton iteration 48 : ||r|| = 0.318579, ||r||/||r_0|| = 0.535755
+MINRES: iteration   0: ||r||_B = 0.0229969 ...
+MINRES: iteration 100: ||r||_B = 3.92499e-05
+MINRES: No convergence!
+Energy decrease: 0.125724% with 1 scaling. 1.60977
+Remap with dt = 0.189482 took 6 steps.
+Newton iteration 49 : ||r|| = 0.918072, ||r||/||r_0|| = 1.54392
+MINRES: iteration   0: ||r||_B = 0.0507047 ...
+MINRES: iteration 100: ||r||_B = 7.48072e-05
+MINRES: No convergence!
+Energy decrease: 0.328355% with 1 scaling. 1.61462
+Remap with dt = 0.1897 took 6 steps.
+Newton iteration 50 : ||r|| = 0.770254, ||r||/||r_0|| = 1.29534
+MINRES: iteration   0: ||r||_B = 0.0458716 ...
+MINRES: iteration 100: ||r||_B = 2.46981e-05
+MINRES: No convergence!
+Energy decrease: 0.182031% with 1 scaling. 1.61066
+Remap with dt = 0.189759 took 6 steps.
+Newton iteration 51 : ||r|| = 5.65342, ||r||/||r_0|| = 9.50738
+MINRES: iteration   0: ||r||_B = 0.0782712 ...
+MINRES: iteration 100: ||r||_B = 0.000488973
+MINRES: No convergence!
+Scale = 1 Norm increased.
+Energy decrease: 0.440985% with 0.5 scaling. 1.62544
+Remap with dt = 0.18982 took 6 steps.
+Newton iteration 52 : ||r|| = 1.9936, ||r||/||r_0|| = 3.35265
+MINRES: iteration   0: ||r||_B = 0.0463248 ...
+MINRES: iteration 100: ||r||_B = 3.22392e-05
+MINRES: No convergence!
+Energy decrease: 0.172446% with 1 scaling. 1.61332
+Remap with dt = 0.189981 took 6 steps.
+Newton iteration 53 : ||r|| = 0.737182, ||r||/||r_0|| = 1.23972
+MINRES: iteration   0: ||r||_B = 0.032975 ...
+MINRES: iteration 100: ||r||_B = 3.38262e-05
+MINRES: No convergence!
+Energy decrease: 0.11049% with 1 scaling. 1.61066
+Remap with dt = 0.189706 took 6 steps.
+Newton iteration 54 : ||r|| = 1.75335, ||r||/||r_0|| = 2.94862
+MINRES: iteration   0: ||r||_B = 0.0670875 ...
+MINRES: iteration 100: ||r||_B = 0.000246856
+MINRES: No convergence!
+Energy decrease: 0.439727% with 1 scaling. 1.61774
+Remap with dt = 0.189577 took 6 steps.
+Newton iteration 55 : ||r|| = 1.22864, ||r||/||r_0|| = 2.06621
+MINRES: iteration   0: ||r||_B = 0.0612614 ...
+MINRES: iteration 100: ||r||_B = 7.87558e-05
+MINRES: No convergence!
+Energy decrease: 0.314869% with 1 scaling. 1.61354
+Remap with dt = 0.189771 took 6 steps.
+Newton iteration 56 : ||r|| = 1.03964, ||r||/||r_0|| = 1.74837
+MINRES: iteration   0: ||r||_B = 0.0477674 ...
+MINRES: iteration 100: ||r||_B = 4.62607e-05
+MINRES: No convergence!
+Scale = 1 Norm increased.
+Energy decrease: 0.162738% with 0.5 scaling. 1.61515
+Remap with dt = 0.190058 took 6 steps.
+Newton iteration 57 : ||r|| = 0.7529, ||r||/||r_0|| = 1.26616
+MINRES: iteration   0: ||r||_B = 0.0411123 ...
+MINRES: iteration 100: ||r||_B = 1.85019e-05
+MINRES: No convergence!
+Scale = 1 Norm increased.
+Energy decrease: 0.122185% with 0.5 scaling. 1.61352
+Remap with dt = 0.190066 took 6 steps.
+Newton iteration 58 : ||r|| = 0.503989, ||r||/||r_0|| = 0.84756
+MINRES: iteration   0: ||r||_B = 0.0318649 ...
+MINRES: iteration 100: ||r||_B = 1.33674e-05
+MINRES: No convergence!
+Energy decrease: 0.0824341% with 1 scaling. 1.61172
+Remap with dt = 0.189893 took 6 steps.
+Newton iteration 59 : ||r|| = 0.542841, ||r||/||r_0|| = 0.912898
+MINRES: iteration   0: ||r||_B = 0.0343309 ...
+MINRES: iteration 100: ||r||_B = 1.72386e-05
+MINRES: No convergence!
+Energy decrease: 0.110332% with 1 scaling. 1.61006
+Remap with dt = 0.18969 took 6 steps.
+Newton iteration 60 : ||r|| = 0.716027, ||r||/||r_0|| = 1.20415
+MINRES: iteration   0: ||r||_B = 0.0397987 ...
+MINRES: iteration 100: ||r||_B = 2.33856e-05
+MINRES: No convergence!
+Energy decrease: 0.159147% with 1 scaling. 1.61127
+Remap with dt = 0.189969 took 6 steps.
+Newton iteration 61 : ||r|| = 0.50819, ||r||/||r_0|| = 0.854626
+MINRES: iteration   0: ||r||_B = 0.0332313 ...
+MINRES: iteration 100: ||r||_B = 1.79228e-05
+MINRES: No convergence!
+Energy decrease: 0.106758% with 1 scaling. 1.6106
+Remap with dt = 0.189821 took 6 steps.
+Newton iteration 62 : ||r|| = 0.863813, ||r||/||r_0|| = 1.45268
+MINRES: iteration   0: ||r||_B = 0.0464595 ...
+MINRES: iteration 100: ||r||_B = 3.83291e-05
+MINRES: No convergence!
+Energy decrease: 0.204536% with 1 scaling. 1.61277
+Remap with dt = 0.190067 took 6 steps.
+Newton iteration 63 : ||r|| = 0.848787, ||r||/||r_0|| = 1.42741
+MINRES: iteration   0: ||r||_B = 0.0459031 ...
+MINRES: iteration 100: ||r||_B = 3.18485e-05
+MINRES: No convergence!
+Energy decrease: 0.179621% with 1 scaling. 1.61169
+Remap with dt = 0.18988 took 6 steps.
+Newton iteration 64 : ||r|| = 1.14473, ||r||/||r_0|| = 1.92509
+MINRES: iteration   0: ||r||_B = 0.0515815 ...
+MINRES: iteration 100: ||r||_B = 0.000421653
+MINRES: No convergence!
+Scale = 1 Neg det(J) found.
+Energy decrease: 0.049377% with 0.5 scaling. 1.61768
+Remap with dt = 0.189864 took 6 steps.
+Newton iteration 65 : ||r|| = 1.1355, ||r||/||r_0|| = 1.90957
+MINRES: iteration   0: ||r||_B = 0.0507056 ...
+MINRES: iteration 100: ||r||_B = 3.54617e-05
+MINRES: No convergence!
+Energy decrease: 0.238928% with 1 scaling. 1.61216
+Remap with dt = 0.189738 took 6 steps.
+Newton iteration 66 : ||r|| = 1.1647, ||r||/||r_0|| = 1.95869
+MINRES: iteration   0: ||r||_B = 0.0491272 ...
+MINRES: iteration 100: ||r||_B = 4.98835e-05
+MINRES: No convergence!
+Scale = 1 Norm increased.
+Energy decrease: 0.101555% with 0.5 scaling. 1.61314
+Remap with dt = 0.189912 took 6 steps.
+Newton iteration 67 : ||r|| = 1.47691, ||r||/||r_0|| = 2.48373
+MINRES: iteration   0: ||r||_B = 0.0561267 ...
+MINRES: iteration 100: ||r||_B = 0.000492392
+MINRES: No convergence!
+Scale = 1 Neg det(J) found.
+Scale = 0.5 Neg det(J) found.
+Energy decrease: 0.101114% with 0.25 scaling. 1.61747
+Remap with dt = 0.189871 took 6 steps.
+Newton iteration 68 : ||r|| = 1.21108, ||r||/||r_0|| = 2.03668
+MINRES: iteration   0: ||r||_B = 0.0505458 ...
+MINRES: iteration 100: ||r||_B = 3.74534e-05
+MINRES: No convergence!
+Energy decrease: 0.226331% with 1 scaling. 1.61472
+Remap with dt = 0.189997 took 6 steps.
+Newton iteration 69 : ||r|| = 0.490586, ||r||/||r_0|| = 0.82502
+MINRES: iteration   0: ||r||_B = 0.0324315 ...
+MINRES: iteration 100: ||r||_B = 3.52072e-05
+MINRES: No convergence!
+Scale = 1 Norm increased.
+Energy decrease: 0.125885% with 0.5 scaling. 1.61112
+Remap with dt = 0.190026 took 6 steps.
+Newton iteration 70 : ||r|| = 0.411271, ||r||/||r_0|| = 0.691635
+MINRES: iteration   0: ||r||_B = 0.026891 ...
+MINRES: iteration 100: ||r||_B = 9.06067e-06
+MINRES: No convergence!
+Energy decrease: 0.0760196% with 1 scaling. 1.61131
+Remap with dt = 0.189988 took 6 steps.
+Newton iteration 71 : ||r|| = 0.345038, ||r||/||r_0|| = 0.580252
+MINRES: iteration   0: ||r||_B = 0.0229078 ...
+MINRES: iteration 100: ||r||_B = 9.86487e-06
+MINRES: No convergence!
+Energy decrease: 0.0466712% with 1 scaling. 1.61057
+Remap with dt = 0.189766 took 6 steps.
+Newton iteration 72 : ||r|| = 0.520513, ||r||/||r_0|| = 0.875348
+MINRES: iteration   0: ||r||_B = 0.0321014 ...
+MINRES: iteration 100: ||r||_B = 8.77421e-06
+MINRES: No convergence!
+Energy decrease: 0.0898307% with 1 scaling. 1.61213
+Remap with dt = 0.189955 took 6 steps.
+Newton iteration 73 : ||r|| = 0.468844, ||r||/||r_0|| = 0.788457
+MINRES: iteration   0: ||r||_B = 0.029258 ...
+MINRES: iteration 100: ||r||_B = 2.01146e-05
+MINRES: No convergence!
+Energy decrease: 0.0724968% with 1 scaling. 1.61159
+Remap with dt = 0.189735 took 6 steps.
+Newton iteration 74 : ||r|| = 0.588006, ||r||/||r_0|| = 0.988852
+MINRES: iteration   0: ||r||_B = 0.0337136 ...
+MINRES: iteration 100: ||r||_B = 2.12037e-05
+MINRES: No convergence!
+Energy decrease: 0.13034% with 1 scaling. 1.61323
+Remap with dt = 0.18985 took 6 steps.
+Newton iteration 75 : ||r|| = 0.689674, ||r||/||r_0|| = 1.15983
+MINRES: iteration   0: ||r||_B = 0.0362444 ...
+MINRES: iteration 100: ||r||_B = 3.04426e-05
+MINRES: No convergence!
+Energy decrease: 0.151679% with 1 scaling. 1.61165
+Remap with dt = 0.189562 took 6 steps.
+Newton iteration 76 : ||r|| = 1.57158, ||r||/||r_0|| = 2.64293
+MINRES: iteration   0: ||r||_B = 0.0557144 ...
+MINRES: iteration 100: ||r||_B = 0.000563116
+MINRES: No convergence!
+Energy decrease: 0.357588% with 1 scaling. 1.61457
+Remap with dt = 0.189591 took 6 steps.
+Newton iteration 77 : ||r|| = 0.770677, ||r||/||r_0|| = 1.29605
+MINRES: iteration   0: ||r||_B = 0.046423 ...
+MINRES: iteration 100: ||r||_B = 0.000158603
+MINRES: No convergence!
+Scale = 1 Neg det(J) found.
+Scale = 0.5 Neg det(J) found.
+Scale = 0.25 Increasing energy.
+Energy decrease: 0.040495% with 0.125 scaling. 1.61622
+Remap with dt = 0.18954 took 6 steps.
+Newton iteration 78 : ||r|| = 0.74215, ||r||/||r_0|| = 1.24808
+MINRES: iteration   0: ||r||_B = 0.043511 ...
+MINRES: iteration 100: ||r||_B = 1.86294e-05
+MINRES: No convergence!
+Energy decrease: 0.247373% with 1 scaling. 1.61322
+Remap with dt = 0.189605 took 6 steps.
+Newton iteration 79 : ||r|| = 1.00563, ||r||/||r_0|| = 1.69117
+MINRES: iteration   0: ||r||_B = 0.0522282 ...
+MINRES: iteration 100: ||r||_B = 0.000221595
+MINRES: No convergence!
+Scale = 1 Neg det(J) found.
+Scale = 0.5 Norm increased.
+Energy decrease: 0.120057% with 0.25 scaling. 1.61835
+Remap with dt = 0.189804 took 6 steps.
+Newton iteration 80 : ||r|| = 1.01568, ||r||/||r_0|| = 1.70806
+MINRES: iteration   0: ||r||_B = 0.0459691 ...
+MINRES: iteration 100: ||r||_B = 8.30191e-05
+MINRES: No convergence!
+Energy decrease: 0.222149% with 1 scaling. 1.61521
+Remap with dt = 0.189876 took 6 steps.
+Newton iteration 81 : ||r|| = 0.48525, ||r||/||r_0|| = 0.816048
+MINRES: iteration   0: ||r||_B = 0.0308831 ...
+MINRES: iteration 100: ||r||_B = 2.88028e-05
+MINRES: No convergence!
+Energy decrease: 0.14247% with 1 scaling. 1.61
+Remap with dt = 0.18945 took 6 steps.
+Newton iteration 82 : ||r|| = 1.24237, ||r||/||r_0|| = 2.0893
+MINRES: iteration   0: ||r||_B = 0.0578589 ...
+MINRES: iteration 100: ||r||_B = 0.000109499
+MINRES: No convergence!
+Energy decrease: 0.403811% with 1 scaling. 1.61582
+Remap with dt = 0.1896 took 6 steps.
+Newton iteration 83 : ||r|| = 0.727546, ||r||/||r_0|| = 1.22352
+MINRES: iteration   0: ||r||_B = 0.0440888 ...
+MINRES: iteration 100: ||r||_B = 2.83928e-05
+MINRES: No convergence!
+Scale = 1 Norm increased.
+Energy decrease: 0.177755% with 0.5 scaling. 1.61101
+Remap with dt = 0.189519 took 6 steps.
+Newton iteration 84 : ||r|| = 0.629383, ||r||/||r_0|| = 1.05844
+MINRES: iteration   0: ||r||_B = 0.0381818 ...
+MINRES: iteration 100: ||r||_B = 1.24548e-05
+MINRES: No convergence!
+Energy decrease: 0.127333% with 1 scaling. 1.61153
+Remap with dt = 0.189817 took 6 steps.
+Newton iteration 85 : ||r|| = 0.431824, ||r||/||r_0|| = 0.726199
+MINRES: iteration   0: ||r||_B = 0.0284463 ...
+MINRES: iteration 100: ||r||_B = 1.34149e-05
+MINRES: No convergence!
+Energy decrease: 0.0710846% with 1 scaling. 1.61073
+Remap with dt = 0.189868 took 6 steps.
+Newton iteration 86 : ||r|| = 0.54516, ||r||/||r_0|| = 0.916797
+MINRES: iteration   0: ||r||_B = 0.0330502 ...
+MINRES: iteration 100: ||r||_B = 1.14136e-05
+MINRES: No convergence!
+Energy decrease: 0.0991072% with 1 scaling. 1.61192
+Remap with dt = 0.190029 took 6 steps.
+Newton iteration 87 : ||r|| = 0.464027, ||r||/||r_0|| = 0.780356
+MINRES: iteration   0: ||r||_B = 0.0292392 ...
+MINRES: iteration 100: ||r||_B = 2.02695e-05
+MINRES: No convergence!
+Energy decrease: 0.0833823% with 1 scaling. 1.61033
+Remap with dt = 0.189752 took 6 steps.
+Newton iteration 88 : ||r|| = 0.638595, ||r||/||r_0|| = 1.07393
+MINRES: iteration   0: ||r||_B = 0.0391557 ...
+MINRES: iteration 100: ||r||_B = 1.40409e-05
+MINRES: No convergence!
+Energy decrease: 0.153391% with 1 scaling. 1.61148
+Remap with dt = 0.189935 took 6 steps.
+Newton iteration 89 : ||r|| = 0.574353, ||r||/||r_0|| = 0.965892
+MINRES: iteration   0: ||r||_B = 0.035663 ...
+MINRES: iteration 100: ||r||_B = 1.3892e-05
+MINRES: No convergence!
+Energy decrease: 0.110295% with 1 scaling. 1.61075
+Remap with dt = 0.18985 took 6 steps.
+Newton iteration 90 : ||r|| = 0.570919, ||r||/||r_0|| = 0.960116
+MINRES: iteration   0: ||r||_B = 0.0344765 ...
+MINRES: iteration 100: ||r||_B = 1.53298e-05
+MINRES: No convergence!
+Energy decrease: 0.120504% with 1 scaling. 1.61132
+Remap with dt = 0.189907 took 6 steps.
+Newton iteration 91 : ||r|| = 0.460959, ||r||/||r_0|| = 0.775196
+MINRES: iteration   0: ||r||_B = 0.0302696 ...
+MINRES: iteration 100: ||r||_B = 1.8253e-05
+MINRES: No convergence!
+Energy decrease: 0.0857677% with 1 scaling. 1.61032
+Remap with dt = 0.189844 took 6 steps.
+Newton iteration 92 : ||r|| = 0.790448, ||r||/||r_0|| = 1.3293
+MINRES: iteration   0: ||r||_B = 0.0425858 ...
+MINRES: iteration 100: ||r||_B = 4.48232e-05
+MINRES: No convergence!
+Energy decrease: 0.174106% with 1 scaling. 1.61188
+Remap with dt = 0.189985 took 6 steps.
+Newton iteration 93 : ||r|| = 0.755087, ||r||/||r_0|| = 1.26983
+MINRES: iteration   0: ||r||_B = 0.0430625 ...
+MINRES: iteration 100: ||r||_B = 3.17386e-05
+MINRES: No convergence!
+Energy decrease: 0.172139% with 1 scaling. 1.61227
+Remap with dt = 0.189828 took 6 steps.
+Newton iteration 94 : ||r|| = 0.987187, ||r||/||r_0|| = 1.66016
+MINRES: iteration   0: ||r||_B = 0.0476668 ...
+MINRES: iteration 100: ||r||_B = 0.000215609
+MINRES: No convergence!
+Scale = 1 Neg det(J) found.
+Energy decrease: 0.11395% with 0.5 scaling. 1.61644
+Remap with dt = 0.18981 took 6 steps.
+Newton iteration 95 : ||r|| = 0.766486, ||r||/||r_0|| = 1.289
+MINRES: iteration   0: ||r||_B = 0.0403148 ...
+MINRES: iteration 100: ||r||_B = 3.39344e-05
+MINRES: No convergence!
+Energy decrease: 0.190472% with 1 scaling. 1.61124
+Remap with dt = 0.189491 took 6 steps.
+Newton iteration 96 : ||r|| = 0.732185, ||r||/||r_0|| = 1.23132
+MINRES: iteration   0: ||r||_B = 0.0405073 ...
+MINRES: iteration 100: ||r||_B = 1.81792e-05
+MINRES: No convergence!
+Energy decrease: 0.145959% with 1 scaling. 1.61241
+Remap with dt = 0.189815 took 6 steps.
+Newton iteration 97 : ||r|| = 0.832608, ||r||/||r_0|| = 1.4002
+MINRES: iteration   0: ||r||_B = 0.0400278 ...
+MINRES: iteration 100: ||r||_B = 2.67389e-05
+MINRES: No convergence!
+Energy decrease: 0.127612% with 1 scaling. 1.61352
+Remap with dt = 0.189797 took 6 steps.
+Newton iteration 98 : ||r|| = 0.447776, ||r||/||r_0|| = 0.753026
+MINRES: iteration   0: ||r||_B = 0.025963 ...
+MINRES: iteration 100: ||r||_B = 2.53813e-05
+MINRES: No convergence!
+Energy decrease: 0.0397061% with 1 scaling. 1.61111
+Remap with dt = 0.189596 took 6 steps.
+Newton iteration 99 : ||r|| = 1.97794, ||r||/||r_0|| = 3.32631
+MINRES: iteration   0: ||r||_B = 0.0571194 ...
+MINRES: iteration 100: ||r||_B = 0.000108541
+MINRES: No convergence!
+Scale = 1 Norm increased.
+Energy decrease: 0.229656% with 0.5 scaling. 1.6176
+Remap with dt = 0.189633 took 6 steps.
+Newton iteration 100 : ||r|| = 0.962642, ||r||/||r_0|| = 1.61888
+MINRES: iteration   0: ||r||_B = 0.0415348 ...
+MINRES: iteration 100: ||r||_B = 2.11369e-05
+MINRES: No convergence!
+Energy decrease: 0.149644% with 1 scaling. 1.61172
+Remap with dt = 0.189869 took 6 steps.
+Newton iteration 101 : ||r|| = 0.666895, ||r||/||r_0|| = 1.12152
+MINRES: iteration   0: ||r||_B = 0.0369638 ...
+MINRES: iteration 100: ||r||_B = 0.000127144
+MINRES: No convergence!
+Scale = 1 Neg det(J) found.
+Scale = 0.5 Neg det(J) found.
+Scale = 0.25 Neg det(J) found.
+Energy decrease: -0.0838474% with 0.125 scaling. 1.61552
+Remap with dt = 0.189897 took 6 steps.
+Newton iteration 102 : ||r|| = 0.721946, ||r||/||r_0|| = 1.2141
+MINRES: iteration   0: ||r||_B = 0.0390083 ...
+MINRES: iteration 100: ||r||_B = 1.42017e-05
+MINRES: No convergence!
+Energy decrease: 0.184777% with 1 scaling. 1.61329
+Remap with dt = 0.189948 took 6 steps.
+Newton iteration 103 : ||r|| = 0.811091, ||r||/||r_0|| = 1.36401
+MINRES: iteration   0: ||r||_B = 0.0366391 ...
+MINRES: iteration 100: ||r||_B = 3.72973e-05
+MINRES: No convergence!
+Energy decrease: 0.139838% with 1 scaling. 1.61177
+Remap with dt = 0.190116 took 6 steps.
+Newton iteration 104 : ||r|| = 0.826429, ||r||/||r_0|| = 1.38981
+MINRES: iteration   0: ||r||_B = 0.0388404 ...
+MINRES: iteration 100: ||r||_B = 6.02697e-05
+MINRES: No convergence!
+Energy decrease: 0.204125% with 1 scaling. 1.61448
+Remap with dt = 0.19004 took 6 steps.
+Newton iteration 105 : ||r|| = 0.812081, ||r||/||r_0|| = 1.36568
+MINRES: iteration   0: ||r||_B = 0.0443841 ...
+MINRES: iteration 100: ||r||_B = 3.31271e-05
+MINRES: No convergence!
+Energy decrease: 0.208341% with 1 scaling. 1.61298
+Remap with dt = 0.189788 took 6 steps.
+Newton iteration 106 : ||r|| = 1.26517, ||r||/||r_0|| = 2.12765
+MINRES: iteration   0: ||r||_B = 0.0598714 ...
+MINRES: iteration 100: ||r||_B = 9.21372e-05
+MINRES: No convergence!
+Scale = 1 Norm increased.
+Energy decrease: 0.275131% with 0.5 scaling. 1.61734
+Remap with dt = 0.189854 took 6 steps.
+Newton iteration 107 : ||r|| = 0.750505, ||r||/||r_0|| = 1.26213
+MINRES: iteration   0: ||r||_B = 0.0434872 ...
+MINRES: iteration 100: ||r||_B = 1.78047e-05
+MINRES: No convergence!
+Energy decrease: 0.145052% with 1 scaling. 1.61362
+Remap with dt = 0.190065 took 6 steps.
+Newton iteration 108 : ||r|| = 0.745549, ||r||/||r_0|| = 1.25379
+MINRES: iteration   0: ||r||_B = 0.0397757 ...
+MINRES: iteration 100: ||r||_B = 3.83651e-05
+MINRES: No convergence!
+Energy decrease: 0.183505% with 1 scaling. 1.61493
+Remap with dt = 0.189951 took 6 steps.
+Newton iteration 109 : ||r|| = 0.560061, ||r||/||r_0|| = 0.941857
+MINRES: iteration   0: ||r||_B = 0.0346438 ...
+MINRES: iteration 100: ||r||_B = 6.73168e-05
+MINRES: No convergence!
+Energy decrease: 0.174466% with 1 scaling. 1.6121
+Remap with dt = 0.189858 took 6 steps.
+Newton iteration 110 : ||r|| = 1.24299, ||r||/||r_0|| = 2.09034
+MINRES: iteration   0: ||r||_B = 0.0540585 ...
+MINRES: iteration 100: ||r||_B = 0.000356429
+MINRES: No convergence!
+Energy decrease: 0.521449% with 1 scaling. 1.61688
+Remap with dt = 0.189627 took 6 steps.
+Newton iteration 111 : ||r|| = 0.746644, ||r||/||r_0|| = 1.25563
+MINRES: iteration   0: ||r||_B = 0.0447262 ...
+MINRES: iteration 100: ||r||_B = 0.000125775
+MINRES: No convergence!
+Scale = 1 Norm increased.
+Energy decrease: 0.21198% with 0.5 scaling. 1.61248
+Remap with dt = 0.189673 took 6 steps.
+Newton iteration 112 : ||r|| = 0.58471, ||r||/||r_0|| = 0.983309
+MINRES: iteration   0: ||r||_B = 0.0360463 ...
+MINRES: iteration 100: ||r||_B = 1.80966e-05
+MINRES: No convergence!
+Energy decrease: 0.0993992% with 1 scaling. 1.61138
+Remap with dt = 0.189898 took 6 steps.
+Newton iteration 113 : ||r|| = 0.566984, ||r||/||r_0|| = 0.9535
+MINRES: iteration   0: ||r||_B = 0.0337288 ...
+MINRES: iteration 100: ||r||_B = 7.06403e-06
+MINRES: No convergence!
+Energy decrease: 0.0968325% with 1 scaling. 1.61086
+Remap with dt = 0.18962 took 6 steps.
+Newton iteration 114 : ||r|| = 0.909375, ||r||/||r_0|| = 1.5293
+MINRES: iteration   0: ||r||_B = 0.0408304 ...
+MINRES: iteration 100: ||r||_B = 2.52738e-05
+MINRES: No convergence!
+Energy decrease: 0.12388% with 1 scaling. 1.61146
+Remap with dt = 0.18972 took 6 steps.
+Newton iteration 115 : ||r|| = 0.658576, ||r||/||r_0|| = 1.10753
+MINRES: iteration   0: ||r||_B = 0.0388781 ...
+MINRES: iteration 100: ||r||_B = 1.30506e-05
+MINRES: No convergence!
+Energy decrease: 0.116567% with 1 scaling. 1.61032
+Remap with dt = 0.189758 took 6 steps.
+Newton iteration 116 : ||r|| = 0.747494, ||r||/||r_0|| = 1.25706
+MINRES: iteration   0: ||r||_B = 0.0425462 ...
+MINRES: iteration 100: ||r||_B = 5.51996e-05
+MINRES: No convergence!
+Scale = 1 Increasing energy.
+Scale = 0.5 Neg det(J) found.
+Energy decrease: -0.030714% with 0.25 scaling. 1.61437
+Remap with dt = 0.189437 took 6 steps.
+Newton iteration 117 : ||r|| = 0.713981, ||r||/||r_0|| = 1.2007
+MINRES: iteration   0: ||r||_B = 0.0410929 ...
+MINRES: iteration 100: ||r||_B = 6.98195e-05
+MINRES: No convergence!
+Scale = 1 Neg det(J) found.
+Scale = 0.5 Neg det(J) found.
+Energy decrease: 0.0290201% with 0.25 scaling. 1.61273
+Remap with dt = 0.189332 took 6 steps.
+Newton iteration 118 : ||r|| = 1.40583, ||r||/||r_0|| = 2.3642
+MINRES: iteration   0: ||r||_B = 0.0447951 ...
+MINRES: iteration 100: ||r||_B = 4.25417e-05
+MINRES: No convergence!
+Scale = 1 Norm increased.
+Energy decrease: 0.135663% with 0.5 scaling. 1.6128
+Remap with dt = 0.18906 took 6 steps.
+Newton iteration 119 : ||r|| = 0.795795, ||r||/||r_0|| = 1.33829
+MINRES: iteration   0: ||r||_B = 0.0387142 ...
+MINRES: iteration 100: ||r||_B = 1.21137e-05
+MINRES: No convergence!
+Energy decrease: 0.0870717% with 1 scaling. 1.61183
+Remap with dt = 0.189411 took 6 steps.
+Newton iteration 120 : ||r|| = 0.471265, ||r||/||r_0|| = 0.792528
+MINRES: iteration   0: ||r||_B = 0.0290941 ...
+MINRES: iteration 100: ||r||_B = 5.89303e-05
+MINRES: No convergence!
+Scale = 1 Increasing energy.
+Scale = 0.5 Neg det(J) found.
+Scale = 0.25 Neg det(J) found.
+Scale = 0.125 Norm increased.
+Energy decrease: 0.0243727% with 0.0625 scaling. 1.61149
+Remap with dt = 0.189627 took 6 steps.
+Newton iteration 121 : ||r|| = 0.412785, ||r||/||r_0|| = 0.694182
+MINRES: iteration   0: ||r||_B = 0.0268396 ...
+MINRES: iteration 100: ||r||_B = 8.76366e-06
+MINRES: No convergence!
+Energy decrease: 0.0606164% with 1 scaling. 1.61063
+Remap with dt = 0.189602 took 6 steps.
+Newton iteration 122 : ||r|| = 0.554067, ||r||/||r_0|| = 0.931777
+MINRES: iteration   0: ||r||_B = 0.0303374 ...
+MINRES: iteration 100: ||r||_B = 1.02442e-05
+MINRES: No convergence!
+Energy decrease: 0.0802501% with 1 scaling. 1.61015
+Remap with dt = 0.189898 took 6 steps.
+Newton iteration 123 : ||r|| = 0.527866, ||r||/||r_0|| = 0.887714
+MINRES: iteration   0: ||r||_B = 0.0328024 ...
+MINRES: iteration 100: ||r||_B = 9.94677e-06
+MINRES: No convergence!
+Energy decrease: 0.0964996% with 1 scaling. 1.61187
+Remap with dt = 0.190105 took 6 steps.
+Newton iteration 124 : ||r|| = 0.553585, ||r||/||r_0|| = 0.930966
+MINRES: iteration   0: ||r||_B = 0.0334274 ...
+MINRES: iteration 100: ||r||_B = 8.70836e-06
+MINRES: No convergence!
+Energy decrease: 0.0889734% with 1 scaling. 1.61286
+Remap with dt = 0.190069 took 6 steps.
+Newton iteration 125 : ||r|| = 0.381027, ||r||/||r_0|| = 0.640774
+MINRES: iteration   0: ||r||_B = 0.0242998 ...
+MINRES: iteration 100: ||r||_B = 1.2892e-05
+MINRES: No convergence!
+Energy decrease: 0.0594918% with 1 scaling. 1.61366
+Remap with dt = 0.190026 took 6 steps.
+Newton iteration 126 : ||r|| = 0.273725, ||r||/||r_0|| = 0.460324
+MINRES: iteration   0: ||r||_B = 0.0180744 ...
+MINRES: iteration 100: ||r||_B = 2.08973e-05
+MINRES: No convergence!
+Energy decrease: 0.0466407% with 1 scaling. 1.61181
+Remap with dt = 0.189723 took 6 steps.
+Newton iteration 127 : ||r|| = 0.482186, ||r||/||r_0|| = 0.810893
+MINRES: iteration   0: ||r||_B = 0.0284235 ...
+MINRES: iteration 100: ||r||_B = 1.86592e-05
+MINRES: No convergence!
+Energy decrease: 0.108609% with 1 scaling. 1.61274
+Remap with dt = 0.189838 took 6 steps.
+Newton iteration 128 : ||r|| = 0.322907, ||r||/||r_0|| = 0.543034
+MINRES: iteration   0: ||r||_B = 0.0223457 ...
+MINRES: iteration 100: ||r||_B = 2.88756e-05
+MINRES: No convergence!
+Energy decrease: 0.0802286% with 1 scaling. 1.61036
+Remap with dt = 0.189445 took 6 steps.
+Newton iteration 129 : ||r|| = 0.742222, ||r||/||r_0|| = 1.2482
+MINRES: iteration   0: ||r||_B = 0.0414654 ...
+MINRES: iteration 100: ||r||_B = 3.24669e-05
+MINRES: No convergence!
+Energy decrease: 0.223653% with 1 scaling. 1.61196
+Remap with dt = 0.189705 took 6 steps.
+Newton iteration 130 : ||r|| = 0.769991, ||r||/||r_0|| = 1.2949
+MINRES: iteration   0: ||r||_B = 0.044804 ...
+MINRES: iteration 100: ||r||_B = 2.02292e-05
+MINRES: No convergence!
+Energy decrease: 0.182936% with 1 scaling. 1.61224
+Remap with dt = 0.189821 took 6 steps.
+Newton iteration 131 : ||r|| = 7.31803, ||r||/||r_0|| = 12.3068
+MINRES: iteration   0: ||r||_B = 0.071323 ...
+MINRES: iteration 100: ||r||_B = 0.000155127
+MINRES: No convergence!
+Energy decrease: 0.423073% with 1 scaling. 1.6175
+Remap with dt = 0.190021 took 6 steps.
+Newton iteration 132 : ||r|| = 1.0737, ||r||/||r_0|| = 1.80565
+MINRES: iteration   0: ||r||_B = 0.0389291 ...
+MINRES: iteration 100: ||r||_B = 4.4944e-05
+MINRES: No convergence!
+Energy decrease: 0.186933% with 1 scaling. 1.61275
+Remap with dt = 0.189247 took 6 steps.
+Newton iteration 133 : ||r|| = 2.5045, ||r||/||r_0|| = 4.21183
+MINRES: iteration   0: ||r||_B = 0.0642547 ...
+MINRES: iteration 100: ||r||_B = 0.000180278
+MINRES: No convergence!
+Energy decrease: 0.340794% with 1 scaling. 1.61518
+Remap with dt = 0.18952 took 6 steps.
+Newton iteration 134 : ||r|| = 2.00925, ||r||/||r_0|| = 3.37897
+MINRES: iteration   0: ||r||_B = 0.0796687 ...
+MINRES: iteration 100: ||r||_B = 0.000476516
+MINRES: No convergence!
+Energy decrease: 0.499599% with 1 scaling. 1.61974
+Remap with dt = 0.189549 took 6 steps.
+Newton iteration 135 : ||r|| = 1.73474, ||r||/||r_0|| = 2.91732
+MINRES: iteration   0: ||r||_B = 0.0706054 ...
+MINRES: iteration 100: ||r||_B = 0.000130387
+MINRES: No convergence!
+Energy decrease: 0.271201% with 1 scaling. 1.61825
+Remap with dt = 0.189624 took 6 steps.
+Newton iteration 136 : ||r|| = 1.91282, ||r||/||r_0|| = 3.2168
+MINRES: iteration   0: ||r||_B = 0.0663254 ...
+MINRES: iteration 100: ||r||_B = 0.00045344
+MINRES: No convergence!
+Scale = 1 Neg det(J) found.
+Energy decrease: 0.233374% with 0.5 scaling. 1.61856
+Remap with dt = 0.189542 took 6 steps.
+Newton iteration 137 : ||r|| = 1.3581, ||r||/||r_0|| = 2.28393
+MINRES: iteration   0: ||r||_B = 0.057753 ...
+MINRES: iteration 100: ||r||_B = 6.34977e-05
+MINRES: No convergence!
+Scale = 1 Neg det(J) found.
+Energy decrease: 0.218702% with 0.5 scaling. 1.6146
+Remap with dt = 0.189337 took 6 steps.
+Newton iteration 138 : ||r|| = 0.982517, ||r||/||r_0|| = 1.6523
+MINRES: iteration   0: ||r||_B = 0.0526818 ...
+MINRES: iteration 100: ||r||_B = 6.72636e-05
+MINRES: No convergence!
+Scale = 1 Neg det(J) found.
+Scale = 0.5 Norm increased.
+Energy decrease: 0.0960795% with 0.25 scaling. 1.61489
+Remap with dt = 0.189676 took 6 steps.
+Newton iteration 139 : ||r|| = 0.741846, ||r||/||r_0|| = 1.24756
+MINRES: iteration   0: ||r||_B = 0.0421713 ...
+MINRES: iteration 100: ||r||_B = 5.72701e-05
+MINRES: No convergence!
+Scale = 1 Neg det(J) found.
+Scale = 0.5 Norm increased.
+Energy decrease: 0.0108081% with 0.25 scaling. 1.61557
+Remap with dt = 0.189637 took 6 steps.
+Newton iteration 140 : ||r|| = 0.706579, ||r||/||r_0|| = 1.18826
+MINRES: iteration   0: ||r||_B = 0.0410942 ...
+MINRES: iteration 100: ||r||_B = 2.34644e-05
+MINRES: No convergence!
+Scale = 1 Neg det(J) found.
+Energy decrease: 0.179386% with 0.5 scaling. 1.61414
+Remap with dt = 0.189467 took 6 steps.
+Newton iteration 141 : ||r|| = 0.681903, ||r||/||r_0|| = 1.14676
+MINRES: iteration   0: ||r||_B = 0.0412724 ...
+MINRES: iteration 100: ||r||_B = 1.71527e-05
+MINRES: No convergence!
+Energy decrease: 0.177763% with 1 scaling. 1.6103
+Remap with dt = 0.189591 took 6 steps.
+Newton iteration 142 : ||r|| = 0.764492, ||r||/||r_0|| = 1.28565
+MINRES: iteration   0: ||r||_B = 0.043003 ...
+MINRES: iteration 100: ||r||_B = 1.86204e-05
+MINRES: No convergence!
+Energy decrease: 0.173858% with 1 scaling. 1.61146
+Remap with dt = 0.190027 took 6 steps.
+Newton iteration 143 : ||r|| = 0.466195, ||r||/||r_0|| = 0.784002
+MINRES: iteration   0: ||r||_B = 0.0309166 ...
+MINRES: iteration 100: ||r||_B = 1.55196e-05
+MINRES: No convergence!
+Energy decrease: 0.0905831% with 1 scaling. 1.60967
+Remap with dt = 0.189863 took 6 steps.
+Newton iteration 144 : ||r|| = 0.753125, ||r||/||r_0|| = 1.26653
+MINRES: iteration   0: ||r||_B = 0.0426342 ...
+MINRES: iteration 100: ||r||_B = 1.75871e-05
+MINRES: No convergence!
+Energy decrease: 0.190894% with 1 scaling. 1.61244
+Remap with dt = 0.190175 took 6 steps.
+Newton iteration 145 : ||r|| = 0.662594, ||r||/||r_0|| = 1.11429
+MINRES: iteration   0: ||r||_B = 0.0386207 ...
+MINRES: iteration 100: ||r||_B = 1.88335e-05
+MINRES: No convergence!
+Energy decrease: 0.139204% with 1 scaling. 1.61086
+Remap with dt = 0.189853 took 6 steps.
+Newton iteration 146 : ||r|| = 0.697342, ||r||/||r_0|| = 1.17272
+MINRES: iteration   0: ||r||_B = 0.0384805 ...
+MINRES: iteration 100: ||r||_B = 1.33616e-05
+MINRES: No convergence!
+Energy decrease: 0.129108% with 1 scaling. 1.61096
+Remap with dt = 0.189975 took 6 steps.
+Newton iteration 147 : ||r|| = 0.424231, ||r||/||r_0|| = 0.713431
+MINRES: iteration   0: ||r||_B = 0.0270315 ...
+MINRES: iteration 100: ||r||_B = 1.43586e-05
+MINRES: No convergence!
+Energy decrease: 0.0800087% with 1 scaling. 1.60895
+Remap with dt = 0.189753 took 6 steps.
+Newton iteration 148 : ||r|| = 0.769791, ||r||/||r_0|| = 1.29456
+MINRES: iteration   0: ||r||_B = 0.0440943 ...
+MINRES: iteration 100: ||r||_B = 2.205e-05
+MINRES: No convergence!
+Energy decrease: 0.199788% with 1 scaling. 1.61309
+Remap with dt = 0.190259 took 6 steps.
+Newton iteration 149 : ||r|| = 0.550602, ||r||/||r_0|| = 0.92595
+MINRES: iteration   0: ||r||_B = 0.0337308 ...
+MINRES: iteration 100: ||r||_B = 1.039e-05
+MINRES: No convergence!
+Energy decrease: 0.0991894% with 1 scaling. 1.61214
+Remap with dt = 0.190019 took 6 steps.
+Newton iteration 150 : ||r|| = 0.519193, ||r||/||r_0|| = 0.873129
+MINRES: iteration   0: ||r||_B = 0.0306954 ...
+MINRES: iteration 100: ||r||_B = 2.29613e-05
+MINRES: No convergence!
+Energy decrease: 0.112395% with 1 scaling. 1.61501
+Remap with dt = 0.190211 took 6 steps.
+Newton iteration 151 : ||r|| = 0.298545, ||r||/||r_0|| = 0.502064
+MINRES: iteration   0: ||r||_B = 0.020777 ...
+MINRES: iteration 100: ||r||_B = 3.26874e-05
+MINRES: No convergence!
+Energy decrease: 0.0855026% with 1 scaling. 1.61132
+Remap with dt = 0.189592 took 6 steps.
+Newton iteration 152 : ||r|| = 0.738982, ||r||/||r_0|| = 1.24275
+MINRES: iteration   0: ||r||_B = 0.0403643 ...
+MINRES: iteration 100: ||r||_B = 2.89039e-05
+MINRES: No convergence!
+Energy decrease: 0.231693% with 1 scaling. 1.61492
+Remap with dt = 0.19006 took 6 steps.
+Newton iteration 153 : ||r|| = 0.309965, ||r||/||r_0|| = 0.52127
+MINRES: iteration   0: ||r||_B = 0.0221188 ...
+MINRES: iteration 100: ||r||_B = 3.63607e-05
+MINRES: No convergence!
+Energy decrease: 0.10907% with 1 scaling. 1.60959
+Remap with dt = 0.189475 took 6 steps.
+Newton iteration 154 : ||r|| = 0.909859, ||r||/||r_0|| = 1.53011
+MINRES: iteration   0: ||r||_B = 0.0496256 ...
+MINRES: iteration 100: ||r||_B = 8.73038e-05
+MINRES: No convergence!
+Energy decrease: 0.324216% with 1 scaling. 1.61426
+Remap with dt = 0.189718 took 6 steps.
+Newton iteration 155 : ||r|| = 0.752228, ||r||/||r_0|| = 1.26502
+MINRES: iteration   0: ||r||_B = 0.0441287 ...
+MINRES: iteration 100: ||r||_B = 4.61322e-05
+MINRES: No convergence!
+Scale = 1 Neg det(J) found.
+Energy decrease: 0.0895655% with 0.5 scaling. 1.61158
+Remap with dt = 0.189625 took 6 steps.
+Newton iteration 156 : ||r|| = 0.598486, ||r||/||r_0|| = 1.00648
+MINRES: iteration   0: ||r||_B = 0.0368105 ...
+MINRES: iteration 100: ||r||_B = 1.18323e-05
+MINRES: No convergence!
+Energy decrease: 0.128285% with 1 scaling. 1.61079
+Remap with dt = 0.189677 took 6 steps.
+Newton iteration 157 : ||r|| = 0.482656, ||r||/||r_0|| = 0.811684
+MINRES: iteration   0: ||r||_B = 0.0300669 ...
+MINRES: iteration 100: ||r||_B = 1.61069e-05
+MINRES: No convergence!
+Energy decrease: 0.0955398% with 1 scaling. 1.61108
+Remap with dt = 0.189927 took 6 steps.
+Newton iteration 158 : ||r|| = 0.413899, ||r||/||r_0|| = 0.696055
+MINRES: iteration   0: ||r||_B = 0.0260139 ...
+MINRES: iteration 100: ||r||_B = 1.29075e-05
+MINRES: No convergence!
+Energy decrease: 0.0666058% with 1 scaling. 1.61115
+Remap with dt = 0.189996 took 6 steps.
+Newton iteration 159 : ||r|| = 0.652647, ||r||/||r_0|| = 1.09756
+MINRES: iteration   0: ||r||_B = 0.038024 ...
+MINRES: iteration 100: ||r||_B = 5.5005e-05
+MINRES: No convergence!
+Scale = 1 Neg det(J) found.
+Scale = 0.5 Norm increased.
+Energy decrease: 0.0407074% with 0.25 scaling. 1.61396
+Remap with dt = 0.190098 took 6 steps.
+Newton iteration 160 : ||r|| = 0.719963, ||r||/||r_0|| = 1.21076
+MINRES: iteration   0: ||r||_B = 0.0392835 ...
+MINRES: iteration 100: ||r||_B = 2.34764e-05
+MINRES: No convergence!
+Energy decrease: 0.0460838% with 1 scaling. 1.61451
+Remap with dt = 0.190058 took 6 steps.
+Newton iteration 161 : ||r|| = 0.814023, ||r||/||r_0|| = 1.36895
+MINRES: iteration   0: ||r||_B = 0.0471977 ...
+MINRES: iteration 100: ||r||_B = 1.92355e-05
+MINRES: No convergence!
+Energy decrease: 0.203289% with 1 scaling. 1.61473
+Remap with dt = 0.190067 took 6 steps.
+Newton iteration 162 : ||r|| = 0.707585, ||r||/||r_0|| = 1.18995
+MINRES: iteration   0: ||r||_B = 0.0390801 ...
+MINRES: iteration 100: ||r||_B = 0.000168754
+MINRES: No convergence!
+Scale = 1 Neg det(J) found.
+Scale = 0.5 Neg det(J) found.
+Scale = 0.25 Norm increased.
+Energy decrease: 0.0181256% with 0.125 scaling. 1.61544
+Remap with dt = 0.19011 took 6 steps.
+Newton iteration 163 : ||r|| = 0.48845, ||r||/||r_0|| = 0.821428
+MINRES: iteration   0: ||r||_B = 0.0308806 ...
+MINRES: iteration 100: ||r||_B = 1.16532e-05
+MINRES: No convergence!
+Energy decrease: 0.127183% with 1 scaling. 1.61222
+Remap with dt = 0.189878 took 6 steps.
+Newton iteration 164 : ||r|| = 0.773762, ||r||/||r_0|| = 1.30124
+MINRES: iteration   0: ||r||_B = 0.0412925 ...
+MINRES: iteration 100: ||r||_B = 1.45146e-05
+MINRES: No convergence!
+Energy decrease: 0.165367% with 1 scaling. 1.61315
+Remap with dt = 0.190009 took 6 steps.
+Newton iteration 165 : ||r|| = 0.560549, ||r||/||r_0|| = 0.942678
+MINRES: iteration   0: ||r||_B = 0.033452 ...
+MINRES: iteration 100: ||r||_B = 2.54579e-05
+MINRES: No convergence!
+Energy decrease: 0.0170334% with 1 scaling. 1.61255
+Remap with dt = 0.189695 took 6 steps.
+Newton iteration 166 : ||r|| = 0.59445, ||r||/||r_0|| = 0.999689
+MINRES: iteration   0: ||r||_B = 0.0364979 ...
+MINRES: iteration 100: ||r||_B = 1.2007e-05
+MINRES: No convergence!
+Energy decrease: 0.15275% with 1 scaling. 1.61215
+Remap with dt = 0.189927 took 6 steps.
+Newton iteration 167 : ||r|| = 0.54095, ||r||/||r_0|| = 0.909718
+MINRES: iteration   0: ||r||_B = 0.0339833 ...
+MINRES: iteration 100: ||r||_B = 1.26074e-05
+MINRES: No convergence!
+Energy decrease: 0.106121% with 1 scaling. 1.61048
+Remap with dt = 0.189868 took 6 steps.
+Newton iteration 168 : ||r|| = 0.688454, ||r||/||r_0|| = 1.15778
+MINRES: iteration   0: ||r||_B = 0.0375918 ...
+MINRES: iteration 100: ||r||_B = 1.45675e-05
+MINRES: No convergence!
+Energy decrease: 0.129522% with 1 scaling. 1.61205
+Remap with dt = 0.190062 took 6 steps.
+Newton iteration 169 : ||r|| = 0.53253, ||r||/||r_0|| = 0.895558
+MINRES: iteration   0: ||r||_B = 0.0340705 ...
+MINRES: iteration 100: ||r||_B = 1.77435e-05
+MINRES: No convergence!
+Energy decrease: 0.0991522% with 1 scaling. 1.61067
+Remap with dt = 0.189777 took 6 steps.
+Newton iteration 170 : ||r|| = 0.80499, ||r||/||r_0|| = 1.35376
+MINRES: iteration   0: ||r||_B = 0.044704 ...
+MINRES: iteration 100: ||r||_B = 1.5429e-05
+MINRES: No convergence!
+Energy decrease: 0.202027% with 1 scaling. 1.61278
+Remap with dt = 0.189999 took 6 steps.
+Newton iteration 171 : ||r|| = 0.641435, ||r||/||r_0|| = 1.0787
+MINRES: iteration   0: ||r||_B = 0.0385256 ...
+MINRES: iteration 100: ||r||_B = 1.59166e-05
+MINRES: No convergence!
+Energy decrease: 0.132356% with 1 scaling. 1.6109
+Remap with dt = 0.189504 took 6 steps.
+Newton iteration 172 : ||r|| = 0.742389, ||r||/||r_0|| = 1.24848
+MINRES: iteration   0: ||r||_B = 0.0422115 ...
+MINRES: iteration 100: ||r||_B = 1.54929e-05
+MINRES: No convergence!
+Energy decrease: 0.178187% with 1 scaling. 1.61141
+Remap with dt = 0.18995 took 6 steps.
+Newton iteration 173 : ||r|| = 0.468072, ||r||/||r_0|| = 0.787158
+MINRES: iteration   0: ||r||_B = 0.0298014 ...
+MINRES: iteration 100: ||r||_B = 1.44284e-05
+MINRES: No convergence!
+Energy decrease: 0.0880896% with 1 scaling. 1.6097
+Remap with dt = 0.189795 took 6 steps.
+Newton iteration 174 : ||r|| = 0.669421, ||r||/||r_0|| = 1.12577
+MINRES: iteration   0: ||r||_B = 0.0385303 ...
+MINRES: iteration 100: ||r||_B = 2.36077e-05
+MINRES: No convergence!
+Energy decrease: 0.13919% with 1 scaling. 1.61258
+Remap with dt = 0.189901 took 6 steps.
+Newton iteration 175 : ||r|| = 0.583266, ||r||/||r_0|| = 0.980881
+MINRES: iteration   0: ||r||_B = 0.0337809 ...
+MINRES: iteration 100: ||r||_B = 1.36711e-05
+MINRES: No convergence!
+Energy decrease: 0.124785% with 1 scaling. 1.6118
+Remap with dt = 0.190011 took 6 steps.
+Newton iteration 176 : ||r|| = 0.527887, ||r||/||r_0|| = 0.887749
+MINRES: iteration   0: ||r||_B = 0.0304257 ...
+MINRES: iteration 100: ||r||_B = 2.09651e-05
+MINRES: No convergence!
+Energy decrease: 0.107081% with 1 scaling. 1.61317
+Remap with dt = 0.190012 took 6 steps.
+Newton iteration 177 : ||r|| = 0.457648, ||r||/||r_0|| = 0.769628
+MINRES: iteration   0: ||r||_B = 0.0292179 ...
+MINRES: iteration 100: ||r||_B = 3.58596e-05
+MINRES: No convergence!
+Energy decrease: 0.12341% with 1 scaling. 1.61237
+Remap with dt = 0.189539 took 6 steps.
+Newton iteration 178 : ||r|| = 0.798254, ||r||/||r_0|| = 1.34243
+MINRES: iteration   0: ||r||_B = 0.0429222 ...
+MINRES: iteration 100: ||r||_B = 3.3118e-05
+MINRES: No convergence!
+Energy decrease: 0.239295% with 1 scaling. 1.61443
+Remap with dt = 0.189739 took 6 steps.
+Newton iteration 179 : ||r|| = 0.752811, ||r||/||r_0|| = 1.266
+MINRES: iteration   0: ||r||_B = 0.0398591 ...
+MINRES: iteration 100: ||r||_B = 3.81916e-05
+MINRES: No convergence!
+Energy decrease: 0.220469% with 1 scaling. 1.61279
+Remap with dt = 0.189791 took 6 steps.
+Newton iteration 180 : ||r|| = 1.62001, ||r||/||r_0|| = 2.72438
+MINRES: iteration   0: ||r||_B = 0.0593644 ...
+MINRES: iteration 100: ||r||_B = 0.000511598
+MINRES: No convergence!
+Energy decrease: 0.445049% with 1 scaling. 1.6168
+Remap with dt = 0.189267 took 6 steps.
+Newton iteration 181 : ||r|| = 0.968627, ||r||/||r_0|| = 1.62894
+MINRES: iteration   0: ||r||_B = 0.0524779 ...
+MINRES: iteration 100: ||r||_B = 7.65731e-05
+MINRES: No convergence!
+Energy decrease: 0.336962% with 1 scaling. 1.61278
+Remap with dt = 0.189471 took 6 steps.
+Newton iteration 182 : ||r|| = 1.58727, ||r||/||r_0|| = 2.66931
+MINRES: iteration   0: ||r||_B = 0.0672611 ...
+MINRES: iteration 100: ||r||_B = 0.000895894
+MINRES: No convergence!
+Scale = 1 Neg det(J) found.
+Scale = 0.5 Neg det(J) found.
+Scale = 0.25 Norm increased.
+Energy decrease: 0.117786% with 0.125 scaling. 1.62271
+Remap with dt = 0.189473 took 6 steps.
+Newton iteration 183 : ||r|| = 1.35139, ||r||/||r_0|| = 2.27264
+MINRES: iteration   0: ||r||_B = 0.0622682 ...
+MINRES: iteration 100: ||r||_B = 0.000286465
+MINRES: No convergence!
+Scale = 1 Norm increased.
+Energy decrease: 0.250716% with 0.5 scaling. 1.61754
+Remap with dt = 0.189122 took 6 steps.
+Newton iteration 184 : ||r|| = 0.820566, ||r||/||r_0|| = 1.37995
+MINRES: iteration   0: ||r||_B = 0.0456039 ...
+MINRES: iteration 100: ||r||_B = 4.11851e-05
+MINRES: No convergence!
+Scale = 1 Norm increased.
+Energy decrease: 0.149752% with 0.5 scaling. 1.61131
+Remap with dt = 0.18955 took 6 steps.
+Newton iteration 185 : ||r|| = 0.697184, ||r||/||r_0|| = 1.17246
+MINRES: iteration   0: ||r||_B = 0.0407119 ...
+MINRES: iteration 100: ||r||_B = 1.36225e-05
+MINRES: No convergence!
+Energy decrease: 0.153739% with 1 scaling. 1.61179
+Remap with dt = 0.189825 took 6 steps.
+Newton iteration 186 : ||r|| = 0.55296, ||r||/||r_0|| = 0.929914
+MINRES: iteration   0: ||r||_B = 0.0348564 ...
+MINRES: iteration 100: ||r||_B = 8.72533e-06
+MINRES: No convergence!
+Energy decrease: 0.102658% with 1 scaling. 1.61092
+Remap with dt = 0.189904 took 6 steps.
+Newton iteration 187 : ||r|| = 0.589877, ||r||/||r_0|| = 0.991999
+MINRES: iteration   0: ||r||_B = 0.0353896 ...
+MINRES: iteration 100: ||r||_B = 1.95643e-05
+MINRES: No convergence!
+Energy decrease: 0.109456% with 1 scaling. 1.61258
+Remap with dt = 0.190121 took 6 steps.
+Newton iteration 188 : ||r|| = 0.541773, ||r||/||r_0|| = 0.911101
+MINRES: iteration   0: ||r||_B = 0.033302 ...
+MINRES: iteration 100: ||r||_B = 1.84816e-05
+MINRES: No convergence!
+Energy decrease: 0.107746% with 1 scaling. 1.61208
+Remap with dt = 0.189831 took 6 steps.
+Newton iteration 189 : ||r|| = 0.574925, ||r||/||r_0|| = 0.966854
+MINRES: iteration   0: ||r||_B = 0.0347119 ...
+MINRES: iteration 100: ||r||_B = 1.78941e-05
+MINRES: No convergence!
+Energy decrease: 0.143788% with 1 scaling. 1.61235
+Remap with dt = 0.189911 took 6 steps.
+Newton iteration 190 : ||r|| = 0.411222, ||r||/||r_0|| = 0.691553
+MINRES: iteration   0: ||r||_B = 0.0270873 ...
+MINRES: iteration 100: ||r||_B = 2.2511e-05
+MINRES: No convergence!
+Energy decrease: 0.0911725% with 1 scaling. 1.61099
+Remap with dt = 0.18974 took 6 steps.
+Newton iteration 191 : ||r|| = 0.581374, ||r||/||r_0|| = 0.977699
+MINRES: iteration   0: ||r||_B = 0.0348315 ...
+MINRES: iteration 100: ||r||_B = 2.6095e-05
+MINRES: No convergence!
+Energy decrease: 0.166154% with 1 scaling. 1.61164
+Remap with dt = 0.189777 took 6 steps.
+Newton iteration 192 : ||r|| = 0.67697, ||r||/||r_0|| = 1.13846
+MINRES: iteration   0: ||r||_B = 0.0408965 ...
+MINRES: iteration 100: ||r||_B = 1.66111e-05
+MINRES: No convergence!
+Energy decrease: 0.178901% with 1 scaling. 1.61206
+Remap with dt = 0.18985 took 6 steps.
+Newton iteration 193 : ||r|| = 0.824551, ||r||/||r_0|| = 1.38665
+MINRES: iteration   0: ||r||_B = 0.0438432 ...
+MINRES: iteration 100: ||r||_B = 3.70246e-05
+MINRES: No convergence!
+Energy decrease: 0.10463% with 1 scaling. 1.6124
+Remap with dt = 0.18987 took 6 steps.
+Newton iteration 194 : ||r|| = 0.872451, ||r||/||r_0|| = 1.4672
+MINRES: iteration   0: ||r||_B = 0.0475461 ...
+MINRES: iteration 100: ||r||_B = 2.85306e-05
+MINRES: No convergence!
+Scale = 1 Norm increased.
+Energy decrease: 0.187182% with 0.5 scaling. 1.61432
+Remap with dt = 0.189885 took 6 steps.
+Newton iteration 195 : ||r|| = 0.686064, ||r||/||r_0|| = 1.15376
+MINRES: iteration   0: ||r||_B = 0.0377174 ...
+MINRES: iteration 100: ||r||_B = 9.41548e-06
+MINRES: No convergence!
+Energy decrease: 0.124215% with 1 scaling. 1.61118
+Remap with dt = 0.190025 took 6 steps.
+Newton iteration 196 : ||r|| = 0.574687, ||r||/||r_0|| = 0.966453
+MINRES: iteration   0: ||r||_B = 0.0344526 ...
+MINRES: iteration 100: ||r||_B = 2.13336e-05
+MINRES: No convergence!
+Scale = 1 Neg det(J) found.
+Energy decrease: 0.0232863% with 0.5 scaling. 1.61226
+Remap with dt = 0.189769 took 6 steps.
+Newton iteration 197 : ||r|| = 0.650845, ||r||/||r_0|| = 1.09453
+MINRES: iteration   0: ||r||_B = 0.0380489 ...
+MINRES: iteration 100: ||r||_B = 2.19098e-05
+MINRES: No convergence!
+Energy decrease: 0.0300187% with 1 scaling. 1.61156
+Remap with dt = 0.189791 took 6 steps.
+Newton iteration 198 : ||r|| = 1.04353, ||r||/||r_0|| = 1.75491
+MINRES: iteration   0: ||r||_B = 0.047328 ...
+MINRES: iteration 100: ||r||_B = 0.000243109
+MINRES: No convergence!
+Scale = 1 Neg det(J) found.
+Scale = 0.5 Norm increased.
+Energy decrease: 0.0771994% with 0.25 scaling. 1.61372
+Remap with dt = 0.189694 took 6 steps.
+Newton iteration 199 : ||r|| = 0.875104, ||r||/||r_0|| = 1.47167
+MINRES: iteration   0: ||r||_B = 0.0445524 ...
+MINRES: iteration 100: ||r||_B = 0.00013258
+MINRES: No convergence!
+Scale = 1 Neg det(J) found.
+Scale = 0.5 Neg det(J) found.
+Energy decrease: 0.117912% with 0.25 scaling. 1.61281
+Remap with dt = 0.18985 took 6 steps.
+Newton iteration 200 : ||r|| = 0.671863, ||r||/||r_0|| = 1.12987
+NewtonIteration: rtol = 1e-12 not achieved.
+time taken (sec): 137.158
+Final strain energy : 1.61397
+The strain energy decreased by: 48.2099659711 %.

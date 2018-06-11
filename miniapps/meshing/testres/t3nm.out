@@ -1,0 +1,187 @@
+Options used:
+   --mesh icf.mesh
+   --order 3
+   --refine-serial 0
+   --refine-parallel 0
+   --jitter 0
+   --metric-id 9
+   --target-id 2
+   --limit-const 0
+   --quad-type 1
+   --quad_order 8
+   --solver_type 0
+   --newton-iters 200
+   --newton-rel-tolerance 1e-12
+   --lin-solver 2
+   --lin-iter 100
+   --move-boundary
+   --no-combo-met
+   --visualization
+   --verbosity-level 2
+Mesh curvature: Quadratic
+Quadrature points per cell: 36
+Initial strain energy: 1.11949
+Minimum det(J) of the original mesh is 1.49928e-05
+RelaxedNewtonSolver is used (as all det(J) > 0).
+Newton iteration  0 : ||r|| = 16.9935
+MINRES: iteration   0: ||r||_B = 0.138071 ...
+MINRES: iteration 100: ||r||_B = 0.00290793
+MINRES: No convergence!
+Scale = 1 Neg det(J) found.
+Scale = 0.5 Neg det(J) found.
+Energy decrease: 15.3061% with 0.25 scaling. 0.948136
+Newton iteration  1 : ||r|| = 13.385, ||r||/||r_0|| = 0.787654
+MINRES: iteration   0: ||r||_B = 0.11787 ...
+MINRES: iteration 100: ||r||_B = 0.00320949
+MINRES: No convergence!
+Scale = 1 Neg det(J) found.
+Energy decrease: 24.0809% with 0.5 scaling. 0.719817
+Newton iteration  2 : ||r|| = 8.42635, ||r||/||r_0|| = 0.495857
+MINRES: iteration   0: ||r||_B = 0.0887233 ...
+MINRES: iteration 100: ||r||_B = 0.00276862
+MINRES: No convergence!
+Scale = 1 Neg det(J) found.
+Scale = 0.5 Neg det(J) found.
+Energy decrease: 9.98934% with 0.25 scaling. 0.647912
+Newton iteration  3 : ||r|| = 6.62953, ||r||/||r_0|| = 0.390122
+MINRES: iteration   0: ||r||_B = 0.0796625 ...
+MINRES: iteration 100: ||r||_B = 0.00285019
+MINRES: No convergence!
+Scale = 1 Neg det(J) found.
+Scale = 0.5 Neg det(J) found.
+Energy decrease: 8.91133% with 0.25 scaling. 0.590174
+Newton iteration  4 : ||r|| = 5.19884, ||r||/||r_0|| = 0.305931
+MINRES: iteration   0: ||r||_B = 0.0721284 ...
+MINRES: iteration 100: ||r||_B = 0.00295968
+MINRES: No convergence!
+Scale = 1 Neg det(J) found.
+Scale = 0.5 Neg det(J) found.
+Energy decrease: 8.03047% with 0.25 scaling. 0.542781
+Newton iteration  5 : ||r|| = 4.01374, ||r||/||r_0|| = 0.236192
+MINRES: iteration   0: ||r||_B = 0.0650602 ...
+MINRES: iteration 100: ||r||_B = 0.0037065
+MINRES: No convergence!
+Scale = 1 Neg det(J) found.
+Scale = 0.5 Neg det(J) found.
+Scale = 0.25 Neg det(J) found.
+Energy decrease: 3.37802% with 0.125 scaling. 0.524445
+Newton iteration  6 : ||r|| = 3.45103, ||r||/||r_0|| = 0.20308
+MINRES: iteration   0: ||r||_B = 0.0614043 ...
+MINRES: iteration 100: ||r||_B = 0.00539906
+MINRES: No convergence!
+Scale = 1 Neg det(J) found.
+Scale = 0.5 Neg det(J) found.
+Scale = 0.25 Neg det(J) found.
+Scale = 0.125 Neg det(J) found.
+Energy decrease: 1.2824% with 0.0625 scaling. 0.51772
+Newton iteration  7 : ||r|| = 3.18432, ||r||/||r_0|| = 0.187385
+MINRES: iteration   0: ||r||_B = 0.0594365 ...
+MINRES: iteration 100: ||r||_B = 0.00516828
+MINRES: No convergence!
+Scale = 1 Increasing energy.
+Scale = 0.5 Neg det(J) found.
+Scale = 0.25 Neg det(J) found.
+Scale = 0.125 Neg det(J) found.
+Energy decrease: 1.66734% with 0.0625 scaling. 0.509088
+Newton iteration  8 : ||r|| = 2.95265, ||r||/||r_0|| = 0.173751
+MINRES: iteration   0: ||r||_B = 0.0583945 ...
+MINRES: iteration 100: ||r||_B = 0.00458281
+MINRES: No convergence!
+Scale = 1 Increasing energy.
+Scale = 0.5 Neg det(J) found.
+Scale = 0.25 Neg det(J) found.
+Energy decrease: 3.50853% with 0.125 scaling. 0.491226
+Newton iteration  9 : ||r|| = 2.52305, ||r||/||r_0|| = 0.148472
+MINRES: iteration   0: ||r||_B = 0.0558702 ...
+MINRES: iteration 100: ||r||_B = 0.00340386
+MINRES: No convergence!
+Scale = 1 Increasing energy.
+Scale = 0.5 Neg det(J) found.
+Scale = 0.25 Neg det(J) found.
+Energy decrease: 3.90269% with 0.125 scaling. 0.472055
+Newton iteration 10 : ||r|| = 2.18673, ||r||/||r_0|| = 0.128681
+MINRES: iteration   0: ||r||_B = 0.0539883 ...
+MINRES: iteration 100: ||r||_B = 0.00204588
+MINRES: No convergence!
+Scale = 1 Neg det(J) found.
+Scale = 0.5 Neg det(J) found.
+Energy decrease: 6.68383% with 0.25 scaling. 0.440504
+Newton iteration 11 : ||r|| = 1.6827, ||r||/||r_0|| = 0.0990199
+MINRES: iteration   0: ||r||_B = 0.0500233 ...
+MINRES: iteration 100: ||r||_B = 0.00125896
+MINRES: No convergence!
+Energy decrease: 15.673% with 1 scaling. 0.371464
+Newton iteration 12 : ||r|| = 0.835195, ||r||/||r_0|| = 0.0491479
+MINRES: iteration   0: ||r||_B = 0.0435414 ...
+MINRES: iteration 100: ||r||_B = 0.000667032
+MINRES: No convergence!
+Energy decrease: 8.19967% with 1 scaling. 0.341005
+Newton iteration 13 : ||r|| = 0.373271, ||r||/||r_0|| = 0.0219655
+MINRES: iteration   0: ||r||_B = 0.0281525 ...
+MINRES: iteration 100: ||r||_B = 0.000288784
+MINRES: No convergence!
+Energy decrease: 3.03727% with 1 scaling. 0.330648
+Newton iteration 14 : ||r|| = 0.160509, ||r||/||r_0|| = 0.00944531
+MINRES: iteration   0: ||r||_B = 0.0132518 ...
+MINRES: iteration 100: ||r||_B = 5.206e-05
+MINRES: No convergence!
+Energy decrease: 0.302424% with 1 scaling. 0.329648
+Newton iteration 15 : ||r|| = 0.0212398, ||r||/||r_0|| = 0.00124988
+MINRES: iteration   0: ||r||_B = 0.00187677 ...
+MINRES: iteration 100: ||r||_B = 1.2828e-05
+MINRES: No convergence!
+Energy decrease: 0.00454829% with 1 scaling. 0.329633
+Newton iteration 16 : ||r|| = 0.000296299, ||r||/||r_0|| = 1.7436e-05
+MINRES: iteration   0: ||r||_B = 2.45105e-05 ...
+MINRES: iteration 100: ||r||_B = 1.39045e-06
+MINRES: No convergence!
+Energy decrease: 0.000170077% with 1 scaling. 0.329632
+Newton iteration 17 : ||r|| = 3.57827e-05, ||r||/||r_0|| = 2.10567e-06
+MINRES: iteration   0: ||r||_B = 1.40298e-06 ...
+MINRES: iteration 100: ||r||_B = 1.6573e-07
+MINRES: No convergence!
+Energy decrease: 5.14888e-07% with 1 scaling. 0.329632
+Newton iteration 18 : ||r|| = 2.83897e-06, ||r||/||r_0|| = 1.67062e-07
+MINRES: iteration   0: ||r||_B = 1.6578e-07 ...
+MINRES: iteration 100: ||r||_B = 2.5537e-08
+MINRES: No convergence!
+Energy decrease: 2.74587e-08% with 1 scaling. 0.329632
+Newton iteration 19 : ||r|| = 7.21903e-07, ||r||/||r_0|| = 4.24811e-08
+MINRES: iteration   0: ||r||_B = 2.55426e-08 ...
+MINRES: iteration 100: ||r||_B = 4.37429e-09
+MINRES: No convergence!
+Energy decrease: 2.99371e-10% with 1 scaling. 0.329632
+Newton iteration 20 : ||r|| = 8.92273e-08, ||r||/||r_0|| = 5.25067e-09
+MINRES: iteration   0: ||r||_B = 4.37434e-09 ...
+MINRES: iteration 100: ||r||_B = 7.74741e-10
+MINRES: No convergence!
+Energy decrease: 2.10336e-11% with 1 scaling. 0.329632
+Newton iteration 21 : ||r|| = 2.2764e-08, ||r||/||r_0|| = 1.33957e-09
+MINRES: iteration   0: ||r||_B = 7.74746e-10 ...
+MINRES: iteration 100: ||r||_B = 1.38777e-10
+MINRES: No convergence!
+Energy decrease: 3.03126e-13% with 1 scaling. 0.329632
+Newton iteration 22 : ||r|| = 2.80745e-09, ||r||/||r_0|| = 1.65207e-10
+MINRES: iteration   0: ||r||_B = 1.38777e-10 ...
+MINRES: iteration 100: ||r||_B = 2.51617e-11
+MINRES: No convergence!
+Energy decrease: 3.36807e-14% with 1 scaling. 0.329632
+Newton iteration 23 : ||r|| = 7.33471e-10, ||r||/||r_0|| = 4.31619e-11
+MINRES: iteration   0: ||r||_B = 2.51617e-11 ...
+MINRES: iteration 100: ||r||_B = 4.58391e-12
+MINRES: No convergence!
+Energy decrease: -3.36807e-14% with 1 scaling. 0.329632
+Newton iteration 24 : ||r|| = 9.33736e-11, ||r||/||r_0|| = 5.49466e-12
+MINRES: iteration   0: ||r||_B = 4.58391e-12 ...
+MINRES: iteration 100: ||r||_B = 8.39413e-13
+MINRES: No convergence!
+Energy decrease: 1.68403e-14% with 1 scaling. 0.329632
+Newton iteration 25 : ||r|| = 2.45109e-11, ||r||/||r_0|| = 1.44237e-12
+MINRES: iteration   0: ||r||_B = 8.39417e-13 ...
+MINRES: iteration 100: ||r||_B = 1.54044e-13
+MINRES: No convergence!
+Energy decrease: 1.68403e-14% with 1 scaling. 0.329632
+Newton iteration 26 : ||r|| = 3.15167e-12, ||r||/||r_0|| = 1.85463e-13
+time taken (sec): 0.820395
+Final strain energy : 0.329632
+The strain energy decreased by: 70.5550405938 %.

@@ -357,6 +357,7 @@ void CGSolver::Mult(const Vector &b, Vector &x) const
    final_iter = max_iter;
    for (i = 1; true; )
    {
+      Vector xsav = x;
       alpha = nom/den;
       add(x,  alpha, d, x);     //  x = x + alpha d
       add(r, -alpha, z, r);     //  r = r - alpha A d
@@ -413,6 +414,7 @@ void CGSolver::Mult(const Vector &b, Vector &x) const
       MFEM_ASSERT(IsFinite(den), "den = " << den);
       if (den <= 0.0)
       {
+//         x = xsav; return;
          if (print_level >= 0 && Dot(d, d) > 0.0)
             mfem::out << "PCG: The operator is not positive definite. (Ad, d) = "
                       << den << '\n';

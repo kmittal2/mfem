@@ -93,234 +93,10 @@ void vis_metric(int order, TMOP_QualityMetric &qm, const TargetConstructor &tc,
    }
 }
 
-//-------------- Begin CGO Solver
-class CGOSolver : public IterativeSolver
-{
-
-private:
-   // Quadrature points that are checked for negative Jacobians etc.
-   const IntegrationRule &ir;
-   ParFiniteElementSpace *pfes;
-   mutable ParGridFunction x_gf;
-
-protected:
-   mutable Vector r, c, s;
-
-public:
-   CGOSolver(const IntegrationRule &irule, ParFiniteElementSpace *pf)
-      : IterativeSolver(pf->GetComm()),ir(irule), pfes(pf) { }
-
-   virtual void SetOperator(const Operator &op);
-
-   /** This method is equivalent to calling SetPreconditioner(). */
-   virtual void SetSolver(Solver &solver) { prec = &solver; }
-
-   /// Solve the nonlinear system with right-hand side @a b.
-   /** If `b.Size() != Height()`, then @a b is assumed to be zero. */
-   virtual void Mult(const Vector &b, Vector &x) const;
-
-   /** @brief This method can be overloaded in derived classes to implement line
-       search algorithms. */
-   /** The base class implementation (NewtonSolver) simply returns 1. A return
-       value of 0 indicates a failure, interrupting the Newton iteration. */
-   virtual double ComputeScalingFactor(const Vector &x, const Vector &b) const;
-
-   virtual void ProcessNewState(const Vector &x) const { }
-};
-
-void CGOSolver::SetOperator(const Operator &op)
-{
-   oper = &op;
-   height = op.Height();
-   width = op.Width();
-   MFEM_ASSERT(height == width, "square Operator is required.");
-
-   r.SetSize(width);
-   c.SetSize(width);
-}
-
-void CGOSolver::Mult(const Vector &b, Vector &x) const
-{
-   MFEM_ASSERT(oper != NULL, "the Operator is not set (use SetOperator).");
-   MFEM_ASSERT(prec != NULL, "the Solver is not set (use SetSolver).");
-
-   int it;
-   double norm0, norm, norm_goal, beta, num,den,num_all,den_all;
-   const bool have_b = (b.Size() == Height());
-
-   if (!iterative_mode)
-   {
-      x = 0.0;
-   }
-
-   oper->Mult(x, r); // r = b-Ax
-   if (have_b)
-   {
-      r -= b;
-   }
-
-   c = r;
-
-   norm0 = norm = Norm(r);
-   norm_goal = std::max(rel_tol*norm, abs_tol);
-
-   prec->iterative_mode = false;
-
-   for (it = 0; true; it++)
-   {
-      MFEM_ASSERT(IsFinite(norm), "norm = " << norm);
-      if (print_level >= 0)
-      {
-         mfem::out << "Newton iteration " << setw(2) << it
-                   << " : ||r|| = " << norm;
-         if (it > 0)
-         {
-            mfem::out << ", ||r||/||r_0|| = " << norm/norm0;
-         }
-         mfem::out << '\n';
-      }
-
-
-
-      if (norm <= norm_goal)
-      {
-         converged = 1;
-         break;
-      }
-
-      if (it >= max_iter)
-      {
-         converged = 0;
-         break;
-      }
-/*
-      if (it % 50 == 0)
-      { 
-        oper->Mult(x, r); // r = b-Ax
-        if (have_b)
-        {  
-         r -= b;
-        }
-        c = r;
-      }
-*/
-      const double c_scale = ComputeScalingFactor(x, b);
-      if (c_scale == 0.0)
-      {
-         converged = 0;
-         break;
-      }
-      add(x, -c_scale, c, x);
-
-      oper->Mult(x, r);
-      if (have_b)
-      {
-         r -= b;
-      }
-
-      num = Dot(r,r); // g_{k+1}^T g_{k+1}
-      den = Dot(c,c); // g_k ^T g_k 
-      MPI_Allreduce(&num,&num_all, 1, MPI_DOUBLE, MPI_SUM,
-                 pfes->GetComm());
-      MPI_Allreduce(&den,&den_all, 1, MPI_DOUBLE, MPI_SUM,
-                 pfes->GetComm());
-      beta = num/den; //
-      add(r,beta,c,c); // c = r - beta(c)
-
-      norm = Norm(r);
-   }
-
-   final_iter = it;
-   final_norm = norm;
-}
-
-double CGOSolver::ComputeScalingFactor(const Vector &x,
-                                                 const Vector &b) const
-{
-   const ParNonlinearForm *nlf = dynamic_cast<const ParNonlinearForm *>(oper);
-   MFEM_VERIFY(nlf != NULL, "invalid Operator subclass");
-   const bool have_b = (b.Size() == Height());
-
-   const int NE = pfes->GetParMesh()->GetNE(), dim = pfes->GetFE(0)->GetDim(),
-             dof = pfes->GetFE(0)->GetDof(), nsp = ir.GetNPoints();
-   Array<int> xdofs(dof * dim);
-   DenseMatrix Jpr(dim), dshape(dof, dim), pos(dof, dim);
-   Vector posV(pos.Data(), dof * dim);
-
-   Vector x_out(x.Size());
-   bool x_out_ok = false;
-   const double energy_in = nlf->GetEnergy(x);
-   double scale = 1.0, energy_out;
-   double norm0 = Norm(r);
-   x_gf.MakeTRef(pfes, x_out, 0);
-
-   // Decreases the scaling of the update until the new mesh is valid.
-   for (int i = 0; i < 12; i++)
-   {
-      add(x, -scale, c, x_out);
-      x_gf.SetFromTrueVector();
-
-      energy_out = nlf->GetParGridFunctionEnergy(x_gf);
-      if (energy_out > 1.2*energy_in || isnan(energy_out) != 0)
-      {
-         if (print_level >= 0)
-         { cout << "Scale = " << scale << " Increasing energy." << endl; }
-         scale *= 0.1; continue;
-      }
-
-      int jac_ok = 1;
-      for (int i = 0; i < NE; i++)
-      {
-         pfes->GetElementVDofs(i, xdofs);
-         x_gf.GetSubVector(xdofs, posV);
-         for (int j = 0; j < nsp; j++)
-         {
-            pfes->GetFE(i)->CalcDShape(ir.IntPoint(j), dshape);
-            MultAtB(pos, dshape, Jpr);
-            if (Jpr.Det() <= 0.0) { jac_ok = 0; goto break2; }
-         }
-      }
-   break2:
-      int jac_ok_all;
-      MPI_Allreduce(&jac_ok, &jac_ok_all, 1, MPI_INT, MPI_LAND,
-                    pfes->GetComm());
-
-      if (jac_ok_all == 0)
-      {
-         if (print_level >= 0)
-         { cout << "Scale = " << scale << " Neg det(J) found." << endl; }
-         scale *= 0.1; continue;
-      }
-
-      oper->Mult(x_out, r);
-      if (have_b) { r -= b; }
-      double norm = Norm(r);
-
-      if (norm > 1.2*norm0)
-      {
-         if (print_level >= 0)
-         { cout << "Scale = " << scale << " Norm increased." << endl; }
-         scale *= 0.1; continue;
-      }
-      else { x_out_ok = true; break; }
-   }
-
-   if (print_level >= 0)
-   {
-      cout << "Energy decrease: "
-           << (energy_in - energy_out) / energy_in * 100.0
-           << "% with " << scale << " scaling." << endl;
-   }
-
-   if (x_out_ok == false) { scale = 0.0; }
-
-   return scale;
-}
-// Done CG Solver
-
-
 double ind_values(const Vector &x)
 {
+   int opt;
+   opt = 4;
    // Sub-square.
    //if (x(0) > 0.3 && x(0) < 0.5 && x(1) > 0.5 && x(1) < 0.7) { return 1.0; }
 
@@ -333,15 +109,92 @@ double ind_values(const Vector &x)
    //if (x(1) >= 0.45 && x(1) <= 0.55 && x(0) >= 0.1 ) { return 1.0; }
 
    // Sine wave.
+   if (opt==1) 
+   {
    const double X = x(0), Y = x(1);
    return std::tanh((10*(Y-0.5) + std::sin(4.0*M_PI*X)) + 1) -
           std::tanh((10*(Y-0.5) + std::sin(4.0*M_PI*X)) - 1);
+    }
 
-
+   if (opt==2) 
+   {
    // Circle in the middle.
-   //const double xc = x(0) - 0.5, yc = x(1) - 0.5;
-   //const double r = sqrt(xc*xc + yc*yc);
-   //if (r > 0.2 && r < 0.3) { return 1.0; }
+   double val = 0.;
+   const double xc = x(0) - 0.5, yc = x(1) - 0.5;
+   const double r = sqrt(xc*xc + yc*yc);
+   double r1 = 0.10;double r2 = 0.30;double sf=30.0;
+   val = 0.5*(1+std::tanh(sf*(r-r1))) - 0.5*(1+std::tanh(sf*(r-r2)));
+   if (val > 1.) {val = 1;}
+   return val;
+    }
+
+   if (opt==3)
+   {
+   // cross
+   double val = 0.;
+   const double X = x(0), Y = x(1);
+   double r = sqrt(X*X + Y*Y);
+   double r1 = 0.40;double r2 = 0.60;double sf=20.0;
+   val = ( 0.5*(1+std::tanh(sf*(X-r1))) - 0.5*(1+std::tanh(sf*(X-r2)))
+          + 0.5*(1+std::tanh(sf*(Y-r1))) - 0.5*(1+std::tanh(sf*(Y-r2))) );
+   if (val > 1.) {val = 1;}
+   return val;
+    }
+
+   if (opt==4)
+   {
+   // Multiple circles
+   double r1,r2,val,rval;
+   double val1,fac1;
+   double sf = 10;
+   val = 0.;
+   fac1 = 0.05;
+   // circle 1 
+   r1= 0.2; r2 = 0.2;rval = 0.15;
+   double xc = x(0) - r1, yc = x(1) - r2;
+   double r = sqrt(xc*xc+yc*yc);
+   val =  0.5*(1+std::tanh(sf*(r+rval))) - 0.5*(1+std::tanh(sf*(r-rval)));// std::exp(val1);
+
+   // circle 2 
+   r1= 0.5; r2 = 0.5;
+   xc = x(0) - r1, yc = x(1) - r2;
+   xc = x(0) - r1, yc = x(1) - r2;
+   r = sqrt(xc*xc+yc*yc);
+   val +=  0.5*(1+std::tanh(sf*(r+rval))) - 0.5*(1+std::tanh(sf*(r-rval)));// std::exp(val1);
+   // circle 3 
+   r1= 0.8; r2 = 0.7;
+   xc = x(0) - r1, yc = x(1) - r2;
+   xc = x(0) - r1, yc = x(1) - r2;
+   r = sqrt(xc*xc+yc*yc);
+   val +=  0.5*(1+std::tanh(sf*(r+rval))) - 0.5*(1+std::tanh(sf*(r-rval)));// std::exp(val1);
+   // circle 4 
+   r1= 0.2; r2 = 0.8;
+   xc = x(0) - r1, yc = x(1) - r2;
+   r = sqrt(xc*xc+yc*yc);
+   val +=  0.5*(1+std::tanh(sf*(r+rval))) - 0.5*(1+std::tanh(sf*(r-rval)));
+//   if (val > 1.0) {val = 1.;}
+
+   return val;
+    }
+
+   if (opt==5)
+   {
+   // cross
+   double val = 0.;
+   double X = x(0)-0.5, Y = x(1)-0.5;
+   double rval = std::sqrt(X*X + Y*Y);
+   double thval = 60.*M_PI/180.;
+   double Xmod,Ymod;
+   Xmod = X*std::cos(thval) + Y*std::sin(thval);
+   Ymod= -X*std::sin(thval) + Y*std::cos(thval);
+   X = Xmod+0.5; Y = Ymod+0.5;
+   double r1 = 0.45;double r2 = 0.55;double sf=30.0;
+   val = ( 0.5*(1+std::tanh(sf*(X-r1))) - 0.5*(1+std::tanh(sf*(X-r2)))
+          + 0.5*(1+std::tanh(sf*(Y-r1))) - 0.5*(1+std::tanh(sf*(Y-r2))) );
+   if (val > 1.) {val = 1.;}
+   if (rval > 0.4) {val = 0.;}
+   return val;
+    }
 
    return 0.0;
 }
@@ -458,6 +311,7 @@ public:
       double dt = 0.5 * min_h / v_max;
       double glob_dt;
       MPI_Allreduce(&dt, &glob_dt, 1, MPI_DOUBLE, MPI_MIN, pfes.GetComm());
+//      if (glob_dt > 0.1) {glob_dt = 0.1;}
 
       int myid;
       MPI_Comm_rank(pfes.GetComm(), &myid);
@@ -487,6 +341,292 @@ public:
    }
 };
 
+// BEGIN CGO SOLVER
+//-------------- Begin CGO Solver
+class CGOSolver : public IterativeSolver
+{
+
+private:
+   // Quadrature points that are checked for negative Jacobians etc.
+   const IntegrationRule &ir;
+   ParFiniteElementSpace *pfes;
+   mutable ParGridFunction x_gf;
+
+   // GridFunction that has the latest mesh positions.
+   ParGridFunction &mesh_nodes;
+
+   // Advection related.
+   ParGridFunction *x0, *ind0, *ind;
+   AdvectorCG *advector;
+
+   // Quadrature points that are checked for negative Jacobians etc.
+//   const IntegrationRule &ir;
+//   ParFiniteElementSpace *pfes;
+//   mutable ParGridFunction x_gf;
+
+protected:
+   mutable Vector r, c, s;
+
+public:
+   CGOSolver(const IntegrationRule &irule,
+                       ParFiniteElementSpace *pf, ParGridFunction &mn,
+                       ParGridFunction *x0_, ParGridFunction *ind0_,
+                       ParGridFunction *ind_, AdvectorCG *adv)
+      : IterativeSolver(pf->GetComm()), ir(irule), pfes(pf), mesh_nodes(mn),
+        x0(x0_), ind0(ind0_), ind(ind_), advector(adv) { }
+//   CGOSolver(const IntegrationRule &irule, ParFiniteElementSpace *pf)
+//      : IterativeSolver(pf->GetComm()),ir(irule), pfes(pf) { }
+
+   virtual void SetOperator(const Operator &op);
+
+   /** This method is equivalent to calling SetPreconditioner(). */
+   virtual void SetSolver(Solver &solver) { prec = &solver; }
+
+   /// Solve the nonlinear system with right-hand side @a b.
+   /** If `b.Size() != Height()`, then @a b is assumed to be zero. */
+   virtual void Mult(const Vector &b, Vector &x) const;
+
+   /** @brief This method can be overloaded in derived classes to implement line
+       search algorithms. */
+   /** The base class implementation (NewtonSolver) simply returns 1. A return
+       value of 0 indicates a failure, interrupting the Newton iteration. */
+   virtual double ComputeScalingFactor(const Vector &x, const Vector &b) const;
+
+   virtual void ProcessNewState(const Vector &x) const
+   {
+      mesh_nodes.Distribute(x);
+
+      if (x0 && ind0 && ind && advector)
+      {
+         // GridFunction with the current positions.
+         Vector x_copy(x);
+         x_gf.MakeTRef(pfes, x_copy, 0);
+
+         // Reset the indicator to its values on the initial positions.
+         *ind = *ind0;
+
+         // Advect the indicator from the original to the new posiions.
+         advector->Advect(*x0, x_gf, *ind);
+      }
+   }
+};
+
+void CGOSolver::SetOperator(const Operator &op)
+{
+   oper = &op;
+   height = op.Height();
+   width = op.Width();
+   MFEM_ASSERT(height == width, "square Operator is required.");
+
+   r.SetSize(width);
+   c.SetSize(width);
+}
+
+void CGOSolver::Mult(const Vector &b, Vector &x) const
+{
+   MFEM_ASSERT(oper != NULL, "the Operator is not set (use SetOperator).");
+   MFEM_ASSERT(prec != NULL, "the Solver is not set (use SetSolver).");
+
+   int it;
+   double norm0, norm, norm_goal, beta, num,den,num_all,den_all;
+   const bool have_b = (b.Size() == Height());
+
+   if (!iterative_mode)
+   {
+      x = 0.0;
+   }
+
+   oper->Mult(x, r); // r = b-Ax
+   if (have_b)
+   {
+      r -= b;
+   }
+
+   c = r;
+
+   norm0 = norm = Norm(r);
+   norm_goal = std::max(rel_tol*norm, abs_tol);
+
+   prec->iterative_mode = false;
+
+   for (it = 0; true; it++)
+   {
+      MFEM_ASSERT(IsFinite(norm), "norm = " << norm);
+      if (print_level >= 0)
+      {
+         mfem::out << "Newton iteration " << setw(2) << it
+                   << " : ||r|| = " << norm;
+         if (it > 0)
+         {
+            mfem::out << ", ||r||/||r_0|| = " << norm/norm0;
+         }
+         mfem::out << '\n';
+      }
+
+
+
+      if (norm <= norm_goal)
+      {
+         converged = 1;
+         break;
+      }
+
+      if (it >= max_iter)
+      {
+         converged = 0;
+         break;
+      }
+
+      if (it % 50 == 0)
+      { 
+        oper->Mult(x, r); // r = b-Ax
+        if (have_b)
+        {  
+         r -= b;
+        }
+        c = r;
+      }
+
+      const double c_scale = ComputeScalingFactor(x, b);
+      if (c_scale == 0.0)
+      {
+         converged = 0;
+         break;
+      }
+      add(x, -c_scale, c, x);
+
+      oper->Mult(x, r);
+      if (have_b)
+      {
+         r -= b;
+      }
+
+      num = Dot(r,r); // g_{k+1}^T g_{k+1}
+      den = Dot(c,c); // g_k ^T g_k 
+      beta = num/den; //
+      add(r,beta,c,c); // c = r + beta(c)
+
+      norm = Norm(r);
+   }
+
+   final_iter = it;
+   final_norm = norm;
+}
+
+double CGOSolver::ComputeScalingFactor(const Vector &x,
+                                                 const Vector &b) const
+{
+   static double scalesav;
+   const ParNonlinearForm *nlf = dynamic_cast<const ParNonlinearForm *>(oper);
+   MFEM_VERIFY(nlf != NULL, "invalid Operator subclass");
+   const bool have_b = (b.Size() == Height());
+
+   const int NE = pfes->GetParMesh()->GetNE(), dim = pfes->GetFE(0)->GetDim(),
+             dof = pfes->GetFE(0)->GetDof(), nsp = ir.GetNPoints();
+   Array<int> xdofs(dof * dim);
+   DenseMatrix Jpr(dim), dshape(dof, dim), pos(dof, dim);
+   Vector posV(pos.Data(), dof * dim);
+
+   Vector x_out(x.Size());
+   bool x_out_ok = false;
+   const double energy_in = nlf->GetEnergy(x);
+   double scale = 1.0, energy_out;
+   double norm0 = Norm(r);
+   double redfac = 0.5;
+
+   if (scalesav==0.)
+    {
+     scale = 1.;
+    }
+   else
+    {
+     scale = scalesav/redfac;
+    }
+
+   // Decreases the scaling of the update until the new mesh is valid.
+   for (int i = 0; i < 20; i++)
+   {
+      add(x, -scale, c, x_out);
+      x_gf.MakeTRef(pfes, x_out, 0);
+      x_gf.SetFromTrueVector();
+      energy_out = nlf->GetEnergy(x_out);
+
+
+      if (energy_out < 1.0*energy_in)
+      {
+        ProcessNewState(x_out);
+        energy_out = nlf->GetEnergy(x_out);
+      }
+      else
+      {
+         if (print_level >= 0)
+         {
+            cout << "Scale = " << scale << " " << energy_in << " " << energy_out <<  " Increasing energy before remap." << endl;
+         }
+         scale *= redfac;
+         continue;
+      }
+
+      if (energy_out > 1.2*energy_in || isnan(energy_out) != 0)
+      {
+         if (print_level >= 0)
+         { cout << "Scale = " << scale << " Increasing energy." << endl; }
+         scale *= 0.1; continue;
+      }
+
+      int jac_ok = 1;
+      for (int i = 0; i < NE; i++)
+      {
+         pfes->GetElementVDofs(i, xdofs);
+         x_gf.GetSubVector(xdofs, posV);
+         for (int j = 0; j < nsp; j++)
+         {
+            pfes->GetFE(i)->CalcDShape(ir.IntPoint(j), dshape);
+            MultAtB(pos, dshape, Jpr);
+            if (Jpr.Det() <= 0.0) { jac_ok = 0; goto break2; }
+         }
+      }
+   break2:
+      int jac_ok_all;
+      MPI_Allreduce(&jac_ok, &jac_ok_all, 1, MPI_INT, MPI_LAND,
+                    pfes->GetComm());
+
+      if (jac_ok_all == 0)
+      {
+         if (print_level >= 0)
+         { cout << "Scale = " << scale << " Neg det(J) found." << endl; }
+         scale *= 0.1; continue;
+      }
+
+      oper->Mult(x_out, r);
+      if (have_b) { r -= b; }
+      double norm = Norm(r);
+
+      if (norm > 1.2*norm0)
+      {
+         if (print_level >= 0)
+         { cout << "Scale = " << scale << " Norm increased." << endl; }
+         scale *= 0.1; continue;
+      }
+      else { x_out_ok = true; break; }
+      x_out_ok = true;
+   }
+
+   if (print_level >= 0)
+   {
+      cout << "Energy decrease: "
+           << (energy_in - energy_out) / energy_in * 100.0
+           << "% with " << scale << " scaling. " << energy_in << " " << energy_out <<  endl;
+   }
+
+   if (x_out_ok == false) { scale = 0.0; }
+
+   scalesav = scale;
+   return scale;
+}
+// Done CG Solver
+
+
 class RelaxedNewtonSolver : public NewtonSolver
 {
 private:
@@ -502,6 +642,7 @@ private:
    ParGridFunction *x0, *ind0, *ind;
    AdvectorCG *advector;
 
+//   static double scalesav;
 public:
    RelaxedNewtonSolver(const IntegrationRule &irule,
                        ParFiniteElementSpace *pf, ParGridFunction &mn,
@@ -534,6 +675,7 @@ public:
 double RelaxedNewtonSolver::ComputeScalingFactor(const Vector &x,
                                                  const Vector &b) const
 {
+   static double scalesav;
    const ParNonlinearForm *nlf = dynamic_cast<const ParNonlinearForm *>(oper);
    MFEM_VERIFY(nlf != NULL, "invalid Operator subclass");
    const bool have_b = (b.Size() == Height());
@@ -545,26 +687,62 @@ double RelaxedNewtonSolver::ComputeScalingFactor(const Vector &x,
    Vector posV(pos.Data(), dof * dim);
 
    Vector x_out(x.Size());
+   Vector x_outb(x.Size());
+   Vector dx_out(x.Size());
+   Vector csav(x.Size());
    bool x_out_ok = false;
+   double energy_dum;
    const double energy_in = nlf->GetEnergy(x);
-   double scale = 1.0, energy_out;
+   double scale, energy_out, energy_outd;
+   double redfac = 0.1;
+   if (scalesav==0.) 
+    {
+     scale = 1.;
+    }
+   else
+    {
+     scale = scalesav/redfac;
+    }
+    scale = 1.;
+   csav = c;
    double norm0 = Norm(r);
    x_gf.MakeTRef(pfes, x_out, 0);
 
    // Decreases the scaling of the update until the new mesh is valid.
-   for (int i = 0; i < 12; i++)
+   for (int i = 0; i < 20; i++)
    {
       add(x, -scale, c, x_out);
+      x_gf.MakeTRef(pfes, x_out, 0);
       x_gf.SetFromTrueVector();
+      energy_out = nlf->GetEnergy(x_out);
 
-      energy_out = nlf->GetParGridFunctionEnergy(x_gf);
+
+      if (energy_out < 1.2*energy_in)
+      {
+        if (print_level >= 0){cout << "about to process new state" << endl;}
+        ProcessNewState(x_out);
+        if (print_level >= 0){cout << "done process new state" << endl;}
+        energy_out = nlf->GetEnergy(x_out);
+      } 
+      else
+      {
+         if (print_level >= 0)
+         { 
+            cout << "Scale = " << scale << " " << energy_in << " " << energy_out <<  " Increasing energy before remap." << endl; 
+         }
+         scale *= redfac;
+         continue;
+      }
+
+
       if (energy_out > 1.2*energy_in || isnan(energy_out) != 0)
       {
          if (print_level >= 0)
          { cout << "Scale = " << scale << " Increasing energy." << endl; }
-         scale *= 0.5; continue;
+         scale *= redfac; continue;
       }
 
+      x_gf.SetFromTrueVector();
       int jac_ok = 1;
       for (int i = 0; i < NE; i++)
       {
@@ -586,7 +764,7 @@ double RelaxedNewtonSolver::ComputeScalingFactor(const Vector &x,
       {
          if (print_level >= 0)
          { cout << "Scale = " << scale << " Neg det(J) found." << endl; }
-         scale *= 0.5; continue;
+         scale *= redfac; continue;
       }
 
       oper->Mult(x_out, r);
@@ -597,20 +775,25 @@ double RelaxedNewtonSolver::ComputeScalingFactor(const Vector &x,
       {
          if (print_level >= 0)
          { cout << "Scale = " << scale << " Norm increased." << endl; }
-         scale *= 0.5; continue;
+         scale *= redfac; 
+         continue;
       }
       else { x_out_ok = true; break; }
    }
+
+   double per_imp = (energy_in - energy_out) / energy_in * 100.0;
+//   if (per_imp < 1.e-6) { x_out_ok = false;}
 
    if (print_level >= 0)
    {
       cout << "Energy decrease: "
            << (energy_in - energy_out) / energy_in * 100.0
-           << "% with " << scale << " scaling." << endl;
+           << "% with " << scale << " scaling. " << energy_in << " " << energy_out << endl;
    }
 
    if (x_out_ok == false) { scale = 0.0; }
 
+   scalesav = scale;
    return scale;
 }
 
@@ -684,7 +867,7 @@ double DescentNewtonSolver::ComputeScalingFactor(const Vector &x,
    {
       cout << "Energy decrease: "
            << (energy_in - energy_out) / energy_in * 100.0
-           << "% with " << scale << " scaling." << endl;
+           << "% with " << scale << " scaling." << energy_out << endl;
    }
 
    if (x_out_ok == false) { return 0.0; }
@@ -976,7 +1159,7 @@ int main (int argc, char *argv[])
    }
    if (target_t == TargetConstructor::IDEAL_SHAPE_ADAPTIVE_SIZE_7)
    {
-      target_c->SetIndicator(remap_gf, 7.0);
+      target_c->SetIndicator(remap_gf, 27.0);
    }
    if (target_t == TargetConstructor::ADAPTIVE_SHAPE)
    {
@@ -1194,6 +1377,7 @@ int main (int argc, char *argv[])
 
    // 20. Finally, perform the nonlinear optimization.
    NewtonSolver *newton = NULL;
+//   CGOSolver    *cgo    = NULL;
    CGOSolver    *cgo    = NULL;
    int start_s=clock();
    if (solver_type == 0)
@@ -1240,7 +1424,10 @@ int main (int argc, char *argv[])
    }
    else
    {
-     cgo = new CGOSolver(*ir, pfespace);
+//     cgo = new CGOSolver(*ir, pfespace);
+      cgo = new CGOSolver(*ir, pfespace, x,
+                                       &x0, &remap_gf_init,
+                                       &remap_gf, advector);
      if (myid == 0)
       {cout << "The CG Optimizer is used." << endl;}
     int start_s=clock();
@@ -1276,6 +1463,7 @@ int main (int argc, char *argv[])
    const double fin_en = a.GetParGridFunctionEnergy(x);
    if (myid == 0)
    {
+      if (verbosity_level>=1) {cout << "Initial strain energy: " << init_en << endl;}
       cout << "Final strain energy : " << fin_en << endl;
       cout << "The strain energy decreased by: " << setprecision(12)
            << (init_en - fin_en) * 100.0 / init_en << " %." << endl;

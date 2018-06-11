@@ -946,14 +946,14 @@ void TargetConstructor::ComputeTargetDerivatives(int e_id, int ip_id,
       case IDEAL_SHAPE_ADAPTIVE_SIZE_7:
       {
          ElementTransformation *tr =
-               indicator->FESpace()->GetElementTransformation(e_id);
-         const IntegrationPoint &ip = ir.IntPoint(ip_id);
-         tr->SetIntPoint(&ip);
+		       indicator->FESpace()->GetElementTransformation(e_id);
+	 const IntegrationPoint &ip = ir.IntPoint(ip_id);
+	 tr->SetIntPoint(&ip);
 
-         DenseMatrix W(dim), dW(dim), Winv(dim), R(dim);
-         const double detW = Wideal.Det();
-         Vector ind_vals(ir.GetNPoints());
-         indicator->GetValues(e_id, ir, ind_vals);
+	 DenseMatrix W(dim), dW(dim), Winv(dim), R(dim);
+	 const double detW = Wideal.Det();
+	 Vector ind_vals(ir.GetNPoints());
+	 indicator->GetValues(e_id, ir, ind_vals);
          if (avg_volume == 0.0) { ComputeAvgVolume(); }
          const double small_zone_size = adapt_scale * avg_volume;
          const double big_zone_size   = adapt_size_factor * small_zone_size;
@@ -964,7 +964,7 @@ void TargetConstructor::ComputeTargetDerivatives(int e_id, int ip_id,
          W.Set(std::pow(target_det / detW, 1.0 / dim), Wideal);
          const double factor = 1.0 / dim *
                                std::pow(target_det / detW, (1.0 - dim) / dim) *
-                               (small_zone_size - big_zone_size) / detW;
+                               (small_zone_size - big_zone_size) / (detW);
          dW.Set(factor, Wideal);
          CalcInverse(W, Winv);
 
@@ -978,7 +978,94 @@ void TargetConstructor::ComputeTargetDerivatives(int e_id, int ip_id,
          {
             for (int j = 0; j < dof; j++)
             {
-               Jtr_dx(dof*d + j).Set(- grad_ind(d) * shape(j), R);
+               Jtr_dx(dof*d + j).Set(-grad_ind(d) * shape(j), R);
+            }
+         }
+         break;
+      }
+case ADAPTIVE_SHAPE:
+      {  
+         ElementTransformation *tr =
+               indicator->FESpace()->GetElementTransformation(e_id);
+         const IntegrationPoint &ip = ir.IntPoint(ip_id);
+         tr->SetIntPoint(&ip);
+         
+         DenseMatrix W(dim), dW(dim), Winv(dim), R(dim);
+         const double detW = Wideal.Det();
+         Vector ind_vals(ir.GetNPoints());
+         indicator->GetValues(e_id, ir, ind_vals);
+         if (avg_volume == 0.0) { ComputeAvgVolume(); }
+
+         const double small_zone_side = 1.0;
+         const double big_zone_side = adapt_size_factor * small_zone_side;
+         if (ind_vals(ip_id) > 1.0) { ind_vals(ip_id) = 1.0; }
+         if (ind_vals(ip_id) < 0.0) { ind_vals(ip_id) = 0.0; }
+         const double target_det = ind_vals(ip_id) * big_zone_side +
+                                   (1.0 - ind_vals(ip_id)) * small_zone_side;
+         W.Set(target_det, Wideal);
+         W(1,1) = 1.0;
+         const double factor = big_zone_side-small_zone_side;
+         dW.Set(factor, Wideal);
+         dW(1,1) = 0.0;
+         CalcInverse(W, Winv);
+         
+         Mult(Winv, dW, W);
+         Mult(W, Winv, R);
+         
+         Vector grad_ind(dim), shape(dof);
+         indicator->GetGradient(*tr, grad_ind);
+         nfe->CalcShape(ip, shape);
+         for (int d = 0; d < dim; d++)
+         {  
+            for (int j = 0; j < dof; j++)
+            {  
+               Jtr_dx(dof*d + j).Set(-grad_ind(d) * shape(j), R);
+            }
+         }
+         break;
+      }	
+case ADAPTIVE_SHAPE_AND_SIZE:
+      {
+         ElementTransformation *tr =
+                indicator->FESpace()->GetElementTransformation(e_id);
+         const IntegrationPoint &ip = ir.IntPoint(ip_id);
+         tr->SetIntPoint(&ip);
+
+         DenseMatrix W(dim), dW(dim), Winv(dim), R(dim);
+         const double detW = Wideal.Det();
+         Vector ind_vals(ir.GetNPoints());
+         indicator->GetValues(e_id, ir, ind_vals);
+
+         if (avg_volume == 0.0) { ComputeAvgVolume(); }
+         const double small_size = adapt_scale * avg_volume;
+         const double big_size   = adapt_size_factor * small_size;
+         if (ind_vals(ip_id) > 1.0) { ind_vals(ip_id) = 1.0; }
+         if (ind_vals(ip_id) < 0.0) { ind_vals(ip_id) = 0.0; }
+         const double target_x = sqrt(big_size);
+         const double target_y =
+                  ind_vals(ip_id) * sqrt(big_size) / adapt_size_factor +
+                  (1.0 - ind_vals(ip_id)) * sqrt(big_size);
+         W.Set(1.0, Wideal);
+         W(0,0) = target_x;
+         W(1,1) = target_y;
+
+         dW.Set(1.0, Wideal);
+         dW(0,0) = 0.0;
+         dW(1,1) = sqrt(big_size) / adapt_size_factor -
+                   sqrt(big_size);
+         CalcInverse(W, Winv);
+
+         Mult(Winv, dW, W);
+         Mult(W, Winv, R);
+
+         Vector grad_ind(dim), shape(dof);
+         indicator->GetGradient(*tr, grad_ind);
+         nfe->CalcShape(ip, shape);
+         for (int d = 0; d < dim; d++)
+         {
+            for (int j = 0; j < dof; j++)
+            {
+               Jtr_dx(dof*d + j).Set(-grad_ind(d) * shape(j), R);
             }
          }
          break;
@@ -1126,35 +1213,59 @@ void TMOP_Integrator::AssembleElementVector(const FiniteElement &el,
       const double weight = ip.weight * Jtr_i.Det();
       double weight_m = weight;
 
-      el.CalcDShape(ip, DSh);
-      Mult(DSh, Jrt, DS);
-      MultAtB(PMatI, DS, Jpt);
 
-      metric->EvalP(Jpt, P);
+      el.CalcDShape(ip, DSh);  // Dsh= A (without x,y,z)
+      Mult(DSh, Jrt, DS);      // Jrt = W^-1, DS = AW^-1
+      MultAtB(PMatI, DS, Jpt); // Jpt = AW^-1
+      MultAtB(PMatI, DSh, Jpr); // A
+
+      metric->EvalP(Jpt, P);   // P = D mu/DT
 
       if (coeff1) { weight_m *= coeff1->Eval(*Tpr, ip); }
 
-      P *= weight_m;
-      AddMultABt(DS, P, PMatO);
+      P *= weight_m;  
+      AddMultABt(DS, P, PMatO); //This is W^-1dA/dx * Dmu/DT 
 
       // Derivative of the target matrix.
-      /*
       targetC->ComputeTargetDerivatives(T.ElementNo, i, el, *ir, Jtr_dx);
       Tpr->SetIntPoint(&ip);
       for (int j = 0; j < dof * dim; j++)
       {
          DenseMatrix AdW(dim);
-         Mult(Tpr->Jacobian(), Jtr_dx(j), AdW);
+//         Mult(Tpr->Jacobian(), Jtr_dx(j), AdW); //A *d(W^-1)/dx
+         Mult(Jpr, Jtr_dx(j), AdW); //A *d(W^-1)/dx
          // Contract.
          for (int d1 = 0; d1 < dim; d1++)
          {
             for (int d2 = 0; d2 < dim; d2++)
             {
-               //elvect(j) += AdW(d1, d2) * P(d1, d2);
+             elvect(j) += AdW(d1, d2) * P(d1, d2);
             }
          }
       }
-      */
+
+      // Derivative of Determinant of target matrix
+      targetC->ComputeTargetDerivativesb(T.ElementNo, i, el, *ir, Jtr_dx);
+      Tpr->SetIntPoint(&ip);
+      double mu = metric->EvalW(Jpt);
+      for (int j = 0; j < dof * dim; j++)
+      {
+       DenseMatrix AdW(dim);
+       AdW = Jtr_dx(j);
+       AdW *= mu;
+       AdW *= ip.weight;
+         // Contract.
+         // not really a contraction.. AdW is mostly zero's except AdW(0,0)
+         for (int d1 = 0; d1 < dim; d1++)
+         {
+            for (int d2 = 0; d2 < dim; d2++)
+            {
+             elvect(j) += AdW(d1, d2);
+            }
+         }
+      }
+
+
 
       if (coeff0)
       {
@@ -1292,4 +1403,221 @@ void InterpolateTMOP_QualityMetric(TMOP_QualityMetric &metric,
    }
 }
 
-} // namespace mfem
+// virtual method
+void TargetConstructor::ComputeTargetDerivativesb(int e_id, int ip_id,
+                                                 const FiniteElement &fe,
+                                                 const IntegrationRule &ir,
+                                                 DenseTensor &Jtr_dx) const
+{
+   const FiniteElement *nfe = (target_type != IDEAL_SHAPE_UNIT_SIZE) ?
+                              nodes->FESpace()->GetFE(e_id) : NULL;
+   const int dim = nfe->GetDim(), dof = nfe->GetDof();
+
+   const DenseMatrix &Wideal =
+      Geometries.GetGeomToPerfGeomJac(fe.GetGeomType());
+
+   switch (target_type)
+   {
+      case IDEAL_SHAPE_ADAPTIVE_SIZE_7:
+      {
+         ElementTransformation *tr =
+                       indicator->FESpace()->GetElementTransformation(e_id);
+         const IntegrationPoint &ip = ir.IntPoint(ip_id);
+         tr->SetIntPoint(&ip);
+
+         DenseMatrix W(dim), dW(dim), Winv(dim), R(dim);
+         const double detW = Wideal.Det();
+         Vector ind_vals(ir.GetNPoints());
+         indicator->GetValues(e_id, ir, ind_vals);
+         if (avg_volume == 0.0) { ComputeAvgVolume(); }
+         const double small_zone_size = adapt_scale * avg_volume;
+         const double big_zone_size   = adapt_size_factor * small_zone_size;
+         if (ind_vals(ip_id) > 1.0) { ind_vals(ip_id) = 1.0; }
+         if (ind_vals(ip_id) < 0.0) { ind_vals(ip_id) = 0.0; }
+         const double target_det = ind_vals(ip_id) * small_zone_size +
+                                   (1.0 - ind_vals(ip_id)) * big_zone_size;
+         W.Set(std::pow(target_det / detW, 1.0 / dim), Wideal);
+         const double factor = 1.0 / dim *
+                               std::pow(target_det / detW, (1.0 - dim) / dim) *
+                               (small_zone_size - big_zone_size) / detW;
+         dW.Set(factor, Wideal);
+         CalcInverseTranspose(W, Winv);
+
+         double detv = W.Det();
+         Winv *= detv;
+/* Method 1
+//         Mult(Winv, dW, R);
+*/
+/* Method 2
+         R = 0.0;
+         for (int d1 = 0; d1 < dim; d1++)
+         {
+            for (int d2 = 0; d2 < dim; d2++)
+            {
+             R(0,0) += Winv(d1,d2)*dW(d1,d2);
+            }
+         }
+*/
+/* Method 3
+
+*/
+         Mult(Winv, dW, R);
+         R(0,1) = 0.0;
+         R(1,0) = 0.0;
+         R(0,0) = R(0,0)+R(1,1);
+         R(1,1) = 0.0;
+
+ 
+         Vector grad_ind(dim), shape(dof);
+         indicator->GetGradient(*tr, grad_ind);
+         nfe->CalcShape(ip, shape);
+         for (int d = 0; d < dim; d++)
+         {
+            for (int j = 0; j < dof; j++)
+            {
+               Jtr_dx(dof*d + j).Set(grad_ind(d) * shape(j), R);
+            }
+         }
+         break;
+      }
+case ADAPTIVE_SHAPE:
+      { 
+         ElementTransformation *tr =
+                       indicator->FESpace()->GetElementTransformation(e_id);
+         const IntegrationPoint &ip = ir.IntPoint(ip_id);
+         tr->SetIntPoint(&ip);
+
+         DenseMatrix W(dim), dW(dim), Winv(dim), R(dim);
+         const double detW = Wideal.Det();
+         Vector ind_vals(ir.GetNPoints());
+         indicator->GetValues(e_id, ir, ind_vals);
+         if (avg_volume == 0.0) { ComputeAvgVolume(); }
+         const double small_zone_side = 1.0;
+         const double big_zone_side = adapt_size_factor * small_zone_side;
+         if (ind_vals(ip_id) > 1.0) { ind_vals(ip_id) = 1.0; }
+         if (ind_vals(ip_id) < 0.0) { ind_vals(ip_id) = 0.0; }
+         const double target_det = ind_vals(ip_id) * big_zone_side +
+                                   (1.0 - ind_vals(ip_id)) * small_zone_side;
+         W.Set(target_det, Wideal);
+         W(1,1) = 1.0;
+         const double factor = big_zone_side-small_zone_side;
+         dW.Set(factor, Wideal);
+         dW(1,1) = 0.0;
+         CalcInverseTranspose(W, Winv);
+
+         double detv = W.Det();
+         Winv *= detv;
+/* Method 1
+//         Mult(Winv, dW, R);
+*/
+/* Method 2
+
+         R = 0.0;
+         for (int d1 = 0; d1 < dim; d1++)
+         {
+            for (int d2 = 0; d2 < dim; d2++)
+            {
+             R(0,0) += Winv(d1,d2)*dW(d1,d2);
+            }
+         }
+
+*/
+/* Method 3
+
+*/
+         Mult(Winv, dW, R);
+         R(0,1) = 0.0;
+         R(1,0) = 0.0;
+         R(0,0) = R(0,0)+R(1,1);
+         R(1,1) = 0.0;
+
+         Vector grad_ind(dim), shape(dof);
+         indicator->GetGradient(*tr, grad_ind);
+         nfe->CalcShape(ip, shape);
+         for (int d = 0; d < dim; d++)
+         { 
+            for (int j = 0; j < dof; j++)
+            { 
+               Jtr_dx(dof*d + j).Set(grad_ind(d) * shape(j), R);
+            }
+         }
+         break;
+      }
+case ADAPTIVE_SHAPE_AND_SIZE:
+      {
+	 ElementTransformation *tr =
+       indicator->FESpace()->GetElementTransformation(e_id);
+	 const IntegrationPoint &ip = ir.IntPoint(ip_id);
+	 tr->SetIntPoint(&ip);
+
+	 DenseMatrix W(dim), dW(dim), Winv(dim), R(dim);
+	 const double detW = Wideal.Det();
+	 Vector ind_vals(ir.GetNPoints());
+	 indicator->GetValues(e_id, ir, ind_vals);
+         if (avg_volume == 0.0) { ComputeAvgVolume(); }
+         const double small_size = adapt_scale * avg_volume;
+         const double big_size   = adapt_size_factor * small_size;
+	 if (ind_vals(ip_id) > 1.0) { ind_vals(ip_id) = 1.0; }
+	 if (ind_vals(ip_id) < 0.0) { ind_vals(ip_id) = 0.0; }
+         const double target_x = sqrt(big_size);
+         const double target_y =
+                  ind_vals(ip_id) * sqrt(big_size) / adapt_size_factor +
+                  (1.0 - ind_vals(ip_id)) * sqrt(big_size);
+	 W.Set(1.0, Wideal);
+	 W(0,0) = target_x;
+	 W(1,1) = target_y;
+
+	 dW.Set(1.0, Wideal);
+	 dW(0,0) = 0.0;
+	 dW(1,1) = sqrt(big_size) / adapt_size_factor -
+                   sqrt(big_size);
+	 CalcInverseTranspose(W, Winv);
+
+	 double detv = W.Det();
+	 Winv *= detv;
+
+//
+/* Method 1
+//         Mult(Winv, dW, R);
+*/
+/* Method 2
+
+	 R = 0.0;
+	 for (int d1 = 0; d1 < dim; d1++)
+	 {
+	    for (int d2 = 0; d2 < dim; d2++)
+	    {
+	     R(0,0) += Winv(d1,d2)*dW(d1,d2);
+	    }
+	 }
+
+*/
+/* Method 3
+
+*/
+	 Mult(Winv, dW, R);
+	 R(0,1) = 0.0;
+	 R(1,0) = 0.0;
+	 R(0,0) = R(0,0)+R(1,1);
+	 R(1,1) = 0.0;
+
+	 Vector grad_ind(dim), shape(dof);
+	 indicator->GetGradient(*tr, grad_ind);
+	 nfe->CalcShape(ip, shape);
+	 for (int d = 0; d < dim; d++)
+	 {
+	    for (int j = 0; j < dof; j++)
+	    {
+	       Jtr_dx(dof*d + j).Set(grad_ind(d) * shape(j), R);
+	    }
+	 }
+	 break;
+      }
+      default:
+      {
+         for (int j = 0; j < dof*dim; j++) { Jtr_dx(j) = 0.0; }
+      }
+   }
+}
+} 
+// namespace mfem

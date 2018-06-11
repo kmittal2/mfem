@@ -1,0 +1,103 @@
+Options used:
+   --mesh square.mesh
+   --order 3
+   --refine-serial 3
+   --refine-parallel 0
+   --jitter 0
+   --metric-id 7
+   --target-id 5
+   --limit-const 0
+   --quad-type 2
+   --quad_order 4
+   --solver_type 0
+   --newton-iters 200
+   --newton-rel-tolerance 1e-12
+   --lin-solver 2
+   --lin-iter 100
+   --move-boundary
+   --no-combo-met
+   --visualization
+   --verbosity-level 2
+Mesh curvature: H1_2D_P1
+Quadrature points per cell: 9
+Initial strain energy: 3.11638
+Minimum det(J) of the original mesh is 0.000976562
+RelaxedNewtonSolver is used (as all det(J) > 0).
+Newton iteration  0 : ||r|| = 0.765561
+MINRES: iteration   0: ||r||_B = 0.0514102 ...
+MINRES: iteration 100: ||r||_B = 0.00162139
+MINRES: No convergence!
+Scale = 1 Increasing energy.
+Scale = 0.5 Norm increased.
+Energy decrease: 14.204% with 0.25 scaling. 2.67373
+Remap with dt = 0.686955 took 2 steps.
+Newton iteration  1 : ||r|| = 0.600956, ||r||/||r_0|| = 0.784988
+MINRES: iteration   0: ||r||_B = 0.0415229 ...
+MINRES: iteration 100: ||r||_B = 0.00100026
+MINRES: No convergence!
+Scale = 1 Increasing energy.
+Energy decrease: 13.9662% with 0.5 scaling. 2.15794
+Remap with dt = 0.269795 took 4 steps.
+Newton iteration  2 : ||r|| = 0.476704, ||r||/||r_0|| = 0.622686
+MINRES: iteration   0: ||r||_B = 0.0348623 ...
+MINRES: iteration 100: ||r||_B = 0.000492351
+MINRES: No convergence!
+Scale = 1 Norm increased.
+Energy decrease: 5.23019% with 0.5 scaling. 1.80405
+Remap with dt = 0.207401 took 5 steps.
+Newton iteration  3 : ||r|| = 0.298547, ||r||/||r_0|| = 0.389971
+MINRES: iteration   0: ||r||_B = 0.0211097 ...
+MINRES: iteration 100: ||r||_B = 0.00031859
+MINRES: No convergence!
+Scale = 1 Increasing energy.
+Energy decrease: 0.955836% with 0.5 scaling. 1.65447
+Remap with dt = 0.183618 took 6 steps.
+Newton iteration  4 : ||r|| = 0.203097, ||r||/||r_0|| = 0.265292
+MINRES: iteration   0: ||r||_B = 0.0141232 ...
+MINRES: iteration 100: ||r||_B = 0.000230409
+MINRES: No convergence!
+Scale = 1 Increasing energy.
+Scale = 0.5 Increasing energy.
+Scale = 0.25 Increasing energy.
+Energy decrease: 0.0281319% with 0.125 scaling. 1.57652
+Remap with dt = 0.18057 took 6 steps.
+Newton iteration  5 : ||r|| = 0.186732, ||r||/||r_0|| = 0.243915
+MINRES: iteration   0: ||r||_B = 0.0129257 ...
+MINRES: iteration 100: ||r||_B = 0.000216819
+MINRES: No convergence!
+Scale = 1 Increasing energy.
+Scale = 0.5 Increasing energy.
+Scale = 0.25 Increasing energy.
+Scale = 0.125 Increasing energy.
+Scale = 0.0625 Increasing energy.
+Energy decrease: 0.000788014% with 0.03125 scaling. 1.56457
+Remap with dt = 0.17989 took 6 steps.
+Newton iteration  6 : ||r|| = 0.18313, ||r||/||r_0|| = 0.239211
+MINRES: iteration   0: ||r||_B = 0.0126671 ...
+MINRES: iteration 100: ||r||_B = 0.000213616
+MINRES: No convergence!
+Scale = 1 Increasing energy.
+Scale = 0.5 Increasing energy.
+Scale = 0.25 Increasing energy.
+Scale = 0.125 Increasing energy.
+Scale = 0.0625 Increasing energy.
+Scale = 0.03125 Increasing energy.
+Scale = 0.015625 Increasing energy.
+Scale = 0.0078125 Increasing energy.
+Scale = 0.00390625 Increasing energy.
+Scale = 0.00195312 Increasing energy.
+Scale = 0.000976562 Increasing energy.
+Scale = 0.000488281 Increasing energy.
+Scale = 0.000244141 Increasing energy.
+Scale = 0.00012207 Increasing energy.
+Scale = 6.10352e-05 Increasing energy.
+Scale = 3.05176e-05 Increasing energy.
+Scale = 1.52588e-05 Increasing energy.
+Scale = 7.62939e-06 Increasing energy.
+Scale = 3.8147e-06 Increasing energy.
+Scale = 1.90735e-06 Increasing energy.
+Energy decrease: -2.78564e-09% with 9.53674e-07 scaling. 1.56185
+NewtonIteration: rtol = 1e-12 not achieved.
+time taken (sec): 3.52797
+Final strain energy : 1.56185
+The strain energy decreased by: 49.8826458467 %.

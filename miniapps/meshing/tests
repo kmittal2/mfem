@@ -1,0 +1,45 @@
+%%%%%% 
+Test 1
+%%%%%%
+
+mpirun -np 4 pmesh-optimizer -m blade.mesh -o 4 -rs 0 -mid 2 -tid 1 -ls 2 -li 100 -bnd -qt 1 -qo 8 -vl 2 -ni 50000 -st 0  - NM t1nm.out
+OR
+mpirun -np 4 pmesh-optimizer -m blade.mesh -o 4 -rs 0 -mid 2 -tid 1 -ls 2 -li 100 -bnd -qt 1 -qo 8 -vl 2 -ni 50000 -st 1  - CG t1cg.out
+
+The plots of error can be plotted in gnuplot as follows:
+set xrange [0:50000];plot "t1nmer.out" u 1 w l;replot  66.4977;replot "t1cger.out" u 1 w l;
+
+The results show very slow convergence for CG as we get near the minima
+    Iteration      time      time/iteration        Energy
+NM    25           0.72           0.0288            66.4977
+CG    50,000+     129.52          0.0026            66.5332 
+
+
+%%%%%% 
+Test 2
+%%%%%%
+
+mpirun -np 4 pmesh-optimizer -m blade.mesh -o 4 -rs 0 -mid 2 -tid 1 -ni 20000 -ls 2 -li 100 -bnd -qt 1 -qo 8 -lc 5000 -vl 2  - NM t2nm.out
+mpirun -np 4 pmesh-optimizer -m blade.mesh -o 4 -rs 0 -mid 2 -tid 1 -ni 20000 -ls 2 -li 100 -bnd -qt 1 -qo 8 -lc 5000 -vl 2 -st 1 - CG t2cg.lout
+
+The results show very slow convergence for CG as we get near the minima
+    Iteration      time      time/iteration     Final energy
+NM    11           0.39           0.0354            126.28
+CG    20,000+      71.93          0.0035            126.28
+CG(2) 20,000+    111.772         0.0055            126.28
+
+visualize as 
+set xrange [0:1000];plot "t2nmer.out" u 1 w l;replot "t2cger.out" u 1 w l;
+
+%%%%%%
+Test 3
+%%%%%%
+
+mpirun -np 4 pmesh-optimizer -o 3 -rs 0 -mid 9 -tid 2 -ni 200 -ls 2 -li 100 -bnd -qt 1 -qo 8 0 - NM  t3nm.out
+mpirun -np 4 pmesh-optimizer -o 3 -rs 0 -mid 9 -tid 2 -ni 10000 -ls 2 -li 100 -bnd -qt 1 -qo 8 -vl 2 -st 1 - CG t3cg.out
+
+    Iteration      time      time/iteration     Final energy
+NM    26           0.32           0.012            0.329
+CG    10,000+      42.71          0.004            0.331
+
+set xrange [0:5000];plot "t3nmer.out" u 1 w l;replot "t3cger.out" u 1 w l;replot 0.329;
