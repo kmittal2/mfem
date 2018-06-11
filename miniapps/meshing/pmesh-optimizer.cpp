@@ -321,6 +321,8 @@ double CGOSolver::ComputeScalingFactor(const Vector &x,
 
 double ind_values(const Vector &x)
 {
+   int opt;
+   opt = 3;
    // Sub-square.
    //if (x(0) > 0.3 && x(0) < 0.5 && x(1) > 0.5 && x(1) < 0.7) { return 1.0; }
 
@@ -333,15 +335,89 @@ double ind_values(const Vector &x)
    //if (x(1) >= 0.45 && x(1) <= 0.55 && x(0) >= 0.1 ) { return 1.0; }
 
    // Sine wave.
+   if (opt==1) 
+   {
    const double X = x(0), Y = x(1);
    return std::tanh((10*(Y-0.5) + std::sin(4.0*M_PI*X)) + 1) -
           std::tanh((10*(Y-0.5) + std::sin(4.0*M_PI*X)) - 1);
+    }
 
-
+   if (opt==2) 
+   {
    // Circle in the middle.
-   //const double xc = x(0) - 0.5, yc = x(1) - 0.5;
-   //const double r = sqrt(xc*xc + yc*yc);
-   //if (r > 0.2 && r < 0.3) { return 1.0; }
+   const double xc = x(0) - 0.5, yc = x(1) - 0.5;
+   const double r = sqrt(xc*xc + yc*yc);
+   if (r > 0.0 && r < 0.2) { return 1.0; }
+    }
+
+   if (opt==3)
+   {
+   // cross
+   const double X = x(0), Y = x(1);
+   double r1 = 0.45;double r2 = 0.55;
+   double val = ( 0.5*(1+std::tanh(50*(X-r1))) - 0.5*(1+std::tanh(50*(X-r2)))
+          + 0.5*(1+std::tanh(50*(Y-r1))) - 0.5*(1+std::tanh(50*(Y-r2))) );
+   if (val > 1.) {val = 1;}
+   return val;
+    }
+
+   if (opt==4)
+   {
+   // Multiple circles
+   double r1,r2,val,rval;
+   val = 0.;
+   // circle 1
+   r1= 0.2; r2 = 0.2;rval = 0.1;
+   double xc = x(0) - r1, yc = x(1) - r2;
+   double r = sqrt(xc*xc + yc*yc);
+   if (r < rval) { val = 1.0; }
+   // circle 2
+   r1= 0.5; r2 = 0.5;rval = 0.1;
+   xc = x(0) - r1, yc = x(1) - r2;
+   r = sqrt(xc*xc + yc*yc);
+   if (r < rval) { val = 1.0; }
+   // circle 3
+   r1= 0.8; r2 = 0.7;rval = 0.1;
+   xc = x(0) - r1, yc = x(1) - r2;
+   r = sqrt(xc*xc + yc*yc);
+   if (r < rval) { val = 1.0; }
+   // circle 4
+   r1= 0.2; r2 = 0.8;rval = 0.1;
+   xc = x(0) - r1, yc = x(1) - r2;
+   r = sqrt(xc*xc + yc*yc);
+   if (r < rval) { val = 1.0; }
+   return val;
+    }
+
+   if (opt==5)
+   {
+   // Multiple circles
+   double r1,r2,val,rval;
+   double val1,fac1;
+   val = 0.;
+   fac1 = 0.05;
+   // circle 1 
+   r1= 0.2; r2 = 0.2;rval = 0.1;
+   double xc = x(0) - r1, yc = x(1) - r2;
+   val1 = -(xc*xc + yc*yc)/fac1;
+   val += std::exp(val1);
+   // circle 2 
+   r1= 0.5; r2 = 0.5;rval = 0.1;
+   xc = x(0) - r1, yc = x(1) - r2;
+   val1 = -(xc*xc + yc*yc)/fac1;
+//   val += std::exp(val1);
+   // circle 3 
+   r1= 0.8; r2 = 0.7;rval = 0.1;
+   xc = x(0) - r1, yc = x(1) - r2;
+   val1 = -(xc*xc + yc*yc)/fac1;
+   val += std::exp(val1);
+   // circle 4 
+   r1= 0.2; r2 = 0.8;rval = 0.1;
+   xc = x(0) - r1, yc = x(1) - r2;
+   val1 = -(xc*xc + yc*yc)/fac1;
+   val += std::exp(val1);
+   return val;
+    }
 
    return 0.0;
 }
