@@ -625,8 +625,6 @@ double CGOSolver::ComputeScalingFactor(const Vector &x,
    return scale;
 }
 // Done CG Solver
-
-
 class RelaxedNewtonSolver : public NewtonSolver
 {
 private:
