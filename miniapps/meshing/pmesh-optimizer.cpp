@@ -57,6 +57,16 @@
 //   3D pinched sphere shape (the mesh is in the mfem/data GitHub repository):
 //   * mpirun -np 4 pmesh-optimizer -m ../../../mfem_data/ball-pert.mesh -o 4 -rs 0 -mid 303 -tid 1 -ni 20 -ls 2 -li 500 -fix-bnd
 
+
+// Summary of changes
+// GMRES in ode solver instead of CG because it kept breaking
+// Added CG and GD
+// Added derivative of Winv and det(W) in tmop.cpp
+// ProcessNewState in ComputeScalingFactor 
+// Added a bunch of different indicators to try different shapes/patterns
+// Added derivatives of more targets
+ 
+
 #include "mfem.hpp"
 #include <fstream>
 #include <iostream>
@@ -96,7 +106,7 @@ void vis_metric(int order, TMOP_QualityMetric &qm, const TargetConstructor &tc,
 double ind_values(const Vector &x)
 {
    int opt;
-   opt = 4;
+   opt = 1;
    // Sub-square.
    //if (x(0) > 0.3 && x(0) < 0.5 && x(1) > 0.5 && x(1) < 0.7) { return 1.0; }
 
@@ -134,7 +144,7 @@ double ind_values(const Vector &x)
    double val = 0.;
    const double X = x(0), Y = x(1);
    double r = sqrt(X*X + Y*Y);
-   double r1 = 0.40;double r2 = 0.60;double sf=20.0;
+   double r1 = 0.45;double r2 = 0.55;double sf=30.0;
    val = ( 0.5*(1+std::tanh(sf*(X-r1))) - 0.5*(1+std::tanh(sf*(X-r2)))
           + 0.5*(1+std::tanh(sf*(Y-r1))) - 0.5*(1+std::tanh(sf*(Y-r2))) );
    if (val > 1.) {val = 1;}
@@ -150,29 +160,27 @@ double ind_values(const Vector &x)
    val = 0.;
    fac1 = 0.05;
    // circle 1 
-   r1= 0.2; r2 = 0.2;rval = 0.15;
+   r1= 0.25; r2 = 0.25;rval = 0.1;
    double xc = x(0) - r1, yc = x(1) - r2;
    double r = sqrt(xc*xc+yc*yc);
    val =  0.5*(1+std::tanh(sf*(r+rval))) - 0.5*(1+std::tanh(sf*(r-rval)));// std::exp(val1);
-
    // circle 2 
-   r1= 0.5; r2 = 0.5;
-   xc = x(0) - r1, yc = x(1) - r2;
+   r1= 0.75; r2 = 0.75;
    xc = x(0) - r1, yc = x(1) - r2;
    r = sqrt(xc*xc+yc*yc);
-   val +=  0.5*(1+std::tanh(sf*(r+rval))) - 0.5*(1+std::tanh(sf*(r-rval)));// std::exp(val1);
+   val +=  (0.5*(1+std::tanh(sf*(r+rval))) - 0.5*(1+std::tanh(sf*(r-rval))));// std::exp(val1);
    // circle 3 
-   r1= 0.8; r2 = 0.7;
-   xc = x(0) - r1, yc = x(1) - r2;
+   r1= 0.75; r2 = 0.25;
    xc = x(0) - r1, yc = x(1) - r2;
    r = sqrt(xc*xc+yc*yc);
    val +=  0.5*(1+std::tanh(sf*(r+rval))) - 0.5*(1+std::tanh(sf*(r-rval)));// std::exp(val1);
    // circle 4 
-   r1= 0.2; r2 = 0.8;
+   r1= 0.25; r2 = 0.75;
    xc = x(0) - r1, yc = x(1) - r2;
    r = sqrt(xc*xc+yc*yc);
    val +=  0.5*(1+std::tanh(sf*(r+rval))) - 0.5*(1+std::tanh(sf*(r-rval)));
-//   if (val > 1.0) {val = 1.;}
+   if (val > 1.0) {val = 1.;}
+   if (val < 0.0) {val = 0.;}
 
    return val;
     }
@@ -191,8 +199,9 @@ double ind_values(const Vector &x)
    double r1 = 0.45;double r2 = 0.55;double sf=30.0;
    val = ( 0.5*(1+std::tanh(sf*(X-r1))) - 0.5*(1+std::tanh(sf*(X-r2)))
           + 0.5*(1+std::tanh(sf*(Y-r1))) - 0.5*(1+std::tanh(sf*(Y-r2))) );
-   if (val > 1.) {val = 1.;}
    if (rval > 0.4) {val = 0.;}
+   if (val > 1.0) {val = 1.;}
+   if (val < 0.0) {val = 0.;}
    return val;
     }
 
@@ -251,7 +260,7 @@ public:
       HypreParVector *RHS = rhs.ParallelAssemble();
       HypreParVector *X   = rhs.ParallelAverage();
       HypreParMatrix *Mh  = M.ParallelAssemble();
-
+/*
       CGSolver cg(M.ParFESpace()->GetParMesh()->GetComm());
       HypreSmoother prec;
       prec.SetType(HypreSmoother::Jacobi, 1);
@@ -261,6 +270,17 @@ public:
       cg.SetMaxIter(100);
       cg.SetPrintLevel(0);
       cg.Mult(*RHS, *X);
+      K.ParFESpace()->Dof_TrueDof_Matrix()->Mult(*X, di_dt);
+*/
+      GMRESSolver gmres(M.ParFESpace()->GetParMesh()->GetComm());
+      HypreSmoother prec;
+      prec.SetType(HypreSmoother::Jacobi, 1);
+      gmres.SetPreconditioner(prec);
+      gmres.SetOperator(*Mh);
+      gmres.SetRelTol(1e-12); gmres.SetAbsTol(0.0);
+      gmres.SetMaxIter(100);
+      gmres.SetPrintLevel(0);
+      gmres.Mult(*RHS, *X);
       K.ParFESpace()->Dof_TrueDof_Matrix()->Mult(*X, di_dt);
 
       delete Mh;
@@ -454,7 +474,7 @@ void CGOSolver::Mult(const Vector &b, Vector &x) const
       MFEM_ASSERT(IsFinite(norm), "norm = " << norm);
       if (print_level >= 0)
       {
-         mfem::out << "Newton iteration " << setw(2) << it
+         mfem::out << "CG iteration " << setw(2) << it
                    << " : ||r|| = " << norm;
          if (it > 0)
          {
@@ -477,7 +497,7 @@ void CGOSolver::Mult(const Vector &b, Vector &x) const
          break;
       }
 
-      if (it % 50 == 0)
+      if (it % 10 == 0)
       { 
         oper->Mult(x, r); // r = b-Ax
         if (have_b)
@@ -501,11 +521,12 @@ void CGOSolver::Mult(const Vector &b, Vector &x) const
          r -= b;
       }
 
+//    CG Opt
       num = Dot(r,r); // g_{k+1}^T g_{k+1}
       den = Dot(c,c); // g_k ^T g_k 
       beta = num/den; //
       add(r,beta,c,c); // c = r + beta(c)
-
+//    
       norm = Norm(r);
    }
 
@@ -625,6 +646,278 @@ double CGOSolver::ComputeScalingFactor(const Vector &x,
    return scale;
 }
 // Done CG Solver
+// BEGIN GDO SOLVER
+//-------------- Begin GDO Solver
+class GDOSolver : public IterativeSolver
+{
+
+private:
+   // Quadrature points that are checked for negative Jacobians etc.
+   const IntegrationRule &ir;
+   ParFiniteElementSpace *pfes;
+   mutable ParGridFunction x_gf;
+
+   // GridFunction that has the latest mesh positions.
+   ParGridFunction &mesh_nodes;
+
+   // Advection related.
+   ParGridFunction *x0, *ind0, *ind;
+   AdvectorCG *advector;
+
+   // Quadrature points that are checked for negative Jacobians etc.
+//   const IntegrationRule &ir;
+//   ParFiniteElementSpace *pfes;
+//   mutable ParGridFunction x_gf;
+
+protected:
+   mutable Vector r, c, s;
+
+public:
+   GDOSolver(const IntegrationRule &irule,
+                       ParFiniteElementSpace *pf, ParGridFunction &mn,
+                       ParGridFunction *x0_, ParGridFunction *ind0_,
+                       ParGridFunction *ind_, AdvectorCG *adv)
+      : IterativeSolver(pf->GetComm()), ir(irule), pfes(pf), mesh_nodes(mn),
+        x0(x0_), ind0(ind0_), ind(ind_), advector(adv) { }
+//   GDOSolver(const IntegrationRule &irule, ParFiniteElementSpace *pf)
+//      : IterativeSolver(pf->GetComm()),ir(irule), pfes(pf) { }
+
+   virtual void SetOperator(const Operator &op);
+
+   /** This method is equivalent to calling SetPreconditioner(). */
+   virtual void SetSolver(Solver &solver) { prec = &solver; }
+
+   /// Solve the nonlinear system with right-hand side @a b.
+   /** If `b.Size() != Height()`, then @a b is assumed to be zero. */
+   virtual void Mult(const Vector &b, Vector &x) const;
+
+   /** @brief This method can be overloaded in derived classes to implement line
+       search algorithms. */
+   /** The base class implementation (NewtonSolver) simply returns 1. A return
+       value of 0 indicates a failure, interrupting the Newton iteration. */
+   virtual double ComputeScalingFactor(const Vector &x, const Vector &b) const;
+
+   virtual void ProcessNewState(const Vector &x) const
+   {
+      mesh_nodes.Distribute(x);
+
+      if (x0 && ind0 && ind && advector)
+      {
+         // GridFunction with the current positions.
+         Vector x_copy(x);
+         x_gf.MakeTRef(pfes, x_copy, 0);
+
+         // Reset the indicator to its values on the initial positions.
+         *ind = *ind0;
+
+         // Advect the indicator from the original to the new posiions.
+         advector->Advect(*x0, x_gf, *ind);
+      }
+   }
+};
+
+void GDOSolver::SetOperator(const Operator &op)
+{
+   oper = &op;
+   height = op.Height();
+   width = op.Width();
+   MFEM_ASSERT(height == width, "square Operator is required.");
+
+   r.SetSize(width);
+   c.SetSize(width);
+}
+
+void GDOSolver::Mult(const Vector &b, Vector &x) const
+{
+   MFEM_ASSERT(oper != NULL, "the Operator is not set (use SetOperator).");
+   MFEM_ASSERT(prec != NULL, "the Solver is not set (use SetSolver).");
+
+   int it;
+   double norm0, norm, norm_goal, beta, num,den,num_all,den_all;
+   const bool have_b = (b.Size() == Height());
+
+   if (!iterative_mode)
+   {
+      x = 0.0;
+   }
+
+   oper->Mult(x, r); // r = b-Ax
+   if (have_b)
+   {
+      r -= b;
+   }
+
+   c = r;
+
+   norm0 = norm = Norm(r);
+   norm_goal = std::max(rel_tol*norm, abs_tol);
+
+   prec->iterative_mode = false;
+
+   for (it = 0; true; it++)
+   {
+      MFEM_ASSERT(IsFinite(norm), "norm = " << norm);
+      if (print_level >= 0)
+      {
+         mfem::out << "GD iteration " << setw(2) << it
+                   << " : ||r|| = " << norm;
+         if (it > 0)
+         {
+            mfem::out << ", ||r||/||r_0|| = " << norm/norm0;
+         }
+         mfem::out << '\n';
+      }
+
+
+
+      if (norm <= norm_goal)
+      {
+         converged = 1;
+         break;
+      }
+
+      if (it >= max_iter)
+      {
+         converged = 0;
+         break;
+      }
+
+      const double c_scale = ComputeScalingFactor(x, b);
+      if (c_scale == 0.0)
+      {
+         converged = 0;
+         break;
+      }
+      add(x, -c_scale, c, x);
+
+      oper->Mult(x, r);
+      if (have_b)
+      {
+         r -= b;
+      }
+
+      c = r;
+      norm = Norm(r);
+   }
+
+   final_iter = it;
+   final_norm = norm;
+}
+
+double GDOSolver::ComputeScalingFactor(const Vector &x,
+                                                 const Vector &b) const
+{
+   static double scalesav;
+   const ParNonlinearForm *nlf = dynamic_cast<const ParNonlinearForm *>(oper);
+   MFEM_VERIFY(nlf != NULL, "invalid Operator subclass");
+   const bool have_b = (b.Size() == Height());
+
+   const int NE = pfes->GetParMesh()->GetNE(), dim = pfes->GetFE(0)->GetDim(),
+             dof = pfes->GetFE(0)->GetDof(), nsp = ir.GetNPoints();
+   Array<int> xdofs(dof * dim);
+   DenseMatrix Jpr(dim), dshape(dof, dim), pos(dof, dim);
+   Vector posV(pos.Data(), dof * dim);
+
+   Vector x_out(x.Size());
+   bool x_out_ok = false;
+   const double energy_in = nlf->GetEnergy(x);
+   double scale = 1.0, energy_out;
+   double norm0 = Norm(r);
+   double redfac = 0.5;
+
+   if (scalesav==0.)
+    {
+     scale = 1.;
+    }
+   else
+    {
+     scale = scalesav/redfac;
+    }
+
+   // Decreases the scaling of the update until the new mesh is valid.
+   for (int i = 0; i < 20; i++)
+   {
+      add(x, -scale, c, x_out);
+      x_gf.MakeTRef(pfes, x_out, 0);
+      x_gf.SetFromTrueVector();
+      energy_out = nlf->GetEnergy(x_out);
+
+
+      if (energy_out < 1.0*energy_in)
+      {
+        ProcessNewState(x_out);
+        energy_out = nlf->GetEnergy(x_out);
+      }
+      else
+      {
+         if (print_level >= 0)
+         {
+            cout << "Scale = " << scale << " " << energy_in << " " << energy_out <<  " Increasing energy before remap." << endl;
+         }
+         scale *= redfac;
+         continue;
+      }
+
+      if (energy_out > 1.2*energy_in || isnan(energy_out) != 0)
+      {
+         if (print_level >= 0)
+         { cout << "Scale = " << scale << " Increasing energy." << endl; }
+         scale *= 0.1; continue;
+      }
+
+      int jac_ok = 1;
+      for (int i = 0; i < NE; i++)
+      {
+         pfes->GetElementVDofs(i, xdofs);
+         x_gf.GetSubVector(xdofs, posV);
+         for (int j = 0; j < nsp; j++)
+         {
+            pfes->GetFE(i)->CalcDShape(ir.IntPoint(j), dshape);
+            MultAtB(pos, dshape, Jpr);
+            if (Jpr.Det() <= 0.0) { jac_ok = 0; goto break2; }
+         }
+      }
+   break2:
+      int jac_ok_all;
+      MPI_Allreduce(&jac_ok, &jac_ok_all, 1, MPI_INT, MPI_LAND,
+                    pfes->GetComm());
+
+      if (jac_ok_all == 0)
+      {
+         if (print_level >= 0)
+         { cout << "Scale = " << scale << " Neg det(J) found." << endl; }
+         scale *= 0.1; continue;
+      }
+
+      oper->Mult(x_out, r);
+      if (have_b) { r -= b; }
+      double norm = Norm(r);
+
+      if (norm > 1.2*norm0)
+      {
+         if (print_level >= 0)
+         { cout << "Scale = " << scale << " Norm increased." << endl; }
+         scale *= 0.1; continue;
+      }
+      else { x_out_ok = true; break; }
+      x_out_ok = true;
+   }
+
+   if (print_level >= 0)
+   {
+      cout << "Energy decrease: "
+           << (energy_in - energy_out) / energy_in * 100.0
+           << "% with " << scale << " scaling. " << energy_in << " " << energy_out <<  endl;
+   }
+
+   if (x_out_ok == false) { scale = 0.0; }
+
+   scalesav = scale;
+   return scale;
+}
+// Done CG Solver
+
+// Newtons method
 class RelaxedNewtonSolver : public NewtonSolver
 {
 private:
@@ -688,11 +981,12 @@ double RelaxedNewtonSolver::ComputeScalingFactor(const Vector &x,
    Vector x_outb(x.Size());
    Vector dx_out(x.Size());
    Vector csav(x.Size());
+   Vector r1(x.Size());
    bool x_out_ok = false;
    double energy_dum;
    const double energy_in = nlf->GetEnergy(x);
    double scale, energy_out, energy_outd;
-   double redfac = 0.1;
+   double redfac = 0.5;
    if (scalesav==0.) 
     {
      scale = 1.;
@@ -705,6 +999,12 @@ double RelaxedNewtonSolver::ComputeScalingFactor(const Vector &x,
    csav = c;
    double norm0 = Norm(r);
    x_gf.MakeTRef(pfes, x_out, 0);
+
+// Wolfe condition
+   oper->Mult(x, r1);
+   double prodr = Dot(r1,c);
+   prodr *= 0.5; // c2 in wolfe
+   prodr += energy_in; //f(xk) + c2 * dot(gradf(xk),pk) 
 
    // Decreases the scaling of the update until the new mesh is valid.
    for (int i = 0; i < 20; i++)
@@ -767,9 +1067,11 @@ double RelaxedNewtonSolver::ComputeScalingFactor(const Vector &x,
 
       oper->Mult(x_out, r);
       if (have_b) { r -= b; }
+      double prodl = Dot(r,c);
       double norm = Norm(r);
 
-      if (norm > 1.2*norm0)
+      if (norm > 1.2*norm0) // Norm condition
+//       if (prodl < prodr) // Wolfe condition 2 - Choose either this or norm condition
       {
          if (print_level >= 0)
          { cout << "Scale = " << scale << " Norm increased." << endl; }
@@ -1157,7 +1459,7 @@ int main (int argc, char *argv[])
    }
    if (target_t == TargetConstructor::IDEAL_SHAPE_ADAPTIVE_SIZE_7)
    {
-      target_c->SetIndicator(remap_gf, 27.0);
+      target_c->SetIndicator(remap_gf, 15.0);
    }
    if (target_t == TargetConstructor::ADAPTIVE_SHAPE)
    {
@@ -1375,8 +1677,8 @@ int main (int argc, char *argv[])
 
    // 20. Finally, perform the nonlinear optimization.
    NewtonSolver *newton = NULL;
-//   CGOSolver    *cgo    = NULL;
    CGOSolver    *cgo    = NULL;
+   GDOSolver    *gdo    = NULL;
    int start_s=clock();
    if (solver_type == 0)
    {
@@ -1420,9 +1722,8 @@ int main (int argc, char *argv[])
    }
    delete newton;
    }
-   else
+   else if (solver_type==1)
    {
-//     cgo = new CGOSolver(*ir, pfespace);
       cgo = new CGOSolver(*ir, pfespace, x,
                                        &x0, &remap_gf_init,
                                        &remap_gf, advector);
@@ -1443,6 +1744,29 @@ int main (int argc, char *argv[])
             << endl;
     }
    delete cgo;
+   }
+   else 
+   {
+      gdo = new GDOSolver(*ir, pfespace, x,
+                                       &x0, &remap_gf_init,
+                                       &remap_gf, advector);
+     if (myid == 0)
+      {cout << "The gd Optimizer is used." << endl;}
+    int start_s=clock();
+    gdo->SetPreconditioner(*S);
+    gdo->SetMaxIter(newton_iter);
+    gdo->SetRelTol(newton_rtol);
+    gdo->SetAbsTol(0.0);
+    gdo->SetPrintLevel(verbosity_level >= 1 ? 1 : -1);
+    gdo->SetOperator(a);
+    gdo->Mult(b, x.GetTrueVector());
+    x.SetFromTrueVector();
+    if (myid == 0 && gdo->GetConverged() == false)
+    {
+       cout << "NewtonIteration: rtol = " << newton_rtol << " not achieved."
+            << endl;
+    }
+   delete gdo;
    }
 
    // 21. Save the optimized mesh to a file. This output can be viewed later
