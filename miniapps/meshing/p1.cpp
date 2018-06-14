@@ -2,10 +2,8 @@
 // ./cfp -m square.mesh -qo 4
 //
 #include "mfem.hpp"
-#ifdef _cplusplus
-#endif
 extern "C" {
-# include "3rd_party/gslib/gslib-1.0.1/src/custom.h"
+# include "3rd_party/gslib/gslib-1.0.1/src/cpp/custom2.h"
 }
     // C Function call
 //    struct findpts_setup()
@@ -15,6 +13,29 @@ extern "C" {
 #include <fstream>
 #include <iostream>
 #include <ctime>
+
+#define D 2
+
+#if D==3
+#define INITD(a,b,c) {a,b,c}
+#define MULD(a,b,c) ((a)*(b)*(c))
+#define INDEXD(a,na, b,nb, c) (((c)*(nb)+(b))*(na)+(a))
+#define findpts_data  findpts_data_3
+//#define findpts_setup findpts_setup_3
+#define findpts_free  findpts_free_3
+#define findpts       findpts_3
+#define findpts_eval  findpts_eval_3
+#elif D==2
+#define INITD(a,b,c) {a,b}
+#define MULD(a,b,c) ((a)*(b))
+#define INDEXD(a,na, b,nb, c) ((b)*(na)+(a))
+#define findpts_data  findpts_data_2
+//#define findpts_setup findpts_setup_2
+#define findpts_free  findpts_free_2
+#define findpts       findpts_2
+#define findpts_eval  findpts_eval_2
+#endif
+
 
 using namespace mfem;
 using namespace std;
@@ -29,6 +50,11 @@ int main (int argc, char *argv[])
    MPI_Init(&argc, &argv);
    MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
    MPI_Comm_rank(MPI_COMM_WORLD, &myid);
+// JL STUFF
+   comm_ext world;
+   struct comm cc;
+   comm_init(&cc,MPI_COMM_WORLD);
+
    // 0. Set the method's default parameters.
    const char *mesh_file = "icf.mesh";
    int mesh_poly_deg     = 1;
@@ -180,6 +206,13 @@ int main (int argc, char *argv[])
 
    // 12. Setup the quadrature rule for the non-linear form integrator.
    TMOP_Integrator *he_nlf_integ;
+   TMOP_QualityMetric *metric = NULL;
+   TargetConstructor::TargetType target_t;
+   metric = new TMOP_Metric_001;
+   TargetConstructor *target_c;
+   target_c = new TargetConstructor(target_t, MPI_COMM_WORLD);
+   target_c->SetNodes(x0);
+   he_nlf_integ = new TMOP_Integrator(metric, target_c);
    const IntegrationRule *ir = NULL;
    const int geom_type = pfespace->GetFE(0)->GetGeomType();
    cout << quad_order << " the quad_order" << endl;
@@ -213,12 +246,24 @@ int main (int argc, char *argv[])
    ParGridFunction nodes(pfespace);
    pmesh->GetNodes(nodes);
 
-   Vector xvals((nsp+1)*(NE+1));
-   Vector yvals((nsp+1)*(NE+1));
-   Vector zvals((nsp+1)*(NE+1));
+
+   
+   int NR = nsp;
+   int NS = nsp;
+   int NT = nsp;
+   static const unsigned nr[D] = INITD(NR,NS,NT);
+   static const unsigned mr[D] = INITD(2*NR,2*NS,2*NT);
+   double zr[NR], zs[NS], zt[NT];
+   double fmesh[D][NE*MULD(NR,NS,NT)];
+   static const double *const elx[D] = INITD(fmesh[0],fmesh[1],fmesh[2]);
+
+
+   double xvals((nsp+1)*(NE+1));
+   double yvals((nsp+1)*(NE+1));
+   double zvals((nsp+1)*(NE+1));
    int np;
 
-   np = 0;
+   np = 1;
    if (dim==2) 
    {
    for (int i = 0; i < NE; i++)
@@ -226,8 +271,10 @@ int main (int argc, char *argv[])
       for (int j = 0; j < nsp; j++)
       {
          const IntegrationPoint &ip = ir->IntPoint(j);
-        xvals[np] = nodes.GetValue(i, ip, 1); //valsi);
-        yvals[np] = nodes.GetValue(i, ip, 2); //valsi);
+        fmesh[0][np] = nodes.GetValue(i, ip, 1); //valsi); 
+//xvals[np] = nodes.GetValue(i, ip, 1); //valsi);
+        fmesh[1][np] =nodes.GetValue(i, ip, 2); //valsi1);
+//yvals[np] = nodes.GetValue(i, ip, 2); //valsi);
         np = np+1;
       }
    }
@@ -238,16 +285,21 @@ int main (int argc, char *argv[])
    {
       for (int j = 0; j < nsp; j++)
       {
-         const IntegrationPoint &ip = ir->IntPoint(j);
-        xvals[np] = nodes.GetValue(i, ip, 1); //valsi);
-        yvals[np] = nodes.GetValue(i, ip, 2); //valsi);
-        zvals[np] = nodes.GetValue(i, ip, 3); //valsi);
+        const IntegrationPoint &ip = ir->IntPoint(j);
+        fmesh[0][np] = nodes.GetValue(i, ip, 1); //valsi); 
+        fmesh[1][np] =nodes.GetValue(i, ip, 2); //valsi1);
+        fmesh[2][np] =nodes.GetValue(i, ip, 3); //valsi1);
+//        xvals[np] = nodes.GetValue(i, ip, 1); //valsi);
+//        yvals[np] = nodes.GetValue(i, ip, 2); //valsi);
+//        zvals[np] = nodes.GetValue(i, ip, 3); //valsi);
         np = np+1;
       }
    }
    }
+/*
    cout << NE << " " << np << " NEL, npts" <<  endl;
    cout << NE << " " << myid << " " << num_procs << endl;
+*/
 
 //  Setup findpts
    int hndl;
@@ -257,10 +309,14 @@ int main (int argc, char *argv[])
    int npt_max = 256;
    double tol = 1.e-12;
    int lx1 = quad_order_ac;
+   int lxf = 2*lx1;
    int ntot = pow(lx1,ldim)*nel;
 
-   ffindpts_setup(hndl,MPI_COMM_WORLD,num_procs, ldim, xvals,yvals,zvals,lx1,lx1,lx1,nel,2*lx1,2*lx1,2*lx1,bb_t,ntot,ntot,npt_max,tol);
+   struct findpts_data *fd;
 
+
+   fd=findpts_setup_2(MPI_COMM_WORLD,elx,nr,NE,mr,bb_t,
+                   ntot,ntot,npt_max,tol)
 
 
    delete pfespace;
