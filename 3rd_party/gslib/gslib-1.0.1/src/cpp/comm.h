@@ -60,6 +60,9 @@
          as defined in "gs_defs.h"
          
 */
+#ifdef MFEM_USE_MPI
+#define MPI
+#endif
 
 #ifdef MPI
 #include <mpi.h>
@@ -68,9 +71,8 @@ typedef MPI_Request comm_req;
 #else
 typedef int comm_ext;
 typedef int comm_req;
-#ifndef MPI_Fint //*k10 - MFEM change - because MPI_Fint can be defined if MFEM is built in parallel mode
 typedef int MPI_Fint;
-#endif
+//#endif
 #endif
 
 #define comm_allreduce  PREFIXED_NAME(comm_allreduce )

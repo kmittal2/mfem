@@ -261,23 +261,32 @@ void findpts(      uint   *const  code_base   , const unsigned  code_stride   ,
                         npt,&fd->local,&fd->cr.data);
   /* send unfound and border points to global hash cells */
   {
+//k10    printf("got here 0\n");
     uint index;
     uint *code=code_base, *proc=proc_base;
     const double *xp[D];
     struct src_pt *pt;
     unsigned d; for(d=0;d<D;++d) xp[d]=x_base[d];
+//k10    printf("got here 0b\n");
     array_init(struct src_pt, &hash_pt, npt), pt=hash_pt.ptr;
+//k10    printf("got here 0c\n");
+    uint val = *code_base;
     for(index=0;index<npt;++index) {
       double x[D]; for(d=0;d<D;++d) x[d]=*xp[d];
+//    printf("xvalue %u %f %f \n",index,*xp[0],*xp[1]);
+//    printf("code value %u %u \n",index,*code);
       *proc = id;
+//k10    printf("got here 0d\n");
       if(*code!=CODE_INTERNAL) {
         const uint hi = hash_index(&fd->hash,x);
         unsigned d;
+//k10    printf("got here 0e\n");
         for(d=0;d<D;++d) pt->x[d]=x[d];
         pt->index=index;
         pt->proc=hi%np;
         ++pt;
       }
+//k10    printf("got here 1\n");
       for(d=0;d<D;++d)
       xp[d] = (const double*)((const char*)xp[d]+   x_stride[d]);
       code  =         (uint*)(      (char*)code +code_stride   );
@@ -285,6 +294,7 @@ void findpts(      uint   *const  code_base   , const unsigned  code_stride   ,
     }
     hash_pt.n = pt - (struct src_pt*)hash_pt.ptr;
     sarray_transfer(struct src_pt,&hash_pt,proc,1,&fd->cr);
+//k10    printf("got here 2\n");
   }
   /* look up points in hash cells, route to possible procs */
   {

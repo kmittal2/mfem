@@ -60,6 +60,9 @@
          as defined in "gs_defs.h"
          
 */
+#ifdef MFEM_USE_MPI
+#define MPI
+#endif
 
 #ifdef MPI
 #include <mpi.h>

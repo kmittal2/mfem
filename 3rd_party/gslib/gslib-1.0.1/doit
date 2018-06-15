@@ -1,0 +1,5 @@
+make clean
+rm -rf ../lib
+make CC=mpicc 
+mkdir `pwd`/../lib
+make PREFIX="`pwd`/../lib" install
