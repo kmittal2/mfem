@@ -17,13 +17,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include "name.h"
+#include "types.h"
 #ifdef MPI
 #  include <mpi.h>
 #else
    typedef void MPI_Comm;
 #endif
-#include "name.h"
-#include "types.h"
 
 typedef long real;
 sint datatype = 3;

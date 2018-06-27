@@ -1,5 +1,5 @@
 ﻿// r-adapt shape+size:
-// ./cfp -m square.mesh -qo 4
+// .p1 -m square.mesh
 //
 #include "mfem.hpp"
 extern "C" {
@@ -13,6 +13,7 @@ extern "C" {
 #include <fstream>
 #include <iostream>
 #include <ctime>
+
 
 #define D 2
 
@@ -244,6 +245,7 @@ int main (int argc, char *argv[])
    static const unsigned mr[D] = INITD(2*NR,2*NS,2*NT);
    double zr[NR], zs[NS], zt[NT];
    double fmesh[D][NE*MULD(NR,NS,NT)];
+   double dumfield[NE*MULD(NR,NS,NT)];
    static const double *const elx[D] = INITD(fmesh[0],fmesh[1],fmesh[2]);
    int np;
 
@@ -258,10 +260,13 @@ int main (int argc, char *argv[])
          const IntegrationPoint &ip = ir->IntPoint(j);
         fmesh[0][np] = nodes.GetValue(i, ip, 1); //valsi); 
         fmesh[1][np] =nodes.GetValue(i, ip, 2); //valsi1);
+        dumfield[np] = pow(fmesh[0][np],2)+pow(fmesh[1][np],2);
+/*
         if (myid==1 && i==0) 
         {
         cout << myid << " " << i << " " << j << " " << fmesh[0][np] << " " << fmesh[1][np] << "k10xy\n";
         }
+*/
         np = np+1;
       }
    }
@@ -332,15 +337,13 @@ int main (int argc, char *argv[])
    cout << sizeof(struct pt_data) <<  " " << x_stride[0] << " k10\n";
 
 //  Find a point
-
   findpts(&pt->code , sizeof(struct pt_data),
           &pt->proc , sizeof(struct pt_data),
           &pt->el   , sizeof(struct pt_data),
            pt->r    , sizeof(struct pt_data),
           &pt->dist2, sizeof(struct pt_data),
-           x_base   , x_stride, npt, fd);
+            x_base   , x_stride, npt, fd);
 
-     
  struct pt_data *pr = (pt_data*) testp.ptr;;
   cout << myid << " " << pr->x[0] << " " << pr->x[1] << " k10xy\n";
   cout << myid << " " << pr->code << " " << pr->el << " " << pr->proc << " " << pr->dist2 << " " << pr->r[0] << " " << pr->r[1] << " k10rst\n";
@@ -348,6 +351,25 @@ int main (int argc, char *argv[])
   ++pr;
   cout << myid << " " << pr->x[0] << " " << pr->x[1] << " k10xy\n";
   cout << myid << " " << pr->code << " " << pr->el << " " << pr->proc << " " << pr->dist2 << " " << pr->r[0] << " " << pr->r[1] << " k10rst\n";
+
+// Do findpts eval
+  printf("doing findpts_eval\n");
+  findpts_eval(&pt->ex[0], sizeof(struct pt_data),
+                 &pt->code , sizeof(struct pt_data),
+                 &pt->proc , sizeof(struct pt_data),
+                 &pt->el   , sizeof(struct pt_data),
+                  pt->r    , sizeof(struct pt_data),
+                  npt, &dumfield[0], fd);
+  printf("done findpts_eval\n");
+
+// Print findpts_eval results
+ struct pt_data *ps = (pt_data*) testp.ptr;;
+  double val = pow(ps->x[0],2)+pow(ps->x[1],2);
+  cout << myid << " " << ps->ex[0] << " " << val << " " << val-ps->ex[0] << " k10comp\n";
+  ++ps;
+  val = pow(ps->x[0],2)+pow(ps->x[1],2);
+  cout << myid << " " << pr->ex[0] << " " << val << " " << val-pr->ex[0] << " k10comp\n";
+
 
 
    delete fespace;

@@ -4,15 +4,13 @@
 #include "mfem.hpp"
 extern "C" {
 # include "3rd_party/gslib/gslib-1.0.1/src/cpp/custom2.h"
+# include "3rd_party/gslib/gslib-1.0.1/src/cpp/findpts_mfem.h"
 }
-    // C Function call
-//    struct findpts_setup()
-//hndl,MPI_COMM_WORLD,num_procs, ldim, xvals,yvals,zvals,lx1,lx1,lx1,nel,2*lx1,2*lx1,2*lx1,bb_t,ntot,ntot,npt_max,tol);
-//#include "3rd_party/gslib/gslib-1.0.1/src/gslib.h" 
-//}
 #include <fstream>
 #include <iostream>
 #include <ctime>
+#include <sstream>
+#include <string>
 
 #define D 2
 
@@ -40,12 +38,34 @@ static uint np, id;
 struct pt_data { double x[D], r[D], dist2, ex[D]; uint code, proc, el; };
 static struct array testp;
 
-
 using namespace mfem;
 using namespace std;
 
 IntegrationRules IntRulesLo(0, Quadrature1D::GaussLobatto);
 IntegrationRules IntRulesCU(0, Quadrature1D::ClosedUniform);
+
+double valfun(double xv, double yv)
+{
+  double xvp = xv;
+  double yvp = yv;
+//  double val = sin(M_PI*xvp*yvp) + cos(M_PI*xvp*yvp)*sin(M_PI*xvp*yvp);
+  double val = pow(xvp,2) + pow(yvp,2);
+  return val;
+}
+
+double ind_values(const Vector &x)
+{
+ double indval = valfun(x(0),x(1));
+ return indval;
+}
+
+void normalize(Vector &v)
+{
+   const double max = v.Max();
+   const double min = v.Min();
+   v -= min;
+   v /= max;
+}
 
 int main (int argc, char *argv[])
 {
@@ -55,18 +75,18 @@ int main (int argc, char *argv[])
    MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
    MPI_Comm_rank(MPI_COMM_WORLD, &myid);
 // JL STUFF
-   comm_ext world;
    struct comm cc;
    comm_init(&cc,MPI_COMM_WORLD);
 
    // 0. Set the method's default parameters.
    const char *mesh_file = "icf.mesh";
-   int mesh_poly_deg     = 1;
+   int mesh_poly_deg     = 3;
    int rs_levels         = 0;
    int rp_levels         = 0;
    double jitter         = 0.0;
    int quad_type         = 1;
    int quad_order        = 8;
+   int quad_eval         = 8;
    bool visualization    = true;
    int verbosity_level   = 0;
 
@@ -89,6 +109,8 @@ int main (int argc, char *argv[])
                   "3: Closed uniform points");
    args.AddOption(&quad_order, "-qo", "--quad_order",
                   "Order of the quadrature rule.");
+   args.AddOption(&quad_eval, "-qe", "--quad_eval",
+                  "Order of the quadrature rule for findpts_eval.");
    args.AddOption(&visualization, "-vis", "--visualization", "-no-vis",
                   "--no-visualization",
                   "Enable or disable GLVis visualization.");
@@ -219,7 +241,29 @@ int main (int argc, char *argv[])
    he_nlf_integ = new TMOP_Integrator(metric, target_c);
    const IntegrationRule *ir = NULL;
    const int geom_type = pfespace->GetFE(0)->GetGeomType();
-//   cout << quad_order << " the quad_order" << endl;
+
+//  OUtput function
+   // Indicator function.
+   // Copy of the initial mesh.
+   ParMesh mesh0(*pmesh);
+   FunctionCoefficient ind_coeff(ind_values);
+   L2_FECollection ind_fec(0, dim);
+   ParFiniteElementSpace ind_fes(&mesh0, &ind_fec);
+   ParGridFunction ind_gf(&ind_fes);
+   ind_gf.ProjectCoefficient(ind_coeff);
+   normalize(ind_gf);
+
+   osockstream sock(19916, "localhost");
+   sock << "solution\n";
+   mesh0.PrintAsOne(sock);
+   ind_gf.SaveAsOne(sock);
+   sock.send();
+   sock << "window_title 'Mesh and Function'\n"
+           << "window_geometry "
+           << 1200 << " " << 0 << " " << 600 << " " << 600 << "\n"
+           << "keys jRmclA" << endl;
+
+//
    switch (quad_type)
    {
       case 1: ir = &IntRulesLo.Get(geom_type, quad_order); break;
@@ -228,24 +272,41 @@ int main (int argc, char *argv[])
       default: cout << "Unknown quad_type: " << quad_type << endl;
         delete he_nlf_integ; return 3;
    }
-    int quad_order_ac;
-    if ( quad_order % 2 == 0)
-     {
-        quad_order_ac = (quad_order+4)/2;
-     }
-    else
-     {
-        quad_order_ac = (quad_order+3)/2;
-     }
-//   cout << quad_order_ac  << " Expected " << endl;
-   cout << "Quadrature points per cell: " << ir->GetNPoints() << endl;
-   he_nlf_integ->SetIntegrationRule(*ir);
+   if (myid==0) {cout << "Quadrature points per cell: " << ir->GetNPoints() << endl;}
+   const IntegrationRule *ire = NULL;
+   switch (quad_type)
+   {
+      case 1: ire = &IntRulesLo.Get(geom_type, quad_eval); break;
+      case 2: ire = &IntRules.Get(geom_type, quad_eval); break;
+      case 3: ire = &IntRulesCU.Get(geom_type, quad_eval); break;
+      default: cout << "Unknown quad_type: " << quad_type << endl;
+        delete he_nlf_integ; return 3;
+   }
+
+//   he_nlf_integ->SetIntegrationRule(*ir);
 
    // 11. write out all dofs
    const int NE = pfespace->GetMesh()->GetNE(),
    dof = pfespace->GetFE(0)->GetDof(), nsp = ir->GetNPoints();
-//   cout << NE << " k10ne" << endl;
-//   const ParGridFunction &nodes = pmesh->GetNodes();
+   const int nspe = ire->GetNPoints();
+   if (myid==0) {cout << dof << " " << nsp << " " << nspe <<  " dof and nsp for findpts and eval\n";}
+
+//  Check number of inverted elements
+   double tauval = infinity();
+   for (int i = 0; i < NE; i++)
+   { 
+      ElementTransformation *transf = pmesh->GetElementTransformation(i);
+      for (int j = 0; j < ir->GetNPoints(); j++)
+      { 
+         transf->SetIntPoint(&ir->IntPoint(j));
+         tauval = min(tauval, transf->Jacobian().Det());
+      }
+   }
+   double minJ0;
+   MPI_Allreduce(&tauval, &minJ0, 1, MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD);
+   tauval = minJ0;
+   if (myid == 0)
+   { cout << "Minimum det(J) of the original mesh is " << tauval << endl; }
    
    ParGridFunction nodes(pfespace);
    pmesh->GetNodes(nodes);
@@ -254,12 +315,20 @@ int main (int argc, char *argv[])
    int NS = NR,NT=NR;
    static const unsigned nr[D] = INITD(NR,NS,NT);
    static const unsigned mr[D] = INITD(2*NR,2*NS,2*NT);
-   double zr[NR], zs[NS], zt[NT];
    double fmesh[D][NE*MULD(NR,NS,NT)];
    double dumfield[NE*MULD(NR,NS,NT)];
    int np;
 
+   int NRe = sqrt(nspe);
+   int NSe = NRe,NTe=NRe;
+   static const unsigned nre[D] = INITD(NRe,NSe,NTe);
+   static const unsigned mre[D] = INITD(2*NRe,2*NSe,2*NTe);
+   double fmeshe[D][NE*MULD(NRe,NSe,NTe)];
+   double dumfielde[NE*MULD(NRe,NSe,NTe)];
+   int npe;
+
    np = 0;
+   npe = 0;
    if (dim==2) 
    {
    for (int i = 0; i < NE; i++)
@@ -269,8 +338,19 @@ int main (int argc, char *argv[])
          const IntegrationPoint &ip = ir->IntPoint(j);
         fmesh[0][np] = nodes.GetValue(i, ip, 1); //valsi); 
         fmesh[1][np] =nodes.GetValue(i, ip, 2); //valsi1);
-        dumfield[np] = pow(fmesh[0][np],2)+pow(fmesh[1][np],2);
+        dumfield[np] = valfun(fmesh[0][np],fmesh[1][np]);
         np = np+1;
+      }
+   }
+   for (int i = 0; i < NE; i++)
+   {
+      for (int j = 0; j < nspe; j++)
+      {
+         const IntegrationPoint &ipe = ire->IntPoint(j);
+        fmeshe[0][npe] = nodes.GetValue(i, ipe, 1); //valsi); 
+        fmeshe[1][npe] =nodes.GetValue(i, ipe, 2); //valsi1);
+        dumfielde[npe] = valfun(fmeshe[0][npe],fmeshe[1][npe]);
+        npe = npe+1;
       }
    }
    }
@@ -288,119 +368,150 @@ int main (int argc, char *argv[])
       }
    }
    }
-/*
-   cout << NE << " " << np << " NEL, npts" <<  endl;
-   cout << NE << " " << myid << " " << num_procs << endl;
-*/
 
 //  Setup findpts
    struct findpts_data *fd;
    int ldim = dim;
    int nel = NE;
-   double bb_t = 0.1;
+   double bb_t = 0.01;
    int npt_max = 256;
    double tol = 1.e-12;
    int ntot = pow(NR,ldim)*nel;
 
+   struct findpts_data *fde;
+   int ntote = pow(NRe,ldim)*nel;
+
 // Setup findpts
    static const double *const elx[D] = INITD(fmesh[0],fmesh[1],fmesh[2]);
-  printf("calling findpts_setup\n");
-   fd=findpts_setup_2(&cc,elx,nr,NE,mr,bb_t,
-                   ntot,ntot,npt_max,tol);
+   static const double *const elxe[D] = INITD(fmeshe[0],fmeshe[1],fmeshe[2]);
+   if (myid==0) {printf("calling findpts_setup\n");}
 
+   fd=findpts_setup(&cc,elx,nr,NE,mr,bb_t,ntot,ntot,npt_max,tol);
+   fde=findpts_setup(&cc,elxe,nre,NE,mre,bb_t,ntote,ntote,npt_max,tol);
 
+// Read x,y,z
+  Vector vrx(50000),vry(50000),vrz(50000);
+  int it = 0;
+  double r1,r2,r3;
+  int nxyz;
+//  std::ifstream infile("randrst.txt");
+  std::ifstream infile("randRT2d2.txt");
+  std::string line;
+ 
+  std::getline(infile, line);
+  std::istringstream iss(line);
+  iss >> nxyz;
+
+  int npp = nxyz/num_procs;
+
+  it = 0;
+  int nn = 0;
+  int lc = (myid)*npp;
+  int uc = (myid+1)*npp;
+  while (std::getline(infile, line))
+  { 
+    std::istringstream iss(line);
+      iss >>  r1 >>  r2 >>  r3;
+      if (nn>lc && nn < uc)
+      {
+      vrx(it) = r1;
+      vry(it) = r2;
+      vrz(it) = r3;
+      it += 1;
+      }
+      nn += 1;
+   }
 // fpt stuff
-#define TN 2  //number of test points 
+   nxyz = it+1;
+   if (myid==0) {cout << "Points to be found: " << nxyz << " \n";}
+
+#define TN nxyz
    array_init(struct pt_data,&testp,TN);
-   struct pt_data *out = (pt_data*) testp.ptr;
+   struct pt_data *pt = (pt_data*) testp.ptr;
    memset(testp.ptr,0,TN*sizeof(struct pt_data));
 
-   out->x[0] = 0.125;
-   out->x[1] = 0.25;
-   ++out;
-   out->x[0] = 0.25;
-   out->x[1] = 0.75;
+   for (it = 0; it < TN; it++)
+   {
+   pt->x[0] = vrx(it);
+   pt->x[1] = vry(it);
+   ++pt;
+   }
+   pt = (pt_data*) testp.ptr;
 
    const double *x_base[D];
    const unsigned x_stride[D] = INITD(sizeof(struct pt_data),
                                      sizeof(struct pt_data),
                                      sizeof(struct pt_data));
-   struct pt_data *pt = (pt_data*) testp.ptr;;
    uint npt = TN;
    x_base[0]=pt->x, x_base[1]=pt->x+1;
 
-// Setup findpts
-  printf("calling findpts\n");
+// findpts
+  MPI_Barrier(MPI_COMM_WORLD);
+  int start_s=clock();
   findpts(&pt->code , sizeof(struct pt_data),
           &pt->proc , sizeof(struct pt_data),
           &pt->el   , sizeof(struct pt_data),
            pt->r    , sizeof(struct pt_data),
           &pt->dist2, sizeof(struct pt_data),
            x_base   , x_stride, npt, fd);
-
+   MPI_Barrier(MPI_COMM_WORLD);
+   int stop_s=clock();
+   if (myid==0) {cout << "findpts time (sec): " << (stop_s-start_s)/1000000. << endl;}
 // Print Results
 
-  if(myid==0) printf("done findpts\n");
-  if (myid==0) 
-  {
- struct pt_data *pr = (pt_data*) testp.ptr;;
-  cout << myid << " " << pr->x[0] << " " << pr->x[1] << " k10xy\n";
-  cout << myid << " " << pr->code << " " << pr->el << " " << pr->proc << " " << pr->dist2 << " " << pr->r[0] << " " << pr->r[1] << " k10rst\n";
-  cout << " DO NEXT POINT NOW\n";
-  ++pr;
-  cout << myid << " " << pr->x[0] << " " << pr->x[1] << " k10xy\n";
-  cout << myid << " " << pr->code << " " << pr->el << " " << pr->proc << " " << pr->dist2 << " " << pr->r[0] << " " << pr->r[1] << " k10rst\n";
-  }
-
-  MPI_Barrier(MPI_COMM_WORLD);
-  cout << " DO PROC 1 NOW\n";
-  if (myid==1) 
-  {
- struct pt_data *pr = (pt_data*) testp.ptr;;
-  cout << myid << " " << pr->x[0] << " " << pr->x[1] << " k10xy\n";
-  cout << myid << " " << pr->code << " " << pr->el << " " << pr->proc << " " << pr->dist2 << " " << pr->r[0] << " " << pr->r[1] << " k10rst\n";
-  cout << " DO NEXT POINT NOW\n";
-  ++pr;
-  cout << myid << " " << pr->x[0] << " " << pr->x[1] << " k10xy\n";
-  cout << myid << " " << pr->code << " " << pr->el << " " << pr->proc << " " << pr->dist2 << " " << pr->r[0] << " " << pr->r[1] << " k10rst\n";
-  }
-
-  MPI_Barrier(MPI_COMM_WORLD);
-
 // Do findpts eval
-  if(myid==0) printf("doing findpts_eval\n");
+  pt = (pt_data*) testp.ptr;
+  start_s=clock();
+
   findpts_eval(&pt->ex[0], sizeof(struct pt_data),
-                 &pt->code , sizeof(struct pt_data),
-                 &pt->proc , sizeof(struct pt_data),
-                 &pt->el   , sizeof(struct pt_data),
-                  pt->r    , sizeof(struct pt_data),
-                  npt, &dumfield[0], fd);
-  if(myid==0) printf("done findpts_eval\n");
+               &pt->code , sizeof(struct pt_data),
+               &pt->proc , sizeof(struct pt_data),
+               &pt->el   , sizeof(struct pt_data),
+               pt->r    , sizeof(struct pt_data),
+               npt, &dumfielde[0], fde);
+
+  MPI_Barrier(MPI_COMM_WORLD);
+  stop_s=clock();
+  if (myid==0) {cout << "findpts_eval time (sec): " << (stop_s-start_s)/1000000. << endl;}
 
 // Print findpts_eval results
-  if (myid==0)
+  double maxv = -100.;
+  pt = (pt_data*) testp.ptr;
+  int nnpt = 0; // number of points not found
+  int nbp = 0;
+  int nerrh = 0; //points with high error
+  for (it = 0; it < TN; it++)
   {
- struct pt_data *pr = (pt_data*) testp.ptr;;
-  double val = pow(pr->x[0],2)+pow(pr->x[1],2);
-  cout << myid << " " << pr->ex[0] << " " << val << " " << val-pr->ex[0] << " k10comp\n";
-  ++pr;
-  val = pow(pr->x[0],2)+pow(pr->x[1],2);
-  cout << myid << " " << pr->ex[0] << " " << val << " " << val-pr->ex[0] << " k10comp\n";
+  double val = valfun(pt->x[0],pt->x[1]);
+  double delv = abs(val-pt->ex[0]);
+//  cout << pt->x[0] << " " << pt->x[1] << " " << pt->ex[0] << " " << abs(val-pt->ex[0]) << " K10c\n";
+  if (pt->code < 2) 
+  {
+  if (delv > maxv) {maxv = delv;}
+  if (pt->code == 1) {nbp += 1;}
+//  if (delv > 1.e-10) {cout << pt->code << " " << pt->r[0] << " " << pt->r[1] << " " << pt->x[0] << " " << pt->x[1] << " " << pt->dist2 << " " << abs(val-pt->ex[0]) << " K10c\n";}
+  if (delv > 1.e-10) {nerrh += 1;}
   }
-
+  else
+  {
+   nnpt += 1;
+  }
+  ++pt;
+  }
   MPI_Barrier(MPI_COMM_WORLD);
-  cout << " DO PROC 1 NOW\n";
-  if (myid==1)
-  {
- struct pt_data *pr = (pt_data*) testp.ptr;; 
-  double val = pow(pr->x[0],2)+pow(pr->x[1],2);
-  cout << myid << " " << pr->ex[0] << " " << val << " " << val-pr->ex[0] << " k10comp\n";
-  ++pr;
-  val = pow(pr->x[0],2)+pow(pr->x[1],2);
-  cout << myid << " " << pr->ex[0] << " " << val << " " << val-pr->ex[0] << " k10comp\n";
-  }
-
-
+  double glob_maxerr;
+  MPI_Allreduce(&maxv, &glob_maxerr, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+  int glob_nnpt;
+  MPI_Allreduce(&nnpt, &glob_nnpt, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+  int glob_nbp;
+  MPI_Allreduce(&nbp, &glob_nbp, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+  int glob_nerrh;
+  MPI_Allreduce(&nerrh, &glob_nerrh, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+  cout << setprecision(16);
+  if (myid==0) {cout << "maximum error is: " << glob_maxerr << " \n";}
+  if (myid==0) {cout << "points not found: " << glob_nnpt << " \n";}
+  if (myid==0) {cout << "points on element border: " << glob_nbp << " \n";}
+  if (myid==0) {cout << "points with high error: " << glob_nerrh << " \n";}
 
 
    delete pfespace;
