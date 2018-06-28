@@ -339,7 +339,10 @@ double TMOP_Metric_211::EvalW(const DenseMatrix &Jpt) const
 
 void TMOP_Metric_211::EvalP(const DenseMatrix &Jpt, DenseMatrix &P) const
 {
-   MFEM_ABORT("Metric not implemented yet. Use metric mu_55 instead.");
+   ie.SetJacobian(Jpt.GetData());
+   const double I2b = ie.Get_I2b(); 
+   double c1 = std::sqrt(I2b*I2b + eps);
+   P.Set(2.*I2b -3. + I2b/c1, ie.Get_dI2b());
 }
 
 void TMOP_Metric_211::AssembleH(const DenseMatrix &Jpt,
@@ -347,7 +350,14 @@ void TMOP_Metric_211::AssembleH(const DenseMatrix &Jpt,
                                 const double weight,
                                 DenseMatrix &A) const
 {
-   MFEM_ABORT("Metric not implemented yet. Use metric mu_55 instead.");
+   ie.SetJacobian(Jpt.GetData());
+   ie.SetDerivativeMatrix(DS.Height(), DS.GetData());
+   const double I2b = ie.Get_I2b();
+   double c1 = std::sqrt(I2b*I2b + eps); 
+   double c2 = (I2b*I2b)/std::pow(c1,1.5);
+
+   ie.Assemble_TProd(weight*(2. + 1/c1 - c2), ie.Get_dI2b(), A.GetData());
+   ie.Assemble_ddI2b(weight*(2*I2b  -3 + I2b/c1), A.GetData());
 }
 
 double TMOP_Metric_252::EvalW(const DenseMatrix &Jpt) const
