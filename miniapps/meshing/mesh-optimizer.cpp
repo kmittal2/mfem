@@ -68,6 +68,18 @@ using namespace mfem;
 using namespace std;
 
 double weight_fun(const Vector &x);
+int spatial_essdof( const Vector &x);
+
+int spatial_essdof(double xv, double yv)
+{
+   double xc = -0.00, yc = 0.;
+   double dx = xv-xc;
+   double dy = yv-yc;
+   const double r = sqrt(dx*dx + dy*dy + 1e-12);
+   int idx = 0;
+   if (r < 0.5) idx = 1;
+   return idx;
+}
 
 // Metric values are visualized by creating an L2 finite element functions and
 // computing the metric values at the nodes.
@@ -511,12 +523,30 @@ double RelaxedNewtonSolver::ComputeScalingFactor(const Vector &x,
    x_gf.MakeTRef(fes, x_out, 0);
 
    // Decreases the scaling of the update until the new mesh is valid.
-   for (int i = 0; i < 12; i++)
+   for (int i = 0; i < 20; i++)
    {
       add(x, -scale, c, x_out);
+      x_gf.MakeTRef(fes, x_out, 0);
       x_gf.SetFromTrueVector();
+      energy_out = nlf->GetEnergy(x_out);
 
-      energy_out = nlf->GetGridFunctionEnergy(x_gf);
+     if (energy_out < 1.2*energy_in)
+      {
+        if (print_level >= 0){cout << "about to process new state" << endl;}
+        ProcessNewState(x_out);
+        if (print_level >= 0){cout << "done process new state" << endl;}
+        energy_out = nlf->GetEnergy(x_out);
+      }
+         else
+      {
+         if (print_level >= 0)
+         {
+            cout << "Scale = " << scale << " " << energy_in << " " << energy_out <<  " Increasing energy before remap." << endl;
+         }
+         scale *= 0.5;
+         continue;
+      }
+
       if (energy_out > 1.2*energy_in || isnan(energy_out) != 0)
       {
          if (print_level >= 0)
@@ -1058,6 +1088,34 @@ int main (int argc, char *argv[])
       }
       a.SetEssentialVDofs(ess_vdofs);
    }
+
+   // Set essential dofs based on location
+       GridFunction snodes(fespace);
+       mesh->GetNodes(snodes);
+       const int nNodes = snodes.Size() / dim;
+       int n = 0;
+       for (int i = 0; i < nNodes; ++i)
+        {
+         int valchk = spatial_essdof(snodes(i),snodes(nNodes+i));
+         if (valchk == 1)
+         {
+           n += 2;
+         }
+        }
+
+      Array<int> spat_ess_vdofs(n);
+      n = 0;
+      for (int i = 0; i < nNodes; ++i)
+        {
+         int valchk = spatial_essdof(snodes(i),snodes(nNodes+i));
+         if (valchk == 1)
+         {
+           spat_ess_vdofs[n] = i;
+           spat_ess_vdofs[n+1] = nNodes+i;
+           n += 2;
+         }
+        }
+         a.SetAddEssentialVDofs(spat_ess_vdofs);
 
    // 17. As we use the Newton method to solve the resulting nonlinear system,
    //     here we setup the linear solver for the system's Jacobian.

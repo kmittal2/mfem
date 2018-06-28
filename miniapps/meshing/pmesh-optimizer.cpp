@@ -76,6 +76,19 @@ using namespace mfem;
 using namespace std;
 
 double weight_fun(const Vector &x);
+int spatial_essdof( const Vector &x);
+
+int spatial_essdof(double xv, double yv)
+{
+   double xc = -0.00, yc = 0.;
+   double dx = xv-xc;
+   double dy = yv-yc;
+   const double r = sqrt(dx*dx + dy*dy + 1e-12);
+   int idx = 0;
+   if (r < 0.5) idx = 1;
+   return idx;
+}
+
 
 // Metric values are visualized by creating an L2 finite element functions and
 // computing the metric values at the nodes.
@@ -1650,7 +1663,7 @@ int main (int argc, char *argv[])
    int quad_type         = 1;
    int quad_order        = 8;
    int newton_iter       = 10;
-   double newton_rtol    = 1e-14;
+   double newton_rtol    = 1e-12;
    int lin_solver        = 2;
    int max_lin_iter      = 100;
    bool move_bnd         = true;
@@ -2024,6 +2037,10 @@ int main (int argc, char *argv[])
    //     fixed x/y/z components of the node.  Attribute 4 corresponds to an
    //     entirely fixed node.  Other boundary attributes do not affect the node
    //     movement boundary conditions.
+
+
+   // Set essential dofs based on location
+
    if (move_bnd == false)
    {
       Array<int> ess_bdr(pmesh->bdr_attributes.Max());
@@ -2050,6 +2067,8 @@ int main (int argc, char *argv[])
       {
          const int attr = pmesh->GetBdrElement(i)->GetAttribute();
          pfespace->GetBdrElementVDofs(i, vdofs);
+//         cout << myid << " " << i << " " << nd <<  " " << vdofs[0] << " k10a\n"; 
+//         vdofs.Print();
          if (attr == 1) // Fix x components.
          {
             for (int j = 0; j < nd; j++)
@@ -2073,6 +2092,35 @@ int main (int argc, char *argv[])
       }
       a.SetEssentialVDofs(ess_vdofs);
    }
+
+   // Set essential dofs based on location
+       ParGridFunction pnodes(pfespace);
+       pmesh->GetNodes(pnodes);
+       const int nNodes = pnodes.Size() / dim;
+       int n = 0;
+       for (int i = 0; i < nNodes; ++i) 
+        {
+         int valchk = spatial_essdof(pnodes(i),pnodes(nNodes+i));
+         if (valchk == 1)
+         {
+           n += 2;
+         }
+        }
+
+      Array<int> spat_ess_vdofs(n);
+      n = 0;
+      for (int i = 0; i < nNodes; ++i)
+        {
+         int valchk = spatial_essdof(pnodes(i),pnodes(nNodes+i));
+         if (valchk == 1)
+         {
+           spat_ess_vdofs[n] = i;
+           spat_ess_vdofs[n+1] = nNodes+i;
+           n += 2;
+         }
+        }
+         a.SetAddEssentialVDofs(spat_ess_vdofs);
+//         cout << n << " " << nNodes << " k10numnodes\n";
 
    // 18. As we use the Newton method to solve the resulting nonlinear system,
    //     here we setup the linear solver for the system's Jacobian.
@@ -2336,36 +2384,3 @@ double weight_fun(const Vector &x)
    return l2;
 }
 
-/*
-       if (it==1000)
-       {
-       for (int idx = 0;idx < yk.Size() ; idx++)
-        {
-          cout << idx << " " << yk(idx) << " " << sk(idx) << " " << " " << ykA1(idx) << " " <<  ykA1(idx) << " k10vecs\n";
-        }
-
-       for (int idxa = 0;idxa < A1.Height() ; idxa++)
-        {
-         for (int idxb = 0;idxb < A1.Height() ; idxb++)
-         {
-          cout << idxa << " " << idxb << " "  << A1(idxb,idxa) << " " << A4A1(idxb,idxa) << " " << A1A3(idxb,idxa) << "  " << A2(idxb,idxa) << "  k10mat\n";
-         }
-        }
-       MFEM_ABORT("printing yk and sk");
-       }
-*/
-
-/*
-       MultVVt(sk,A2);
-       A2 *= const1;
-
-       MultVWt(ykA1,sk,A1A3);
-       A1A3 *= const2;
-
-       MultVWt(sk,ykA1,A4A1);
-       A4A1 *= const2;
-       A1 += A2;
-       A1 += A1A3;
-       A1 += A4A1;
-       A1.Mult(r,c);
-*/
