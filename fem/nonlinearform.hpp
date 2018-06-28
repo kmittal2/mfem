@@ -96,6 +96,7 @@ public:
    /// (DEPRECATED) Specify essential boundary conditions.
    /** @deprecated Use either SetEssentialBC() or SetEssentialTrueDofs(). */
    void SetEssentialVDofs(const Array<int> &ess_vdofs_list);
+   void SetAddEssentialVDofs(const Array<int> &ess_vdofs_list);
 
    /// Specify essential boundary conditions.
    void SetEssentialTrueDofs(const Array<int> &ess_tdof_list)

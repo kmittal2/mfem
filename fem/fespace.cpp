@@ -397,6 +397,23 @@ void FiniteElementSpace::MarkerToList(const Array<int> &marker,
    }
 }
 
+void FiniteElementSpace::AddMarkerToList(const Array<int> &marker,
+                                      Array<int> &list)
+{
+   int nex = list.Size();
+   int num_marked = 0;
+   for (int i = 0; i < marker.Size(); i++)
+   {
+      if (marker[i]) { num_marked++; }
+   }
+   list.SetSize(nex);
+   list.Reserve(nex+num_marked);
+   for (int i = 0; i < marker.Size(); i++)
+   {
+      if (marker[i]) { list.Append(i); }
+   }
+}
+
 // static method
 void FiniteElementSpace::ListToMarker(const Array<int> &list, int marker_size,
                                       Array<int> &marker, int mark_val)

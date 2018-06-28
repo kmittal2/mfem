@@ -59,6 +59,41 @@ void NonlinearForm::SetEssentialVDofs(const Array<int> &ess_vdofs_list)
    }
 }
 
+void NonlinearForm::SetAddEssentialVDofs(const Array<int> &ess_vdofs_list)
+{
+   if (!P)
+   {
+//      FiniteElementSpace::AddMarkerToList(ess_vdofs_list, ess_tdof_list);
+      Array<int> ess_vdof_marker, ess_tdof_marker;
+      FiniteElementSpace::ListToMarker(ess_vdofs_list, fes->GetVSize(),
+                                       ess_vdof_marker);
+      fes->ConvertToConformingVDofs(ess_vdof_marker, ess_tdof_marker);
+      FiniteElementSpace::AddMarkerToList(ess_tdof_marker, ess_tdof_list);
+   }
+   else
+   {
+      Array<int> ess_vdof_marker, ess_tdof_marker;
+      FiniteElementSpace::ListToMarker(ess_vdofs_list, fes->GetVSize(),
+                                       ess_vdof_marker);
+      if (Serial())
+      {
+         fes->ConvertToConformingVDofs(ess_vdof_marker, ess_tdof_marker);
+      }
+      else
+      {
+#ifdef MFEM_USE_MPI
+         ParFiniteElementSpace *pf = dynamic_cast<ParFiniteElementSpace*>(fes);
+         ess_tdof_marker.SetSize(pf->GetTrueVSize());
+         pf->Dof_TrueDof_Matrix()->BooleanMultTranspose(1, ess_vdof_marker,
+                                                        0, ess_tdof_marker);
+#else
+         MFEM_ABORT("internal MFEM error");
+#endif
+      }
+      FiniteElementSpace::AddMarkerToList(ess_tdof_marker, ess_tdof_list);
+   }
+}
+
 double NonlinearForm::GetGridFunctionEnergy(const Vector &x) const
 {
    Array<int> vdofs;

@@ -418,6 +418,7 @@ public:
 
    /// Convert a Boolean marker array to a list containing all marked indices.
    static void MarkerToList(const Array<int> &marker, Array<int> &list);
+   static void AddMarkerToList(const Array<int> &marker, Array<int> &list);
 
    /** Convert an array of indices (list) to a Boolean marker array where all
        indices in the list are marked with the given value and the rest are set
