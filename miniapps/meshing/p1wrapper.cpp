@@ -41,22 +41,23 @@ private:
 public:
       gslib_findpts_lib() {};
 
-      virtual void gslib_findpts_setup(struct findpts_data *fda, const IntegrationRule &ir,
+      struct findpts_data * gslib_findpts_setup(const IntegrationRule &ir,
                                        ParFiniteElementSpace *pfes, ParMesh *pmesh);
 
-      virtual void gslib_findpts(Vector &pcode, Vector $pproc, Vector &pel, 
+      void gslib_findpts(Vector &pcode, Vector $pproc, Vector &pel, 
                                  Vector &pr, Vector &pdist2,
                       const Vector &xp, const Vector &yp, const Vector &zp, const double nxyz, 
                       const struct findpts_data *fda);
 
-      virtual void gslib_findpts_eval (const Vector &fieldin,  
+      void gslib_findpts_eval (const Vector &fieldin,  
                    const Vector &pcode,const Vector &pproc,const Vector &pel, 
                    const Vector fieldout, const double nxyz, const struct findpts_data *fda);
 };
 
-void gslib_findpts_lib::gslib_findpts_setup(struct findpts_data *fda, const IntegrationRule &ir,    ParFiniteElementSpace *pfes, ParMesh *pmesh)
+struct findpts_data * gslib_findpts_lib::gslib_findpts_setup(const IntegrationRule &ir,    ParFiniteElementSpace *pfes, ParMesh *pmesh)
 {
-    cout << sizeof(fda) << " " << &fda << " k10aa\n";
+   struct findpts_data *fda;
+   cout << sizeof(fda) << " " << &fda << " k10aa\n";
    const int NE = pfes->GetParMesh()->GetNE(), nsp = ir.GetNPoints(),
    dim = pfes->GetFE(0)->GetDim(),NR=sqrt(nsp),NS=NR,NT=NR;
    int np;
@@ -114,6 +115,7 @@ void gslib_findpts_lib::gslib_findpts_setup(struct findpts_data *fda, const Inte
                    ntot,ntot,npt_max,tol);
    cout << sizeof(fda) << " " << &fda << " k10ab\n";
    }
+   return fda;
 //   cout << fda << " " << sizeof(fda) << " k10size\n";
 // Done findpts_setup
 }
@@ -427,7 +429,7 @@ int main (int argc, char *argv[])
    gsfl = new gslib_findpts_lib;
 
    cout << sizeof(fd) << " " << &fd << " k10a\n";
-   gsfl->gslib_findpts_setup(fd, *ir, pfespace,pmesh);
+   fd = gsfl->gslib_findpts_setup(*ir, pfespace,pmesh);
    cout << sizeof(fd) << " " << &fd << " k10b\n";
    if (myid==0) {printf("done findpts_setup\n");}
 
