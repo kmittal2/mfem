@@ -26,6 +26,30 @@ using namespace std;
 #define findpts_data  findpts_data_2
 #endif
 
+#if D==3
+#define INITD(a,b,c) {a,b,c}
+#define MULD(a,b,c) ((a)*(b)*(c))
+#define findpts_data  findpts_data_3
+#define findpts_setup findpts_setup_3
+#define findpts_free  findpts_free_3
+#define findpts       findpts_3
+#define findpts_eval  findpts_eval_3
+#elif D==2
+#define INITD(a,b,c) {a,b}
+#define MULD(a,b,c) ((a)*(b))
+#define findpts_data  findpts_data_2
+#define findpts_setup findpts_setup_2
+#define findpts_free  findpts_free_2
+#define findpts       findpts_2
+#define findpts_eval  findpts_eval_2
+#endif
+
+
+static uint np, id;
+struct pt_data { double x[D], r[D], dist2, ex[D]; uint code, proc, el; };
+static struct ::array testp;
+
+
 struct handle { void *data; unsigned ndim; };
 
 class gslib_findpts_lib
@@ -41,23 +65,21 @@ private:
 public:
       gslib_findpts_lib() {};
 
-      struct findpts_data * gslib_findpts_setup(const IntegrationRule &ir,
+      void gslib_findpts_setup(struct findpts_data *fda,const IntegrationRule &ir,
                                        ParFiniteElementSpace *pfes, ParMesh *pmesh);
 
       void gslib_findpts(Vector &pcode, Vector $pproc, Vector &pel, 
                                  Vector &pr, Vector &pdist2,
-                      const Vector &xp, const Vector &yp, const Vector &zp, const double nxyz, 
-                      const struct findpts_data *fda);
+                      const Vector &xp, const Vector &yp, const Vector &zp, const double nxy);
 
       void gslib_findpts_eval (const Vector &fieldin,  
                    const Vector &pcode,const Vector &pproc,const Vector &pel, 
-                   const Vector fieldout, const double nxyz, const struct findpts_data *fda);
+                   const Vector fieldout, const double nxyz);
 };
 
-struct findpts_data * gslib_findpts_lib::gslib_findpts_setup(const IntegrationRule &ir,    ParFiniteElementSpace *pfes, ParMesh *pmesh)
+void gslib_findpts_lib::gslib_findpts_setup(struct findpts_data *fda,const IntegrationRule &ir,    ParFiniteElementSpace *pfes, ParMesh *pmesh)
 {
-   struct findpts_data *fda;
-   cout << sizeof(fda) << " " << &fda << " k10aa\n";
+   cout << &fda <<  " " << fda << " k10aa\n";
    const int NE = pfes->GetParMesh()->GetNE(), nsp = ir.GetNPoints(),
    dim = pfes->GetFE(0)->GetDim(),NR=sqrt(nsp),NS=NR,NT=NR;
    int np;
@@ -108,57 +130,25 @@ struct findpts_data * gslib_findpts_lib::gslib_findpts_setup(const IntegrationRu
 
 // Setup findpts
    static const double *const elx[D] = INITD(fmesh[0],fmesh[1],fmesh[2]);
-//   cout << fda << " " << sizeof(fda) << " k10size0\n";
    if (dim==2)
    {
    fda=findpts_setup_2(&cc,elx,nr,NE,mr,bb_t,
                    ntot,ntot,npt_max,tol);
-   cout << sizeof(fda) << " " << &fda << " k10ab\n";
    }
-   return fda;
-//   cout << fda << " " << sizeof(fda) << " k10size\n";
-// Done findpts_setup
+   cout << &fda <<  " " << fda << " k10ac\n";
 }
 
 void gslib_findpts_lib::gslib_findpts(Vector &pcode, Vector $pproc, Vector &pel, Vector &pr, 
                           Vector &pdist2,
-                    const Vector &xp, const Vector &yp, const Vector &zp, const double nxyz, 
-                    const struct findpts_data *fd)
+                    const Vector &xp, const Vector &yp, const Vector &zp, const double nxyz) 
 {
 }
 
 void gslib_findpts_lib::gslib_findpts_eval (const Vector &fieldin,  
                    const Vector &pcode,const Vector &pproc,const Vector &pel, 
-                   const Vector fieldout, const double nxyz, const struct findpts_data *fd)
+                   const Vector fieldout, const double nxyz)
 {
 }
-
-
-#undef D
-#define D 2
-
-#if D==3
-#define INITD(a,b,c) {a,b,c}
-#define MULD(a,b,c) ((a)*(b)*(c))
-#define findpts_data  findpts_data_3
-#define findpts_setup findpts_setup_3
-#define findpts_free  findpts_free_3
-#define findpts       findpts_3
-#define findpts_eval  findpts_eval_3
-#elif D==2
-#define INITD(a,b,c) {a,b}
-#define MULD(a,b,c) ((a)*(b))
-#define findpts_data  findpts_data_2
-#define findpts_setup findpts_setup_2
-#define findpts_free  findpts_free_2
-#define findpts       findpts_2
-#define findpts_eval  findpts_eval_2
-#endif
-
-
-static uint np, id;
-struct pt_data { double x[D], r[D], dist2, ex[D]; uint code, proc, el; };
-static struct ::array testp;
 
 IntegrationRules IntRulesLo(0, Quadrature1D::GaussLobatto);
 IntegrationRules IntRulesCU(0, Quadrature1D::ClosedUniform);
@@ -420,17 +410,17 @@ int main (int argc, char *argv[])
 
 // Setup findpts
    static const double *const elx[D] = INITD(fmesh[0],fmesh[1],fmesh[2]);
-  if (myid==0) {printf("calling findpts_setup\n");}
-//   fd=findpts_setup(&cc,elx,nr,NE,mr,bb_t,
-//                   ntot,ntot,npt_max,tol);
+   if (myid==0) {printf("calling findpts_setup\n");}
+
+//   fd=findpts_setup(&cc,elx,nr,NE,mr,bb_t,ntot,ntot,npt_max,tol);
+
 //kkkk
-   struct handle hh;
    gslib_findpts_lib *gsfl=NULL;
    gsfl = new gslib_findpts_lib;
 
-   cout << sizeof(fd) << " " << &fd << " k10a\n";
-   fd = gsfl->gslib_findpts_setup(*ir, pfespace,pmesh);
-   cout << sizeof(fd) << " " << &fd << " k10b\n";
+   cout << &fd << " " << fd << " k10a\n";
+   gsfl->gslib_findpts_setup(fd,*ir, pfespace,pmesh);
+   cout << &fd << " " << fd << " k10b\n";
    if (myid==0) {printf("done findpts_setup\n");}
 
 // Read x,y,z
@@ -521,17 +511,20 @@ int main (int argc, char *argv[])
 // Print findpts_eval results
   double maxv = -100.;
   struct pt_data *pr = (pt_data*) testp.ptr;;
+  int nbp = 0;
   for (it = 0; it < nxyz; it++)
   {
   if (pr->code < 2) {
   double val = pow(pr->x[0],3)+pow(pr->x[1],2);
   double delv = abs(val-pr->ex[0]);
   if (delv > maxv) {maxv = delv;}
+  if (pr->code == 1) {nbp += 1;}
   }
   ++pr;
 
   }
   cout << "maximum error is: " << maxv << " \n";
+  cout << "border points: " << nbp << " \n";
 
   findpts_free(fd);
 
