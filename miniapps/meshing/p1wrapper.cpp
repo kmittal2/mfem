@@ -41,22 +41,22 @@ private:
 public:
       gslib_findpts_lib() {};
 
-      virtual void gslib_findpts_setup(struct handle h, const IntegrationRule &ir,
+      virtual void gslib_findpts_setup(struct findpts_data *fda, const IntegrationRule &ir,
                                        ParFiniteElementSpace *pfes, ParMesh *pmesh);
 
       virtual void gslib_findpts(Vector &pcode, Vector $pproc, Vector &pel, 
                                  Vector &pr, Vector &pdist2,
                       const Vector &xp, const Vector &yp, const Vector &zp, const double nxyz, 
-                      const struct findpts_data &fda);
+                      const struct findpts_data *fda);
 
       virtual void gslib_findpts_eval (const Vector &fieldin,  
                    const Vector &pcode,const Vector &pproc,const Vector &pel, 
-                   const Vector fieldout, const double nxyz, const struct findpts_data &fda);
+                   const Vector fieldout, const double nxyz, const struct findpts_data *fda);
 };
 
-void gslib_findpts_lib::gslib_findpts_setup(struct handle h, const IntegrationRule &ir,    ParFiniteElementSpace *pfes, ParMesh *pmesh)
+void gslib_findpts_lib::gslib_findpts_setup(struct findpts_data *fda, const IntegrationRule &ir,    ParFiniteElementSpace *pfes, ParMesh *pmesh)
 {
-   struct findpts_data *fda;
+    cout << sizeof(fda) << " " << &fda << " k10aa\n";
    const int NE = pfes->GetParMesh()->GetNE(), nsp = ir.GetNPoints(),
    dim = pfes->GetFE(0)->GetDim(),NR=sqrt(nsp),NS=NR,NT=NR;
    int np;
@@ -107,30 +107,27 @@ void gslib_findpts_lib::gslib_findpts_setup(struct handle h, const IntegrationRu
 
 // Setup findpts
    static const double *const elx[D] = INITD(fmesh[0],fmesh[1],fmesh[2]);
-   cout << fda << " " << sizeof(fda) << " k10size0\n";
+//   cout << fda << " " << sizeof(fda) << " k10size0\n";
    if (dim==2)
    {
    fda=findpts_setup_2(&cc,elx,nr,NE,mr,bb_t,
                    ntot,ntot,npt_max,tol);
+   cout << sizeof(fda) << " " << &fda << " k10ab\n";
    }
-   cout << fda << " " << sizeof(fda) << " k10size\n";
-   h.ndim = dim;
-   h.data = fda;
-   cout << h.data << " " << sizeof(h.data) << " k10sizea\n";
-   cout << h.ndim << " " << sizeof(h.ndim) << " k10sizea\n";
+//   cout << fda << " " << sizeof(fda) << " k10size\n";
 // Done findpts_setup
 }
 
 void gslib_findpts_lib::gslib_findpts(Vector &pcode, Vector $pproc, Vector &pel, Vector &pr, 
                           Vector &pdist2,
                     const Vector &xp, const Vector &yp, const Vector &zp, const double nxyz, 
-                    const struct findpts_data &fd)
+                    const struct findpts_data *fd)
 {
 }
 
 void gslib_findpts_lib::gslib_findpts_eval (const Vector &fieldin,  
                    const Vector &pcode,const Vector &pproc,const Vector &pel, 
-                   const Vector fieldout, const double nxyz, const struct findpts_data &fd)
+                   const Vector fieldout, const double nxyz, const struct findpts_data *fd)
 {
 }
 
@@ -429,13 +426,9 @@ int main (int argc, char *argv[])
    gslib_findpts_lib *gsfl=NULL;
    gsfl = new gslib_findpts_lib;
 
-   gsfl->gslib_findpts_setup(hh, *ir, pfespace,pmesh);
-   MPI_Barrier(MPI_COMM_WORLD);
-   cout << (hh.data) << " " << sizeof(fd) << " k10size3\n";
-   fd = (findpts_data*) (hh.data);
-   MPI_Barrier(MPI_COMM_WORLD);
-   cout << fd << " " << sizeof(fd) << " k10size2\n";
-   MPI_Barrier(MPI_COMM_WORLD);
+   cout << sizeof(fd) << " " << &fd << " k10a\n";
+   gsfl->gslib_findpts_setup(fd, *ir, pfespace,pmesh);
+   cout << sizeof(fd) << " " << &fd << " k10b\n";
    if (myid==0) {printf("done findpts_setup\n");}
 
 // Read x,y,z
