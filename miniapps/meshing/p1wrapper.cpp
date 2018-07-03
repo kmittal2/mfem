@@ -1,5 +1,7 @@
 ﻿// r-adapt shape+size:
 // ./cfp -m square.mesh -qo 4
+//mpirun -np 2 p1wrapper -m RT2D.mesh -qo 14 -qe 12 -o 3
+// TO DO: Add checks inside wrapper for array sizes etc...
 //
 #include "mfem.hpp"
 extern "C" {
@@ -14,12 +16,6 @@ extern "C" {
 using namespace mfem;
 using namespace std;
 
-
-static uint np, id;
-//struct pt_data { double x[D], r[D], dist2, ex[D]; uint code, proc, el; };
-//static struct ::array testp;
-
-
 IntegrationRules IntRulesLo(0, Quadrature1D::GaussLobatto);
 IntegrationRules IntRulesCU(0, Quadrature1D::ClosedUniform);
 
@@ -28,13 +24,14 @@ struct handle { void *data; unsigned ndim; };
 class gslib_findpts_lib
 {
 protected: 
-        int dim, nel, qo, msz;
+//        int dim, nel, qo, msz;
 private:
         IntegrationRule ir;
         double *fmesh;
         struct findpts_data_2 *fda;
         struct findpts_data_3 *fdb;
         struct comm cc;
+        int dim, nel, qo, msz;
 
 public:
       gslib_findpts_lib (ParFiniteElementSpace *pfes, ParMesh *pmesh, int QORDER);
@@ -65,9 +62,8 @@ gslib_findpts_lib::gslib_findpts_lib (ParFiniteElementSpace *pfes, ParMesh *pmes
    else
      {msz = nel*qo*qo*qo;}
    this->fmesh = new double[dim*msz];
-   cout << "findpts_setup size " << dim*msz << " " << QORDER << " " << nel << " " << qo <<  " k10c\n";
 
-   const int NE = nel, nsp = this->ir.GetNPoints(), NR = qo, NS = qo, NT = qo;
+   const int NE = nel, nsp = this->ir.GetNPoints(), NR = qo;
    int np;
    ParGridFunction nodes(pfes);
    pmesh->GetNodes(nodes);
@@ -76,9 +72,6 @@ gslib_findpts_lib::gslib_findpts_lib (ParFiniteElementSpace *pfes, ParMesh *pmes
    {
     np = 0;
     int npt = NE*nsp;
-    static const unsigned nr[2] = {NR,NS};
-    static const unsigned mr[2] = {2*NR,2*NS};
-    double dumfield[NE*NR*NS];
     for (int i = 0; i < NE; i++)
     {
        for (int j = 0; j < nsp; j++)
@@ -92,14 +85,25 @@ gslib_findpts_lib::gslib_findpts_lib (ParFiniteElementSpace *pfes, ParMesh *pmes
    } //end dim==2
    else
    {
-//     3D STUFF goes here
+    np = 0; 
+    int npt = NE*nsp;
+    for (int i = 0; i < NE; i++)
+    {  
+       for (int j = 0; j < nsp; j++)
+       { 
+         const IntegrationPoint &ip = this->ir.IntPoint(j);
+         this->fmesh[0+np] = nodes.GetValue(i, ip, 1);
+         this->fmesh[npt+np] =nodes.GetValue(i, ip, 2);
+         this->fmesh[npt+2*np] =nodes.GetValue(i, ip, 3);
+         np = np+1;
+       }
+    }
    }
 }
 
 void gslib_findpts_lib::gslib_findpts_setup()
 {
-   const int NE = nel, nsp = this->ir.GetNPoints(), NR = qo, NS = qo, NT = qo;
-   int np;
+   const int NE = nel, nsp = this->ir.GetNPoints(), NR = qo;
    comm_init(&this->cc,MPI_COMM_WORLD);
    double bb_t = 0.05;
    int npt_max = 256;
@@ -108,18 +112,19 @@ void gslib_findpts_lib::gslib_findpts_setup()
 
    if (dim==2)
    {
-    np = 0;
     int npt = NE*nsp;
-    static const unsigned nr[2] = {NR,NS};
-    static const unsigned mr[2] = {2*NR,2*NS};
-    static const double *const elx[2] = {&this->fmesh[0],&this->fmesh[npt]};
-    cout << this->fmesh << " " << qo << " k10size fmesh\n";
-    this->fda=findpts_setup_2(&this->cc,elx,nr,NE,mr,bb_t,
-                   ntot,ntot,npt_max,tol);
+    unsigned nr[2] = {NR,NR};
+    unsigned mr[2] = {2*NR,2*NR};
+    double *const elx[2] = {&this->fmesh[0],&this->fmesh[npt]};
+    this->fda=findpts_setup_2(&this->cc,elx,nr,NE,mr,bb_t,ntot,ntot,npt_max,tol);
    }
    else
    {
-//     3D STUFF goes here
+    int npt = NE*nsp;
+    unsigned nr[3] = {NR,NR,NR};
+    unsigned mr[3] = {2*NR,2*NR,2*NR};
+    double *const elx[3] = {&this->fmesh[0],&this->fmesh[npt],&this->fmesh[2*npt]};
+    this->fdb=findpts_setup_3(&this->cc,elx,nr,NE,mr,bb_t,ntot,ntot,npt_max,tol);
    }
 }
 
@@ -128,9 +133,8 @@ void gslib_findpts_lib::gslib_findpts(uint *pcode, uint *pproc, uint *pel,double
 
     if (dim==2)
     {
-    cout << this->fmesh << " " << qo << " k10size fmesh\n";
     int npt = nel*qo*qo;
-    static const double *const elx[2] = {&fmesh[0],&fmesh[npt]};
+    const double *const elx[2] = {&fmesh[0],&fmesh[npt]};
     const double *xv_base[2];
     xv_base[0]=xp, xv_base[1]=yp;
     unsigned xv_stride[2];
@@ -152,9 +156,29 @@ void gslib_findpts_lib::gslib_findpts(uint *pcode, uint *pproc, uint *pel,double
     }
    else
    {
-//     3D STUFF goes here
+    int npt = nel*qo*qo*qo;
+    const double *const elx[3] = {&fmesh[0],&fmesh[npt],&fmesh[2*npt]};
+    const double *xv_base[3];
+    xv_base[0]=xp, xv_base[1]=yp;xv_base[2]=zp;
+    unsigned xv_stride[3];
+    xv_stride[0] = sizeof(double),
+    xv_stride[1] = sizeof(double);
+    xv_stride[2] = sizeof(double);
+    uint *const code_base = pcode;
+    uint *const proc_base = pproc;
+    uint *const el_base = pel;
+    double *const r_base = pr;
+    double *const dist_base = pd;
+    findpts_3(
+      code_base,sizeof(uint),
+      proc_base,sizeof(uint),
+      el_base,sizeof(uint),
+      pr,sizeof(double)*dim,
+      dist_base,sizeof(double),
+      xv_base,     xv_stride,
+      nxyz,this->fdb);
    }
-    cout <<  " done in findpts\n";
+   if (this->cc.id==0) {cout <<  "Done findpts\n";}
 }
 
 void gslib_findpts_lib::gslib_findpts_eval(
@@ -163,9 +187,8 @@ void gslib_findpts_lib::gslib_findpts_eval(
 {
     if (dim==2)
     {
-    cout << this->fmesh << " " << qo << " k10size fmesh\n";
     int npt = nel*qo*qo;
-    static const double *const elx[2] = {&fmesh[0],&fmesh[npt]};
+    const double *const elx[2] = {&fmesh[0],&fmesh[npt]};
     uint *const code_base = pcode;
     uint *const proc_base = pproc;
     uint *const el_base = pel;
@@ -181,9 +204,22 @@ void gslib_findpts_lib::gslib_findpts_eval(
     }
    else
    {
-//     3D STUFF goes here
+    int npt = nel*qo*qo;
+    const double *const elx[3] = {&fmesh[0],&fmesh[npt],&fmesh[2*npt]};
+    uint *const code_base = pcode;
+    uint *const proc_base = pproc;
+    uint *const el_base = pel;
+    double *const r_base = pr;
+    double *const out_base = fieldout;
+    double *const in_base = fieldin;
+    findpts_eval_3(out_base,sizeof(double),
+      code_base,sizeof(uint),
+      proc_base,sizeof(uint),
+      el_base,sizeof(uint),
+      pr,sizeof(double)*dim,
+      nxyz,fieldin,this->fdb);
    }
-    cout << " done findpts eval\n";
+   if (this->cc.id==0) {cout <<  "Done findpts_eval\n";}
 }
 
 void gslib_findpts_lib::gslib_findpts_free ()
@@ -194,7 +230,7 @@ void gslib_findpts_lib::gslib_findpts_free ()
  }
  else
  {
-  findpts_free_3(fdb);
+  findpts_free_3(this->fdb);
  }
 }
 
@@ -250,6 +286,7 @@ int main (int argc, char *argv[])
    double jitter         = 0.0;
    int quad_type         = 1;
    int quad_order        = 8;
+   int quad_eval         = 8;
    bool visualization    = true;
    int verbosity_level   = 0;
 
@@ -271,6 +308,8 @@ int main (int argc, char *argv[])
                   "2: Gauss-Legendre\n\t"
                   "3: Closed uniform points");
    args.AddOption(&quad_order, "-qo", "--quad_order",
+                  "Order of the quadrature rule.");
+   args.AddOption(&quad_eval, "-qe", "--quad_eval",
                   "Order of the quadrature rule.");
    args.AddOption(&visualization, "-vis", "--visualization", "-no-vis",
                   "--no-visualization",
@@ -406,7 +445,7 @@ int main (int argc, char *argv[])
 //   cout << quad_order << " the quad_order" << endl;
    switch (quad_type)
    {
-      case 1: ir = &IntRulesLo.Get(geom_type, quad_order), irb = &IntRulesLo.Get(geom_type, 2*quad_order);
+      case 1: ir = &IntRulesLo.Get(geom_type, quad_order), irb = &IntRulesLo.Get(geom_type, quad_eval);
    }
     int quad_order_ac;
     if ( quad_order % 2 == 0)
@@ -455,7 +494,7 @@ int main (int argc, char *argv[])
          const IntegrationPoint &ip = ir->IntPoint(j);
         fx[0][np] = nodes.GetValue(i, ip, 1); 
         fx[1][np] =nodes.GetValue(i, ip, 2);
-        dumfield[np] = pow(fx[0][np],3)+pow(fx[1][np],2);
+        dumfield[np] = pow(fx[0][np],2)+pow(fx[1][np],2);
         np = np+1;
       }
    }
@@ -471,7 +510,7 @@ int main (int argc, char *argv[])
          const IntegrationPoint &ipb = irb->IntPoint(j);
         fxb[0][np] = nodes.GetValue(i, ipb, 1);
         fxb[1][np] =nodes.GetValue(i, ipb, 2);
-        dumfieldb[np] = pow(fxb[0][np],3)+pow(fxb[1][np],2);
+        dumfieldb[np] = pow(fxb[0][np],2)+pow(fxb[1][np],2);
 //        cout << i << " " << j << " " << np << " "  << fxb[0][np] << " " << fxb[1][np] << " " << dumfieldb[np] << " k10mesh\n";
         np = np+1;
       }
@@ -481,27 +520,28 @@ int main (int argc, char *argv[])
    gslib_findpts_lib *gsfl=NULL;
    gslib_findpts_lib *gsflb=NULL;
    gsfl = new gslib_findpts_lib(pfespace,pmesh,quad_order);
-   gsflb = new gslib_findpts_lib(pfespace,pmesh,2*quad_order);
+   gsflb = new gslib_findpts_lib(pfespace,pmesh,quad_eval);
 
    gsfl->gslib_findpts_setup();
    gsflb->gslib_findpts_setup();
-   if (myid==0) {printf("done findpts_setup\n");}
+   if (myid==0) {cout <<  "Done findpts_setup\n";}
 
 // Read x,y,z
-  int nlim = 1000;
+  int nlim = 50000;
   double *vrx = new double[nlim];
   double *vry = new double[nlim];
   double *vrz = new double[nlim];
   int it = 0;
   double r1,r2,r3;
   int nxyz;
-  std::ifstream infile("randrst.txt");
+//  std::ifstream infile("randrst.txt");
+  std::ifstream infile("randRT2d2.txt");
   std::string line;
  
   std::getline(infile, line);
   std::istringstream iss(line);
   iss >> nxyz;
-  if (myid==0) {cout << nxyz << " number of points about to be read\n";}
+  if (myid==0) {cout << "Number of points per processor: " << nxyz << " \n";}
 
   it = 1;
   while (std::getline(infile, line))
@@ -520,10 +560,10 @@ int main (int argc, char *argv[])
     double pr[nxyz*dim];
     double pd[nxyz];
     double fout[nxyz];
-    gsflb->gslib_findpts(pcode,pproc,pel,pr,pd,vrx,vry,vrz,nxyz);
+    gsfl->gslib_findpts(pcode,pproc,pel,pr,pd,vrx,vry,vrz,nxyz);
 //    gsfl->gslib_findpts_eval(fout,pcode,pproc,pel,pr,dumfield,nxyz);
     gsflb->gslib_findpts_eval(fout,pcode,pproc,pel,pr,dumfieldb,nxyz);
-//    gsfl->gslib_findpts_free();
+    gsfl->gslib_findpts_free();
     gsflb->gslib_findpts_free();
 
     int nbp = 0;
@@ -531,7 +571,7 @@ int main (int argc, char *argv[])
     for (it = 0; it < nxyz; it++)
     {
     if (pcode[it] < 2) {
-    double val = pow(vrx[it],3)+pow(vry[it],2);
+    double val = pow(vrx[it],2)+pow(vry[it],2);
     double delv = abs(val-fout[it]);
     if (delv > maxv) {maxv = delv;}
     if (pcode[it] == 1) {nbp += 1;}
