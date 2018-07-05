@@ -57,6 +57,7 @@ gslib_findpts_lib::gslib_findpts_lib (ParFiniteElementSpace *pfes, ParMesh *pmes
    dim = pmesh->Dimension();
    nel = pmesh->GetNE();
    qo = sqrt(ir.GetNPoints());
+   if (dim==3) qo = cbrt(ir.GetNPoints());
    if (dim==2) 
      {msz = nel*qo*qo;}
    else
@@ -83,9 +84,9 @@ gslib_findpts_lib::gslib_findpts_lib (ParFiniteElementSpace *pfes, ParMesh *pmes
        }
     }
    } //end dim==2
-   else
-   {
-    np = 0; 
+  else
+  {
+   np = 0; 
     int npt = NE*nsp;
     for (int i = 0; i < NE; i++)
     {  
@@ -94,7 +95,7 @@ gslib_findpts_lib::gslib_findpts_lib (ParFiniteElementSpace *pfes, ParMesh *pmes
          const IntegrationPoint &ip = this->ir.IntPoint(j);
          this->fmesh[0+np] = nodes.GetValue(i, ip, 1);
          this->fmesh[npt+np] =nodes.GetValue(i, ip, 2);
-         this->fmesh[npt+2*np] =nodes.GetValue(i, ip, 3);
+         this->fmesh[2*npt+np] =nodes.GetValue(i, ip, 3);
          np = np+1;
        }
     }
@@ -109,10 +110,11 @@ void gslib_findpts_lib::gslib_findpts_setup()
    int npt_max = 256;
    double tol = 1.e-12;
    int ntot = pow(NR,dim)*NE;
+   int npt = NE*NR*NR;
+   if (dim==3) {npt *= NR;}
 
    if (dim==2)
    {
-    int npt = NE*nsp;
     unsigned nr[2] = {NR,NR};
     unsigned mr[2] = {2*NR,2*NR};
     double *const elx[2] = {&this->fmesh[0],&this->fmesh[npt]};
@@ -120,7 +122,6 @@ void gslib_findpts_lib::gslib_findpts_setup()
    }
    else
    {
-    int npt = NE*nsp;
     unsigned nr[3] = {NR,NR,NR};
     unsigned mr[3] = {2*NR,2*NR,2*NR};
     double *const elx[3] = {&this->fmesh[0],&this->fmesh[npt],&this->fmesh[2*npt]};
@@ -130,7 +131,6 @@ void gslib_findpts_lib::gslib_findpts_setup()
 
 void gslib_findpts_lib::gslib_findpts(uint *pcode, uint *pproc, uint *pel,double *pr,double *pd,double *xp, double *yp, double *zp, int nxyz)
 {
-
     if (dim==2)
     {
     int npt = nel*qo*qo;
@@ -178,7 +178,7 @@ void gslib_findpts_lib::gslib_findpts(uint *pcode, uint *pproc, uint *pel,double
       xv_base,     xv_stride,
       nxyz,this->fdb);
    }
-   if (this->cc.id==0) {cout <<  "Done findpts\n";}
+//   if (this->cc.id==0) {cout <<  "Done findpts\n";}
 }
 
 void gslib_findpts_lib::gslib_findpts_eval(
@@ -219,7 +219,7 @@ void gslib_findpts_lib::gslib_findpts_eval(
       pr,sizeof(double)*dim,
       nxyz,fieldin,this->fdb);
    }
-   if (this->cc.id==0) {cout <<  "Done findpts_eval\n";}
+//   if (this->cc.id==0) {cout <<  "Done findpts_eval\n";}
 }
 
 void gslib_findpts_lib::gslib_findpts_free ()
@@ -236,36 +236,6 @@ void gslib_findpts_lib::gslib_findpts_free ()
 
 //IntegrationRules IntRulesLo(0, Quadrature1D::GaussLobatto);
 //IntegrationRules IntRulesCU(0, Quadrature1D::ClosedUniform);
-
-#define D 2
-
-#if D==3
-#define INITD(a,b,c) {a,b,c}
-#define MULD(a,b,c) ((a)*(b)*(c))
-#define findpts_data  findpts_data_3
-#elif D==2
-#define INITD(a,b,c) {a,b}
-#define MULD(a,b,c) ((a)*(b))
-#define findpts_data  findpts_data_2
-#endif
-
-#if D==3
-#define INITD(a,b,c) {a,b,c}
-#define MULD(a,b,c) ((a)*(b)*(c))
-#define findpts_data  findpts_data_3
-#define findpts_setup findpts_setup_3
-#define findpts_free  findpts_free_3
-#define findpts       findpts_3
-#define findpts_eval  findpts_eval_3
-#elif D==2
-#define INITD(a,b,c) {a,b}
-#define MULD(a,b,c) ((a)*(b))
-#define findpts_data  findpts_data_2
-#define findpts_setup findpts_setup_2
-#define findpts_free  findpts_free_2
-#define findpts       findpts_2
-#define findpts_eval  findpts_eval_2
-#endif
 
 int main (int argc, char *argv[])
 {
@@ -322,7 +292,7 @@ int main (int argc, char *argv[])
       args.PrintUsage(cout);
       return 1;
    }
-   args.PrintOptions(cout);
+   if (myid == 0) {args.PrintOptions(cout);}
 
    // 3. Initialize and refine the starting mesh.
    Mesh *mesh = new Mesh(mesh_file, 1, 1, false);
@@ -443,6 +413,11 @@ int main (int argc, char *argv[])
    const IntegrationRule *irb = NULL;
    const int geom_type = pfespace->GetFE(0)->GetGeomType();
 //   cout << quad_order << " the quad_order" << endl;
+   if (quad_order > 4) 
+   {
+    if (quad_order % 2 == 0) {quad_order = 2*quad_order - 4;}
+    else {quad_order = 2*quad_order - 3;}
+   }
    switch (quad_type)
    {
       case 1: ir = &IntRulesLo.Get(geom_type, quad_order), irb = &IntRulesLo.Get(geom_type, quad_eval);
@@ -456,7 +431,6 @@ int main (int argc, char *argv[])
      {
         quad_order_ac = (quad_order+3)/2;
      }
-//   cout << quad_order_ac  << " Expected " << endl;
    if (myid==0) {cout << "Quadrature points per cell: " << ir->GetNPoints() << endl;}
    he_nlf_integ->SetIntegrationRule(*ir);
 
@@ -464,67 +438,61 @@ int main (int argc, char *argv[])
    const int NE = pfespace->GetMesh()->GetNE(),
    dof = pfespace->GetFE(0)->GetDof(), nsp = ir->GetNPoints();
    const int nspb = irb->GetNPoints();
-//   cout << NE << " k10ne" << endl;
-//   const ParGridFunction &nodes = pmesh->GetNodes();
    
    ParGridFunction nodes(pfespace);
    pmesh->GetNodes(nodes);
 
 
-   const int NR = sqrt(nsp);
-   int NS = NR,NT=NR;
-   const int NRb = sqrt(nspb);
+   int NR = sqrt(nsp);
+   int NRb = sqrt(nspb);
+   if (dim==3) {NR = cbrt(nsp); NRb = cbrt(nspb);}
 
-//   static const unsigned nr[D] = INITD(NR,NS,NT);
-//   static const unsigned mr[D] = INITD(2*NR,2*NS,2*NT);
-//   double zr[NR], zs[NS], zt[NT];
-   double fx[D][NE*MULD(NR,NS,NT)];
-   double dumfield[NE*MULD(NR,NS,NT)];
-   double fxb[D][NE*MULD(NRb,NRb,NRb)];
-   double dumfieldb[NE*MULD(NRb,NRb,NRb)];
-  int np;
+   int sz1 = NR*NR, szb = NRb*NRb;
+   if (dim==3) {sz1 *= NR; szb *= NRb;}
+   double fx[dim*NE*sz1], fxb[dim*NE*szb];
+   double dumfield[NE*sz1], dumfieldb[NE*szb];
+   int np;
 
    np = 0;
-   if (dim==2) 
-   {
+   int tnp = NE*nsp;
    for (int i = 0; i < NE; i++)
    {
       for (int j = 0; j < nsp; j++)
       {
          const IntegrationPoint &ip = ir->IntPoint(j);
-        fx[0][np] = nodes.GetValue(i, ip, 1); 
-        fx[1][np] =nodes.GetValue(i, ip, 2);
-        dumfield[np] = pow(fx[0][np],2)+pow(fx[1][np],2);
+        fx[np] = nodes.GetValue(i, ip, 1); 
+        fx[tnp+np] =nodes.GetValue(i, ip, 2);
+        dumfield[np] = pow(fx[np],2)+pow(fx[tnp+np],2);
+        if (dim==3) {fx[2*tnp+np] =nodes.GetValue(i, ip, 3);
+                    dumfield[np] += pow(fx[2*tnp+np],2);}
         np = np+1;
       }
    }
-   }
 
    np = 0;
-   if (dim==2)
-   {
+   tnp = NE*nspb;
    for (int i = 0; i < NE; i++)
    {
       for (int j = 0; j < nspb; j++)
       {
          const IntegrationPoint &ipb = irb->IntPoint(j);
-        fxb[0][np] = nodes.GetValue(i, ipb, 1);
-        fxb[1][np] =nodes.GetValue(i, ipb, 2);
-        dumfieldb[np] = pow(fxb[0][np],2)+pow(fxb[1][np],2);
-//        cout << i << " " << j << " " << np << " "  << fxb[0][np] << " " << fxb[1][np] << " " << dumfieldb[np] << " k10mesh\n";
+        fxb[np] = nodes.GetValue(i, ipb, 1);
+        fxb[tnp+np] =nodes.GetValue(i, ipb, 2);
+        dumfieldb[np] = pow(fxb[np],2)+pow(fxb[tnp+np],2);
+        if (dim==3) {fxb[2*tnp+np] =nodes.GetValue(i, ipb, 3);
+                     dumfieldb[np] += pow(fxb[2*tnp+np],2);}
         np = np+1;
       }
    }
-   }
 //kkkk
    gslib_findpts_lib *gsfl=NULL;
-   gslib_findpts_lib *gsflb=NULL;
+//   gslib_findpts_lib *gsflb=NULL;
    gsfl = new gslib_findpts_lib(pfespace,pmesh,quad_order);
-   gsflb = new gslib_findpts_lib(pfespace,pmesh,quad_eval);
+//   gsflb = new gslib_findpts_lib(pfespace,pmesh,quad_eval);
 
    gsfl->gslib_findpts_setup();
-   gsflb->gslib_findpts_setup();
-   if (myid==0) {cout <<  "Done findpts_setup\n";}
+//   gsflb->gslib_findpts_setup();
+//   if (myid==0) {cout <<  "Done findpts_setup\n";}
 
 // Read x,y,z
   int nlim = 50000;
@@ -534,25 +502,38 @@ int main (int argc, char *argv[])
   int it = 0;
   double r1,r2,r3;
   int nxyz;
-//  std::ifstream infile("randrst.txt");
-  std::ifstream infile("randRT2d2.txt");
+//  std::ifstream infile("randsqm.txt"); //from 0 to 1 for square mesh
+//   std::ifstream infile("randRT2d2.txt"); //for curvy 2D mesh
+   std::ifstream infile("randRT3d.txt"); //for curvy 2D mesh
+//  std::ifstream infile("randrst.txt"); // collection of r,s,t between -1 and 1 
+ 
   std::string line;
  
   std::getline(infile, line);
   std::istringstream iss(line);
   iss >> nxyz;
-  if (myid==0) {cout << "Number of points per processor: " << nxyz << " \n";}
+  int npp = nxyz/num_procs;
 
-  it = 1;
+// make sure not all procs are finding the same point
+  it = 0;
+  int nn = 0;
+  int lc = (myid)*npp;
+  int uc = (myid+1)*npp;
   while (std::getline(infile, line))
-  { 
+  {
     std::istringstream iss(line);
       iss >>  r1 >>  r2 >>  r3;
-      vrx[it-1] = r1;
-      vry[it-1] = r2;
-      vrz[it-1] = r3;
-    it = it+1;
+      if (nn>lc && nn < uc)
+      {
+      vrx[it] = r1;
+      vry[it] = r2;
+      vrz[it] = r3;
+      it += 1;
+      }
+      nn += 1;
    }
+   nxyz = it+1;
+   if (myid==0) {cout << "Points to be found: " << nxyz*num_procs << " \n";}
 
     uint pcode[nxyz];
     uint pproc[nxyz];
@@ -560,31 +541,60 @@ int main (int argc, char *argv[])
     double pr[nxyz*dim];
     double pd[nxyz];
     double fout[nxyz];
+    int start_s=clock();
     gsfl->gslib_findpts(pcode,pproc,pel,pr,pd,vrx,vry,vrz,nxyz);
-//    gsfl->gslib_findpts_eval(fout,pcode,pproc,pel,pr,dumfield,nxyz);
-    gsflb->gslib_findpts_eval(fout,pcode,pproc,pel,pr,dumfieldb,nxyz);
+    MPI_Barrier(MPI_COMM_WORLD);
+    int stop_s=clock();
+    if (myid==0) {cout << "findpts order: " << NR << " \n";}
+    if (myid==0) {cout << "findpts time (sec): " << (stop_s-start_s)/1000000. << endl;}
+// FINDPTS_EVAL
+    MPI_Barrier(MPI_COMM_WORLD);
+    start_s=clock();
+    gsfl->gslib_findpts_eval(fout,pcode,pproc,pel,pr,dumfield,nxyz);
+    stop_s=clock();
+    if (myid==0) {cout << "findpts_eval time (sec): " << (stop_s-start_s)/1000000. << endl;}
+//    gsflb->gslib_findpts_eval(fout,pcode,pproc,pel,pr,dumfieldb,nxyz);
     gsfl->gslib_findpts_free();
-    gsflb->gslib_findpts_free();
+//    gsflb->gslib_findpts_free();
 
     int nbp = 0;
+    int nnpt = 0;
+    int nerrh = 0;
     double maxv = -100.;
     for (it = 0; it < nxyz; it++)
     {
     if (pcode[it] < 2) {
     double val = pow(vrx[it],2)+pow(vry[it],2);
+    if (dim==3) val += pow(vrz[it],2);
     double delv = abs(val-fout[it]);
     if (delv > maxv) {maxv = delv;}
     if (pcode[it] == 1) {nbp += 1;}
+    if (delv > 1.e-10) {nerrh += 1;}
 //    cout << it << " " << vrx[it] << " " << vry[it] << " " << fout[it] << " k10a\n";
     }
+    else
+    {
+     nnpt += 1;
     }
-    cout << "maximum error is: " << maxv << " \n";
-    cout << "border points: " << nbp << " \n";
+    }
+  MPI_Barrier(MPI_COMM_WORLD);
+  double glob_maxerr;
+  MPI_Allreduce(&maxv, &glob_maxerr, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+  int glob_nnpt;
+  MPI_Allreduce(&nnpt, &glob_nnpt, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+  int glob_nbp;
+  MPI_Allreduce(&nbp, &glob_nbp, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+  int glob_nerrh;
+  MPI_Allreduce(&nerrh, &glob_nerrh, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+  cout << setprecision(16);
+  if (myid==0) {cout << "maximum error: " << glob_maxerr << " \n";}
+  if (myid==0) {cout << "points not found: " << glob_nnpt << " \n";}
+  if (myid==0) {cout << "points on element border: " << glob_nbp << " \n";}
+  if (myid==0) {cout << "points with error > 1.e-10: " << glob_nerrh << " \n";}
 
    delete pfespace;
    delete fec;
    delete pmesh;
-
    MPI_Finalize();
 
    return 0;
