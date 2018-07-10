@@ -1,6 +1,6 @@
+#undef MPI
 #ifndef TYPES_H
 #define TYPES_H
-#define MPI
 #include <limits.h>
 
 /* 

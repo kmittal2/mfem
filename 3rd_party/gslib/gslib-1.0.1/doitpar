@@ -1,7 +1,5 @@
 make clean
 rm -rf ../lib
-cp typespar.h src/types.h
-cp typespar.h src/cpp/types.h
 make CC=mpicc 
 mkdir `pwd`/../lib
 make PREFIX="`pwd`/../lib" install

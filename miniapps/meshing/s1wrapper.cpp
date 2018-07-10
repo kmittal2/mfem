@@ -1,11 +1,11 @@
 ﻿// r-adapt shape+size:
 // ./cfp -m square.mesh -qo 4
-//mpirun -np 2 p1wrapper -m RT2D.mesh -qo 14 -qe 12 -o 3
+// ./s1wrapper -m RT2D.mesh -qo 8 -o 3
 // TO DO: Add checks inside wrapper for array sizes etc...
 //
 #include "mfem.hpp"
 extern "C" {
-# include "3rd_party/gslib/gslib-1.0.1/src/cpp_par/findpts_h.h"
+# include "3rd_party/gslib/gslib-1.0.1/src/cpp_ser/findpts_h.h"
 }
 
 #include <fstream>
@@ -20,25 +20,17 @@ using namespace std;
 IntegrationRules IntRulesLo(0, Quadrature1D::GaussLobatto);
 IntegrationRules IntRulesCU(0, Quadrature1D::ClosedUniform);
 
-#include "fpt_par_wrapper.hpp"
+#include "fpt_ser_wrapper.hpp"
 
 int main (int argc, char *argv[])
 {
-   // 0. Initialize MPI.
-   int num_procs, myid;
-   MPI_Init(&argc, &argv);
-   MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
-   MPI_Comm_rank(MPI_COMM_WORLD, &myid);
-
    // 0. Set the method's default parameters.
    const char *mesh_file = "icf.mesh";
    int mesh_poly_deg     = 1;
    int rs_levels         = 0;
-   int rp_levels         = 0;
    double jitter         = 0.0;
    int quad_type         = 1;
    int quad_order        = 8;
-   int quad_eval         = 8;
    bool visualization    = true;
    int verbosity_level   = 0;
 
@@ -50,8 +42,6 @@ int main (int argc, char *argv[])
                   "Polynomial degree of mesh finite element space.");
    args.AddOption(&rs_levels, "-rs", "--refine-serial",
                   "Number of times to refine the mesh uniformly in serial.");
-   args.AddOption(&rp_levels, "-rp", "--refine-parallel",
-                  "Number of times to refine the mesh uniformly in parallel.");
    args.AddOption(&jitter, "-ji", "--jitter",
                   "Random perturbation scaling factor.");
    args.AddOption(&quad_type, "-qt", "--quad-type",
@@ -60,8 +50,6 @@ int main (int argc, char *argv[])
                   "2: Gauss-Legendre\n\t"
                   "3: Closed uniform points");
    args.AddOption(&quad_order, "-qo", "--quad_order",
-                  "Order of the quadrature rule.");
-   args.AddOption(&quad_eval, "-qe", "--quad_eval",
                   "Order of the quadrature rule.");
    args.AddOption(&visualization, "-vis", "--visualization", "-no-vis",
                   "--no-visualization",
@@ -74,24 +62,22 @@ int main (int argc, char *argv[])
       args.PrintUsage(cout);
       return 1;
    }
-   if (myid == 0) {args.PrintOptions(cout);}
+   args.PrintOptions(cout);
 
-   // 3. Initialize and refine the starting mesh.
+   // 2. Initialize and refine the starting mesh.
    Mesh *mesh = new Mesh(mesh_file, 1, 1, false);
    for (int lev = 0; lev < rs_levels; lev++) { mesh->UniformRefinement(); }
    const int dim = mesh->Dimension();
-   if (myid == 0)
-   {
-      cout << "Mesh curvature: ";
-      if (mesh->GetNodes()) { cout << mesh->GetNodes()->OwnFEC()->Name(); }
-      else { cout << "(NONE)"; }
-      cout << endl;
-   }
-   ParMesh *pmesh = new ParMesh(MPI_COMM_WORLD, *mesh);
-   delete mesh;
-   for (int lev = 0; lev < rp_levels; lev++) { pmesh->UniformRefinement(); }
+   cout << "Mesh curvature: ";
+   if (mesh->GetNodes()) { cout << mesh->GetNodes()->OwnFEC()->Name(); }
+   else { cout << "(NONE)"; }
+   cout << endl;
 
    // 4. Define a finite element space on the mesh. Here we use vector finite
+   //    elements which are tensor products of quadratic finite elements. The
+   //    number of components in the vector finite element space is specified by
+   //    the last parameter of the FiniteElementSpace constructor.
+   // 3. Define a finite element space on the mesh. Here we use vector finite
    //    elements which are tensor products of quadratic finite elements. The
    //    number of components in the vector finite element space is specified by
    //    the last parameter of the FiniteElementSpace constructor.
@@ -102,12 +88,12 @@ int main (int argc, char *argv[])
       mesh_poly_deg = 2;
    }
    else { fec = new H1_FECollection(mesh_poly_deg, dim); }
-   ParFiniteElementSpace *pfespace = new ParFiniteElementSpace(pmesh, fec, dim);
+   FiniteElementSpace *fespace = new FiniteElementSpace(mesh, fec, dim);
 
-   // 5. Make the mesh curved based on the above finite element space. This
+   // 4. Make the mesh curved based on the above finite element space. This
    //    means that we define the mesh elements through a fespace-based
    //    transformation of the reference element.
-   pmesh->SetNodalFESpace(pfespace);
+   mesh->SetNodalFESpace(fespace);
 
    // 6. Set up an empty right-hand side vector b, which is equivalent to b=0.
    Vector b(0);
@@ -115,23 +101,22 @@ int main (int argc, char *argv[])
    // 7. Get the mesh nodes (vertices and other degrees of freedom in the finite
    //    element space) as a finite element grid function in fespace. Note that
    //    changing x automatically changes the shapes of the mesh elements.
-   ParGridFunction x(pfespace);
-   pmesh->SetNodalGridFunction(&x);
+   GridFunction *x = mesh->GetNodes();
 
-   // 8. Define a vector representing the minimal local mesh size in the mesh
+   // 7. Define a vector representing the minimal local mesh size in the mesh
    //    nodes. We index the nodes using the scalar version of the degrees of
-   //    freedom in pfespace.
-   Vector h0(pfespace->GetNDofs());
+   //    freedom in fespace.
+   Vector h0(fespace->GetNDofs());
    h0 = infinity();
    Array<int> dofs;
-   for (int i = 0; i < pmesh->GetNE(); i++)
+   for (int i = 0; i < mesh->GetNE(); i++)
    {
       // Get the local scalar element degrees of freedom in dofs.
-      pfespace->GetElementDofs(i, dofs);
+      fespace->GetElementDofs(i, dofs);
       // Adjust the value of h0 in dofs based on the local mesh size.
       for (int j = 0; j < dofs.Size(); j++)
       {
-         h0(dofs[j]) = min(h0(dofs[j]), pmesh->GetElementSize(i));
+         h0(dofs[j]) = min(h0(dofs[j]), mesh->GetElementSize(i));
       }
    }
 
@@ -140,47 +125,38 @@ int main (int argc, char *argv[])
    //    zero on the boundary and its values are locally of the order of h0.
    //    The latter is based on the DofToVDof() method which maps the scalar to
    //    the vector degrees of freedom in fespace.
-   ParGridFunction rdm(pfespace);
+   GridFunction rdm(fespace);
    rdm.Randomize();
    rdm -= 0.25; // Shift to random values in [-0.5,0.5].
    rdm *= jitter;
    // Scale the random values to be of order of the local mesh size.
-   for (int i = 0; i < pfespace->GetNDofs(); i++)
+   for (int i = 0; i < fespace->GetNDofs(); i++)
    {
       for (int d = 0; d < dim; d++)
       {
-         rdm(pfespace->DofToVDof(i,d)) *= h0(i);
+         rdm(fespace->DofToVDof(i,d)) *= h0(i);
       }
    }
    Array<int> vdofs;
-   for (int i = 0; i < pfespace->GetNBE(); i++)
+   for (int i = 0; i < fespace->GetNBE(); i++)
    {
       // Get the vector degrees of freedom in the boundary element.
-      pfespace->GetBdrElementVDofs(i, vdofs);
+      fespace->GetBdrElementVDofs(i, vdofs);
       // Set the boundary values to zero.
       for (int j = 0; j < vdofs.Size(); j++) { rdm(vdofs[j]) = 0.0; }
    }
-   x -= rdm;
-   // Set the perturbation of all nodes from the true nodes.
-   x.SetTrueVector();
-   x.SetFromTrueVector();
+   *x -= rdm;
 
-   // 10. Save the starting (prior to the optimization) mesh to a file. This
-   //     output can be viewed later using GLVis: "glvis -m perturbed -np
-   //     num_mpi_tasks".
+   // 9. Save the starting (prior to the optimization) mesh to a file. This
+   //    output can be viewed later using GLVis: "glvis -m perturbed.mesh".
    {
-      ostringstream mesh_name;
-      mesh_name << "perturbed." << setfill('0') << setw(6) << myid;
-      ofstream mesh_ofs(mesh_name.str().c_str());
-      mesh_ofs.precision(8);
-      pmesh->Print(mesh_ofs);
+      ofstream mesh_ofs("perturbed.mesh");
+      mesh->Print(mesh_ofs);
    }
 
    // 10. Store the starting (prior to the optimization) positions.
-   // 11. Store the starting (prior to the optimization) positions.
-   ParGridFunction x0(pfespace);
-   x0 = x;
-
+   GridFunction x0(fespace);
+   x0 = *x;
 
    // 12. Setup the quadrature rule for the non-linear form integrator.
    TMOP_Integrator *he_nlf_integ;
@@ -188,12 +164,14 @@ int main (int argc, char *argv[])
    TargetConstructor::TargetType target_t;
    metric = new TMOP_Metric_001;
    TargetConstructor *target_c;
-   target_c = new TargetConstructor(target_t, MPI_COMM_WORLD);
+   target_c = new TargetConstructor(target_t);
    target_c->SetNodes(x0);
    he_nlf_integ = new TMOP_Integrator(metric, target_c);
    const IntegrationRule *ir = NULL;
    const IntegrationRule *irb = NULL;
-   const int geom_type = pfespace->GetFE(0)->GetGeomType();
+   const int geom_type = fespace->GetFE(0)->GetGeomType();
+   int quad_eval = quad_order;
+   int myid = 0;
 //   cout << quad_order << " the quad_order" << endl;
    if (quad_order > 4) 
    {
@@ -217,12 +195,12 @@ int main (int argc, char *argv[])
    he_nlf_integ->SetIntegrationRule(*ir);
 
    // 11. write out all dofs
-   const int NE = pfespace->GetMesh()->GetNE(),
-   dof = pfespace->GetFE(0)->GetDof(), nsp = ir->GetNPoints();
+   const int NE = fespace->GetMesh()->GetNE(),
+   dof = fespace->GetFE(0)->GetDof(), nsp = ir->GetNPoints();
    const int nspb = irb->GetNPoints();
    
-   ParGridFunction nodes(pfespace);
-   pmesh->GetNodes(nodes);
+   GridFunction nodes(fespace);
+   mesh->GetNodes(nodes);
 
 
    int NR = sqrt(nsp);
@@ -269,7 +247,7 @@ int main (int argc, char *argv[])
 //kkkk
    findpts_gslib *gsfl=NULL;
 //   findpts_gslib *gsflb=NULL;
-   gsfl = new findpts_gslib(pfespace,pmesh,quad_order);
+   gsfl = new findpts_gslib(fespace,mesh,quad_order);
 //   gsflb = new findpts_gslib(pfespace,pmesh,quad_eval);
 
    gsfl->gslib_findpts_setup();
@@ -294,6 +272,7 @@ int main (int argc, char *argv[])
   std::getline(infile, line);
   std::istringstream iss(line);
   iss >> nxyz;
+  int num_procs = 1;
   int npp = nxyz/num_procs;
 
 // make sure not all procs are finding the same point
@@ -325,12 +304,10 @@ int main (int argc, char *argv[])
     double fout[nxyz];
     int start_s=clock();
     gsfl->gslib_findpts(pcode,pproc,pel,pr,pd,vrx,vry,vrz,nxyz);
-    MPI_Barrier(MPI_COMM_WORLD);
     int stop_s=clock();
     if (myid==0) {cout << "findpts order: " << NR << " \n";}
     if (myid==0) {cout << "findpts time (sec): " << (stop_s-start_s)/1000000. << endl;}
 // FINDPTS_EVAL
-    MPI_Barrier(MPI_COMM_WORLD);
     start_s=clock();
     gsfl->gslib_findpts_eval(fout,pcode,pproc,pel,pr,dumfield,nxyz);
     stop_s=clock();
@@ -359,25 +336,19 @@ int main (int argc, char *argv[])
      nnpt += 1;
     }
     }
-  MPI_Barrier(MPI_COMM_WORLD);
-  double glob_maxerr;
-  MPI_Allreduce(&maxv, &glob_maxerr, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
-  int glob_nnpt;
-  MPI_Allreduce(&nnpt, &glob_nnpt, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
-  int glob_nbp;
-  MPI_Allreduce(&nbp, &glob_nbp, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
-  int glob_nerrh;
-  MPI_Allreduce(&nerrh, &glob_nerrh, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+  double glob_maxerr=maxv;
+  int glob_nnpt=nnpt;
+  int glob_nbp=nbp;
+  int glob_nerrh=nerrh;
   cout << setprecision(16);
   if (myid==0) {cout << "maximum error: " << glob_maxerr << " \n";}
   if (myid==0) {cout << "points not found: " << glob_nnpt << " \n";}
   if (myid==0) {cout << "points on element border: " << glob_nbp << " \n";}
   if (myid==0) {cout << "points with error > 1.e-10: " << glob_nerrh << " \n";}
 
-   delete pfespace;
+   delete fespace;
    delete fec;
-   delete pmesh;
-   MPI_Finalize();
+   delete mesh;
 
    return 0;
 }

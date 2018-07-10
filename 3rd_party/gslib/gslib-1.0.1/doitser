@@ -1,7 +1,7 @@
 make clean
 rm -rf ../lib
 cp typesser.h src/types.h
-cp typesser.h src/cpp/types.h
+cp typesser.h src/cpp_ser/types.h
 make CC=gcc 
 mkdir `pwd`/../lib
 make PREFIX="`pwd`/../lib" install
