@@ -224,13 +224,11 @@ int main (int argc, char *argv[])
    ParGridFunction nodes(pfespace);
    pmesh->GetNodes(nodes);
 
-
    int NR = sqrt(nsp);
    int NRb = sqrt(nspb);
    if (dim==3) {NR = cbrt(nsp); NRb = cbrt(nspb);}
 
-   int sz1 = NR*NR, szb = NRb*NRb;
-   if (dim==3) {sz1 *= NR; szb *= NRb;}
+   int sz1 = pow(NR,dim), szb = pow(NRb,dim);
    double fx[dim*NE*sz1], fxb[dim*NE*szb];
    double dumfield[NE*sz1], dumfieldb[NE*szb];
    int np;
@@ -272,7 +270,7 @@ int main (int argc, char *argv[])
    gsfl = new findpts_gslib(pfespace,pmesh,quad_order);
 //   gsflb = new findpts_gslib(pfespace,pmesh,quad_eval);
 
-   gsfl->gslib_findpts_setup();
+   gsfl->gslib_findpts_setup(0.05,1.e-12,256);
 //   gsflb->gslib_findpts_setup();
 //   if (myid==0) {cout <<  "Done findpts_setup\n";}
 
@@ -315,6 +313,7 @@ int main (int argc, char *argv[])
       nn += 1;
    }
    nxyz = it+1;
+   if (myid==0) {cout << "Num procs: " << num_procs << " \n";}
    if (myid==0) {cout << "Points to be found: " << nxyz*num_procs << " \n";}
 
     uint pcode[nxyz];

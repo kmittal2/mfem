@@ -1,7 +1,5 @@
 ﻿class findpts_gslib
 {
-protected: 
-//        int dim, nel, qo, msz;
 private:
         IntegrationRule ir;
         double *fmesh;
@@ -13,14 +11,24 @@ private:
 public:
       findpts_gslib (ParFiniteElementSpace *pfes, ParMesh *pmesh, int QORDER);
 
-      void gslib_findpts_setup();
+//    sets up findpts
+      void gslib_findpts_setup(double bb_t, double newt_tol, int npt_max);
 
+//    finds r,s,t,e,p for given x,y,z
       void gslib_findpts(uint *pcode, uint *pproc, uint *pel,
       double *pr,double *pd,double *xp, double *yp, double *zp, int nxyz);
 
+//    Interpolates fieldin for given r,s,t,e,p and puts it in fieldout
       void gslib_findpts_eval (double *fieldout, uint *pcode, uint *pproc, uint *pel,
             double *pr,double *fieldin, int nxyz);
 
+//    routine to convert grid function to a double field
+      void gslib_gf2db (ParGridFunction *pgf, double *fieldout);
+
+//    optional vdif for vector pargridfunction
+      void gslib_gf2db (ParGridFunction *pgf, double *fieldout, int vdim);
+
+//    clears up memory
       void gslib_findpts_free ();
 
       ~findpts_gslib();
@@ -34,93 +42,64 @@ findpts_gslib::findpts_gslib (ParFiniteElementSpace *pfes, ParMesh *pmesh, int Q
    nel = pmesh->GetNE();
    qo = sqrt(ir.GetNPoints());
    if (dim==3) qo = cbrt(ir.GetNPoints());
-   if (dim==2) 
-     {msz = nel*qo*qo;}
-   else
-     {msz = nel*qo*qo*qo;}
+   int nsp = pow(qo,dim);
+   msz = nel*nsp;
    this->fmesh = new double[dim*msz];
 
-   const int NE = nel, nsp = this->ir.GetNPoints(), NR = qo;
-   int np;
+   int npt = nel*nsp;
    ParGridFunction nodes(pfes);
    pmesh->GetNodes(nodes);
 
-   if (dim==2)
-   {
-    np = 0;
-    int npt = NE*nsp;
-    for (int i = 0; i < NE; i++)
-    {
-       for (int j = 0; j < nsp; j++)
-       {
-         const IntegrationPoint &ip = this->ir.IntPoint(j);
-         this->fmesh[0+np] = nodes.GetValue(i, ip, 1);
-         this->fmesh[npt+np] =nodes.GetValue(i, ip, 2);
-         np = np+1;
-       }
-    }
-   } //end dim==2
-  else
-  {
-   np = 0; 
-    int npt = NE*nsp;
-    for (int i = 0; i < NE; i++)
-    {  
-       for (int j = 0; j < nsp; j++)
-       { 
-         const IntegrationPoint &ip = this->ir.IntPoint(j);
-         this->fmesh[0+np] = nodes.GetValue(i, ip, 1);
-         this->fmesh[npt+np] =nodes.GetValue(i, ip, 2);
-         this->fmesh[2*npt+np] =nodes.GetValue(i, ip, 3);
-         np = np+1;
-       }
-    }
+   int np = 0; 
+   for (int i = 0; i < nel; i++)
+   {  
+      for (int j = 0; j < nsp; j++)
+      { 
+        const IntegrationPoint &ip = this->ir.IntPoint(j);
+        for (int k = 0; k < dim; k++)
+        {
+         this->fmesh[k*npt+np] = nodes.GetValue(i, ip, k+1);
+        }
+        np = np+1;
+      }
    }
 }
 
-void findpts_gslib::gslib_findpts_setup()
+void findpts_gslib::gslib_findpts_setup(double bb_t, double newt_tol, int npt_max)
 {
    const int NE = nel, nsp = this->ir.GetNPoints(), NR = qo;
    comm_init(&this->cc,MPI_COMM_WORLD);
-   double bb_t = 0.05;
-   int npt_max = 256;
-   double tol = 1.e-12;
    int ntot = pow(NR,dim)*NE;
-   int npt = NE*NR*NR;
-   if (dim==3) {npt *= NR;}
-
    if (dim==2)
    {
     unsigned nr[2] = {NR,NR};
     unsigned mr[2] = {2*NR,2*NR};
-    double *const elx[2] = {&this->fmesh[0],&this->fmesh[npt]};
-    this->fda=findpts_setup_2(&this->cc,elx,nr,NE,mr,bb_t,ntot,ntot,npt_max,tol);
+    double *const elx[2] = {&this->fmesh[0],&this->fmesh[ntot]};
+    this->fda=findpts_setup_2(&this->cc,elx,nr,NE,mr,bb_t,ntot,ntot,npt_max,newt_tol);
    }
    else
    {
     unsigned nr[3] = {NR,NR,NR};
     unsigned mr[3] = {2*NR,2*NR,2*NR};
-    double *const elx[3] = {&this->fmesh[0],&this->fmesh[npt],&this->fmesh[2*npt]};
-    this->fdb=findpts_setup_3(&this->cc,elx,nr,NE,mr,bb_t,ntot,ntot,npt_max,tol);
+    double *const elx[3] = {&this->fmesh[0],&this->fmesh[ntot],&this->fmesh[2*ntot]};
+    this->fdb=findpts_setup_3(&this->cc,elx,nr,NE,mr,bb_t,ntot,ntot,npt_max,newt_tol);
    }
 }
 
 void findpts_gslib::gslib_findpts(uint *pcode, uint *pproc, uint *pel,double *pr,double *pd,double *xp, double *yp, double *zp, int nxyz)
 {
-    if (dim==2)
-    {
-    int npt = nel*qo*qo;
-    const double *const elx[2] = {&fmesh[0],&fmesh[npt]};
-    const double *xv_base[2];
-    xv_base[0]=xp, xv_base[1]=yp;
-    unsigned xv_stride[2];
-    xv_stride[0] = sizeof(double),
-    xv_stride[1] = sizeof(double);
+    int npt = nel*pow(qo,dim);
     uint *const code_base = pcode;
     uint *const proc_base = pproc;
     uint *const el_base = pel;
     double *const r_base = pr;
     double *const dist_base = pd;
+    if (dim==2)
+    {
+    const double *xv_base[2];
+    xv_base[0]=xp, xv_base[1]=yp;
+    unsigned xv_stride[2];
+    xv_stride[0] = sizeof(double),xv_stride[1] = sizeof(double);
     findpts_2(
       code_base,sizeof(uint),
       proc_base,sizeof(uint),
@@ -133,18 +112,10 @@ void findpts_gslib::gslib_findpts(uint *pcode, uint *pproc, uint *pel,double *pr
    else
    {
     int npt = nel*qo*qo*qo;
-    const double *const elx[3] = {&fmesh[0],&fmesh[npt],&fmesh[2*npt]};
     const double *xv_base[3];
     xv_base[0]=xp, xv_base[1]=yp;xv_base[2]=zp;
     unsigned xv_stride[3];
-    xv_stride[0] = sizeof(double),
-    xv_stride[1] = sizeof(double);
-    xv_stride[2] = sizeof(double);
-    uint *const code_base = pcode;
-    uint *const proc_base = pproc;
-    uint *const el_base = pel;
-    double *const r_base = pr;
-    double *const dist_base = pd;
+    xv_stride[0] = sizeof(double),xv_stride[1] = sizeof(double),xv_stride[2] = sizeof(double);
     findpts_3(
       code_base,sizeof(uint),
       proc_base,sizeof(uint),
@@ -154,23 +125,55 @@ void findpts_gslib::gslib_findpts(uint *pcode, uint *pproc, uint *pel,double *pr
       xv_base,     xv_stride,
       nxyz,this->fdb);
    }
-//   if (this->cc.id==0) {cout <<  "Done findpts\n";}
+}
+
+void findpts_gslib::gslib_gf2db(ParGridFunction *pgf, double *fieldout)
+{
+   int np, npt;
+   np = 0;
+   npt = nel*pow(qo,dim);
+   int nsp = pow(qo,dim);
+   for (int i = 0; i < nel; i++)
+   {  
+     for (int j = 0; j < nsp; j++)
+      { 
+        const IntegrationPoint &ip = this->ir.IntPoint(j);
+        fieldout[np] = pgf->GetValue(i, ip);
+        np = np+1;
+      }
+   }
+}
+
+void findpts_gslib::gslib_gf2db(ParGridFunction *pgf, double *fieldout, int vdim)
+{  
+   int np, npt;
+   np = 0;
+   npt = nel*pow(qo,dim);
+   int nsp = pow(qo,dim);
+   for (int i = 0; i < nel; i++)
+   {  
+     for (int j = 0; j < nsp; j++)
+      { 
+        const IntegrationPoint &ip = this->ir.IntPoint(j);
+        fieldout[np] = pgf->GetValue(i, ip,vdim);
+        np = np+1;
+      }
+   } 
 }
 
 void findpts_gslib::gslib_findpts_eval(
                 double *fieldout, uint *pcode, uint *pproc, uint *pel, double *pr,
                    double *fieldin, int nxyz)
 {
-    if (dim==2)
-    {
-    int npt = nel*qo*qo;
-    const double *const elx[2] = {&fmesh[0],&fmesh[npt]};
     uint *const code_base = pcode;
     uint *const proc_base = pproc;
     uint *const el_base = pel;
     double *const r_base = pr;
     double *const out_base = fieldout;
     double *const in_base = fieldin;
+    int npt = nel*pow(qo,dim);
+    if (dim==2)
+    {
     findpts_eval_2(out_base,sizeof(double),
       code_base,sizeof(uint),
       proc_base,sizeof(uint),
@@ -180,14 +183,6 @@ void findpts_gslib::gslib_findpts_eval(
     }
    else
    {
-    int npt = nel*qo*qo;
-    const double *const elx[3] = {&fmesh[0],&fmesh[npt],&fmesh[2*npt]};
-    uint *const code_base = pcode;
-    uint *const proc_base = pproc;
-    uint *const el_base = pel;
-    double *const r_base = pr;
-    double *const out_base = fieldout;
-    double *const in_base = fieldin;
     findpts_eval_3(out_base,sizeof(double),
       code_base,sizeof(uint),
       proc_base,sizeof(uint),
@@ -195,7 +190,6 @@ void findpts_gslib::gslib_findpts_eval(
       pr,sizeof(double)*dim,
       nxyz,fieldin,this->fdb);
    }
-//   if (this->cc.id==0) {cout <<  "Done findpts_eval\n";}
 }
 
 void findpts_gslib::gslib_findpts_free ()
